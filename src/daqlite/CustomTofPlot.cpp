@@ -123,12 +123,17 @@ void CustomTofPlot::clearDetectorImage() {
 void CustomTofPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
 
-  // Calculate coordinates grouped with bins and retrive data
-  // according to the identified bin.
-  int stepSize = int(mConfig.TOF.MaxValue / mConfig.TOF.BinSize);
-  int dataBinPos = int((x - stepSize / 2) / stepSize);
-  int tofBinPos = int((x + stepSize / 2) / stepSize) * stepSize;
-  double count = mGraph->data()->at(dataBinPos)->mainValue();
+  // Calculate x coord width of the graphical representation of the column
+  int xCoordStep = int(mConfig.TOF.MaxValue / mConfig.TOF.BinSize);
 
-  setToolTip(QString("Tof: %1 Count: %2").arg(tofBinPos).arg(count));
+  // Get the index in data store for the x coordinate
+  int xCoordDataIndex = int((x - xCoordStep / 2) / xCoordStep);
+
+  // Get coulmn middle TOF value for the x coordinate
+  int xCoordTofValue = int((x + xCoordStep / 2) / xCoordStep) * xCoordStep;
+
+  // Get the count value from the data store
+  double count = mGraph->data()->at xCoordDataIndex)->mainValue();
+
+  setToolTip(QString("Tof: %1 Count: %2").arg(xCoordTofValue).arg(count));
 }
