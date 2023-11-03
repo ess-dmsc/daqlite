@@ -133,7 +133,7 @@ void CustomTofPlot::showPointToolTip(QMouseEvent *event) {
   int xCoordTofValue = int((x + xCoordStep / 2) / xCoordStep) * xCoordStep;
 
   // Get the count value from the data store
-  double count = mGraph->data()->at xCoordDataIndex)->mainValue();
+  double count = mGraph->data()->at(xCoordDataIndex)->mainValue();
 
   setToolTip(QString("Tof: %1 Count: %2").arg(xCoordTofValue).arg(count));
 }
