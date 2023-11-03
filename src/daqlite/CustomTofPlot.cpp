@@ -6,6 +6,7 @@
 //===----------------------------------------------------------------------===//
 
 #include <CustomTofPlot.h>
+#include <QPlot/qcustomplot/qcustomplot.h>
 #include <WorkerThread.h>
 #include <algorithm>
 #include <assert.h>
@@ -13,6 +14,11 @@
 #include <string>
 
 CustomTofPlot::CustomTofPlot(Configuration &Config) : mConfig(Config) {
+
+  // Register callback functions for events
+  connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
+          SLOT(showPointToolTip(QMouseEvent *)));
+  setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.Geometry;
 
@@ -111,4 +117,18 @@ void CustomTofPlot::clearDetectorImage() {
   std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
   addData(HistogramTofData);
   plotDetectorImage(true);
+}
+
+// MouseOver, display coordinate and data in tooltip
+void CustomTofPlot::showPointToolTip(QMouseEvent *event) {
+  int x = this->xAxis->pixelToCoord(event->pos().x());
+
+  // Calculate coordinates grouped with bins and retrive data
+  // according to the identified bin.
+  int stepSize = int(mConfig.TOF.MaxValue / mConfig.TOF.BinSize);
+  int dataBinPos = int((x - stepSize / 2) / stepSize);
+  int tofBinPos = int((x + stepSize / 2) / stepSize) * stepSize;
+  double count = mGraph->data()->at(dataBinPos)->mainValue();
+
+  setToolTip(QString("Tof: %1 Count: %2").arg(tofBinPos).arg(count));
 }

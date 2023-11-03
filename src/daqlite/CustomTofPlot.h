@@ -16,6 +16,7 @@
 class CustomTofPlot : public QCustomPlot {
   Q_OBJECT
 public:
+
   /// \brief plot needs the configurable plotting options
   CustomTofPlot(Configuration &Config);
 
@@ -29,6 +30,9 @@ public:
   ///
   void clearDetectorImage();
 
+public slots:
+  void showPointToolTip(QMouseEvent *event);
+  
 private:
   const int TofBinSize{512};
   /// \brief updates the image

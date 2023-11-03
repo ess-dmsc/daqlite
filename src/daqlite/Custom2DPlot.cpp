@@ -15,6 +15,7 @@
 Custom2DPlot::Custom2DPlot(Configuration &Config, Projection Proj)
     : mConfig(Config), mProjection(Proj) {
 
+  // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
           SLOT(showPointToolTip(QMouseEvent *)));
   setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -203,12 +204,12 @@ void Custom2DPlot::addData(std::vector<uint32_t> &Histogram) {
   return;
 }
 
-// MouseOver, display coordinate and data in tool-tip
+// MouseOver, display coordinate and data in tooltip
 void Custom2DPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
   int y = this->yAxis->pixelToCoord(event->pos().y());
 
-  double zValue = mColorMap->data()->data(x, y);
+  double count = mColorMap->data()->data(x, y);
 
-  setToolTip(QString("%1 , %2, %3").arg(x).arg(y).arg(zValue));
+  setToolTip(QString("X: %1 , Y: %2, Count: %3").arg(x).arg(y).arg(count));
 }
