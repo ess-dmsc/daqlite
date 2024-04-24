@@ -1,7 +1,7 @@
 {
   "kafka" : {
-    "broker" : "172.30.242.20:9092",
-    "topic" : "timepix3_detector",
+    "broker" : "10.100.1.19:8093",
+    "topic" : "odin_detector",
 
     "message.max.bytes" : "10000000",
     "fetch.message.max.bytes" : "10000000",
@@ -18,9 +18,9 @@
   },
 
   "tof" : {
-    "scale" : 1,
-    "max_value" : 70000,
-    "bin_size" : 512
+    "scale" : 1000,
+    "max_value" : 72000,
+    "bin_size" : 1024
   },
 
   "plot": {

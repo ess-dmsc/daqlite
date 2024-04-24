@@ -1,7 +1,7 @@
 {
   "kafka" : {
-    "broker" : "172.30.242.20:9092",
-    "topic" : "timepix3_detector",
+    "broker" : "10.100.1.19:8093",
+    "topic" : "odin_detector",
 
     "message.max.bytes" : "10000000",
     "fetch.message.max.bytes" : "10000000",
@@ -22,7 +22,7 @@
     "window_title" : "ODIN all detectors image",
     "plot_title" : "Pixels",
     "clear_periodic" : false,
-    "clear_interval_seconds" : 5,
+    "clear_interval_seconds" : 1,
     "interpolate_pixels" : false,
     "color_gradient" : "hot",
     "invert_gradient" : false,
