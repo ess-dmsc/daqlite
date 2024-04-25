@@ -1,0 +1,16 @@
+{
+  "KafkaParms" : [
+    {"security.protocol" : "SASL_SSL"},
+    {"sasl.mechanism" : "SCRAM-SHA-256"},
+    {"sasl.username" : "ecdc_ops"},
+    {"sasl.password" : "ZoihVS2yloCh7NZ"},
+    {"enable.ssl.certificate.verification" : "true"},
+    {"ssl.endpoint.identification.algorithm" : "none"},
+    {"ssl.ca.location" : "/workspaces/daqlite/configs/cert.crt"},
+    {"message.max.bytes" : "10000000"},
+    {"fetch.message.max.bytes" : "10000000"},
+    {"message.copy.max.bytes" : "10000000"},
+    {"queue.buffering.max.ms" : "100"},
+    {"api.version.request" : "true"}
+  ]
+}
