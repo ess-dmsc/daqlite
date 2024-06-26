@@ -19,7 +19,7 @@
 
   "tof" : {
     "scale" : 1000,
-    "max_value" : 71428,
+    "max_value" : 100000,
     "bin_size" : 1024
   },
 
@@ -28,7 +28,7 @@
     "window_title" : "ODIN TOF",
     "plot_title" : "TOF",
     "clear_periodic" : false,
-    "clear_interval_seconds" : 30,
+    "clear_interval_seconds": 2,
     "interpolate_pixels" : false,
     "color_gradient" : "hot",
     "invert_gradient" : false,

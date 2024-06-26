@@ -22,7 +22,6 @@
     "window_title" : "ODIN all detectors image",
     "plot_title" : "Pixels",
     "clear_periodic" : false,
-    "clear_interval_seconds" : 1,
     "interpolate_pixels" : false,
     "color_gradient" : "hot",
     "invert_gradient" : false,
