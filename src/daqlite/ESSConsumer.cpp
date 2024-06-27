@@ -9,17 +9,21 @@
 #include "ev44_events_generated.h"
 #include <ESSConsumer.h>
 #include <algorithm>
+#include <cstddef>
+#include <cstdint>
 #include <fmt/format.h>
 #include <iostream>
 #include <unistd.h>
 #include <vector>
 
-ESSConsumer::ESSConsumer(Configuration &Config, std::vector<std::pair<std::string, std::string>> &KafkaConfig) :
-    mConfig(Config), mKafkaConfig(KafkaConfig) {
+ESSConsumer::ESSConsumer(
+    Configuration &Config,
+    std::vector<std::pair<std::string, std::string>> &KafkaConfig)
+    : mConfig(Config), mKafkaConfig(KafkaConfig) {
   auto &geom = mConfig.Geometry;
   uint32_t NumPixels = geom.XDim * geom.YDim * geom.ZDim;
   mMinPixel = geom.Offset + 1;
-  mMaxPixel = geom.Offset +  NumPixels;
+  mMaxPixel = geom.Offset + NumPixels;
   assert(mMaxPixel != 0);
   assert(mMinPixel < mMaxPixel);
   mHistogram.resize(NumPixels);
@@ -51,7 +55,7 @@ RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
   mConf->set("enable.auto.commit", mConfig.Kafka.EnableAutoCommit, ErrStr);
   mConf->set("enable.auto.offset.store", mConfig.Kafka.EnableAutoOffsetStore,
              ErrStr);
- 
+
   for (auto &Config : mKafkaConfig) {
     mConf->set(Config.first, Config.second, ErrStr);
   }
@@ -86,7 +90,8 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
     uint32_t Tof = (*TOFs)[i] / mConfig.TOF.Scale; // ns to us
 
     // accumulate events for 2D TOF
-    uint32_t TofBin = std::min(Tof, mConfig.TOF.MaxValue) * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue;
+    uint32_t TofBin = std::min(Tof, mConfig.TOF.MaxValue) *
+                      (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue;
     mPixelIDs.push_back(Pixel);
     mTOFs.push_back(TofBin);
 
@@ -97,11 +102,52 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
       Pixel = Pixel - mConfig.Geometry.Offset;
       mHistogram[Pixel]++;
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
-      mHistogramTof[Tof * (mConfig.TOF.BinSize - 1)/ mConfig.TOF.MaxValue]++;
+      mHistogramTof[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
     }
   }
   EventCount += PixelIds->size();
   return PixelIds->size();
+}
+
+uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
+  auto EvMsg = Getda00_DataArray(Msg->payload());
+  if (EvMsg->data()->size() == 0) {
+    return 0;
+  }
+
+  const auto TimeBinsVariable = EvMsg->data()->Get(0);
+  const auto DataBinsVariable = EvMsg->data()->Get(1);
+  std::vector<int64_t> TimeBins = getDataVector(*TimeBinsVariable);
+  std::vector<int64_t> DataBins = getDataVector(*DataBinsVariable);
+
+  if (TimeBins.size() != DataBins.size()) {
+    return 0;
+  }
+
+  int64_t MaxTime = *std::max_element(TimeBins.begin(), TimeBins.end());
+
+  if (MaxTime > mConfig.TOF.MaxValue) {
+    return 0;
+  }
+
+  for (size_t i = 0; i < TimeBins.size(); i++) {
+    int64_t TimeBin = TimeBins[i];
+    int64_t DataBin = DataBins[i];
+
+    if (TimeBin > MaxTime) {
+      continue;
+    }
+
+    if (DataBin < 0) {
+      continue;
+    }
+
+    mHistogramTof[DataBin * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue] +=
+        DataBin;
+  }
+
+  EventCount++;
+  return mHistogramTof.size();
 }
 
 uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
@@ -118,7 +164,8 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     uint32_t Tof = (*TOFs)[i] / mConfig.TOF.Scale; // ns to us
 
     // accumulate events for 2D TOF
-    uint32_t TofBin = std::min(Tof, mConfig.TOF.MaxValue) * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue;
+    uint32_t TofBin = std::min(Tof, mConfig.TOF.MaxValue) *
+                      (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue;
     mPixelIDs.push_back(Pixel);
     mTOFs.push_back(TofBin);
 
@@ -129,7 +176,7 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
       Pixel = Pixel - mConfig.Geometry.Offset;
       mHistogram[Pixel]++;
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
-      mHistogramTof[Tof * (mConfig.TOF.BinSize - 1)/ mConfig.TOF.MaxValue]++;
+      mHistogramTof[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
     }
   }
   EventCount += PixelIds->size();
@@ -147,7 +194,12 @@ bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
 
   case RdKafka::ERR_NO_ERROR:
     mKafkaStats.MessagesData++;
-    processEV44Data(Message);
+    if (Event44MessageBufferHasIdentifier(Message->payload())) {
+      processEV44Data(Message);
+    } else if (da00_DataArrayBufferHasIdentifier(Message->payload())) {
+      processDA00Data(Message);
+    }
+
     return true;
     break;
 
@@ -183,6 +235,36 @@ std::string ESSConsumer::randomGroupString(size_t length) {
   std::string str(length, 0);
   std::generate_n(str.begin(), length, randchar);
   return str;
+}
+
+std::vector<int64_t>
+ESSConsumer::getDataVector(const da00_Variable &Variable) const {
+  std::vector<int64_t> Data;
+  switch (Variable.data_type()) {
+  case da00_dtype::int32: {
+    auto dataPtr = reinterpret_cast<const int32_t *>(Variable.data());
+    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+    break;
+  }
+  case da00_dtype::int64: {
+    auto dataPtr = reinterpret_cast<const int64_t *>(Variable.data());
+    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+    break;
+  }
+  case da00_dtype::uint32: {
+    auto dataPtr = reinterpret_cast<const uint32_t *>(Variable.data());
+    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+    break;
+  }
+  case da00_dtype::uint64: {
+    auto dataPtr = reinterpret_cast<const uint64_t *>(Variable.data());
+    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+    break;
+  }
+  default:
+    break;
+  }
+  return Data;
 }
 
 /// \todo is timeout reasonable?
