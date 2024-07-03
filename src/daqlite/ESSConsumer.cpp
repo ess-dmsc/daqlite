@@ -126,7 +126,7 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
 
   int64_t MaxTime = *std::max_element(TimeBins.begin(), TimeBins.end());
 
-  if (MaxTime > mConfig.TOF.MaxValue) {
+  if (MaxTime / mConfig.TOF.Scale > mConfig.TOF.MaxValue) {
     return 0;
   }
 
@@ -142,8 +142,9 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
       continue;
     }
 
-    mHistogramTof[DataBin * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue] +=
-        DataBin;
+    int index = TimeBin / ((mConfig.TOF.MaxValue * mConfig.TOF.Scale) /
+                           (mConfig.TOF.BinSize - 1));
+    mHistogramTof[index] += DataBin;
   }
 
   EventCount++;
@@ -186,6 +187,9 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
 bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
   mKafkaStats.MessagesRx++;
 
+  flatbuffers::Verifier Verifier(
+      reinterpret_cast<const uint8_t *>(Message->payload()), Message->len());
+
   switch (Message->err()) {
   case RdKafka::ERR__TIMED_OUT:
     mKafkaStats.MessagesTMO++;
@@ -194,11 +198,12 @@ bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
 
   case RdKafka::ERR_NO_ERROR:
     mKafkaStats.MessagesData++;
-    if (Event44MessageBufferHasIdentifier(Message->payload())) {
-      processEV44Data(Message);
-    } else if (da00_DataArrayBufferHasIdentifier(Message->payload())) {
-      processDA00Data(Message);
-    }
+
+    // if (VerifyEvent44MessageBuffer(Verifier)) {
+    // processEV44Data(Message);
+    // } else if (Verifyda00_DataArrayBuffer(Verifier)) {
+    processDA00Data(Message);
+    // }
 
     return true;
     break;
@@ -240,6 +245,9 @@ std::string ESSConsumer::randomGroupString(size_t length) {
 std::vector<int64_t>
 ESSConsumer::getDataVector(const da00_Variable &Variable) const {
   std::vector<int64_t> Data;
+
+  auto data = Variable.unit()->str();
+
   switch (Variable.data_type()) {
   case da00_dtype::int32: {
     auto dataPtr = reinterpret_cast<const int32_t *>(Variable.data());

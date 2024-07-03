@@ -11,6 +11,7 @@
 #pragma once
 
 #include "da00_dataarray_generated.h"
+#include "flatbuffers/flatbuffers.h"
 #include <Configuration.h>
 #include <librdkafka/rdkafkacpp.h>
 #include <string>
