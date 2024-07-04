@@ -1,7 +1,7 @@
 {
   "kafka" : {
     "broker" : "172.18.51.21:9092",
-    "topic" : "cbm",
+    "topic" : "cbm_detector",
 
     "message.max.bytes" : "10000000",
     "fetch.message.max.bytes" : "10000000",
