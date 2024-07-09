@@ -5,12 +5,16 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "Configuration.h"
+#include "da00_dataarray_generated.h"
 #include "ev42_events_generated.h"
 #include "ev44_events_generated.h"
+#include "flatbuffers/flatbuffers.h"
 #include <ESSConsumer.h>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <fmt/core.h>
 #include <fmt/format.h>
 #include <iostream>
 #include <unistd.h>
@@ -115,8 +119,13 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
+  if (EvMsg->source_name()->str() != mConfig.Kafka.Source) {
+    return 0;
+  }
+
   const auto TimeBinsVariable = EvMsg->data()->Get(0);
   const auto DataBinsVariable = EvMsg->data()->Get(1);
+
   std::vector<int64_t> TimeBins = getDataVector(*TimeBinsVariable);
   std::vector<int64_t> DataBins = getDataVector(*DataBinsVariable);
 
@@ -187,8 +196,9 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
 bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
   mKafkaStats.MessagesRx++;
 
-  flatbuffers::Verifier Verifier(
-      reinterpret_cast<const uint8_t *>(Message->payload()), Message->len());
+  const uint8_t *FlatBuffer = static_cast<const uint8_t *>(Message->payload());
+
+  flatbuffers::Verifier Verifier(FlatBuffer, Message->len());
 
   switch (Message->err()) {
   case RdKafka::ERR__TIMED_OUT:
@@ -199,11 +209,17 @@ bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
   case RdKafka::ERR_NO_ERROR:
     mKafkaStats.MessagesData++;
 
-    // if (VerifyEvent44MessageBuffer(Verifier)) {
-    // processEV44Data(Message);
-    // } else if (Verifyda00_DataArrayBuffer(Verifier)) {
-    processDA00Data(Message);
-    // }
+    if (VerifyEvent44MessageBuffer(Verifier)) {
+      processEV44Data(Message);
+    } else if (VerifyEventMessageBuffer(Verifier)) {
+      processEV42Data(Message);
+    } else if (Verifyda00_DataArrayBuffer(Verifier)) {
+      processDA00Data(Message);
+    } else {
+      mKafkaStats.MessagesUnknown++;
+      fmt::print("Unknown message type\n");
+      return false;
+    }
 
     return true;
     break;

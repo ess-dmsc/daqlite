@@ -1,7 +1,8 @@
 {
   "kafka" : {
-    "broker" : "172.18.51.21:9092",
+    "broker" : "10.70.6.62:9092",
     "topic" : "cbm_detector",
+    "source": "cbm1",
 
     "message.max.bytes" : "10000000",
     "fetch.message.max.bytes" : "10000000",
@@ -19,8 +20,7 @@
 
   "tof" : {
     "scale" : 1000,
-    "max_value" : 72000
-    ,
+    "max_value" : 71428,
     "bin_size" : 512
   },
 
@@ -34,7 +34,7 @@
     "color_gradient" : "hot",
     "invert_gradient" : false,
     "log_scale" : false,
-    "window_height" : 250,
-    "window_width" : 750
+    "window_height" : 900,
+    "window_width" : 1920
    }
 }
