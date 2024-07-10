@@ -40,6 +40,7 @@ void Configuration::getKafkaConfig() {
   using std::operator""s;
   Kafka.Broker = getVal("kafka", "broker", "n/a"s, true);
   Kafka.Topic = getVal("kafka", "topic", "n/a"s, true);
+  Kafka.Source = getVal("kafka", "source", "n/a"s, false);
   /// The rest are optional, using default values
   Kafka.MessageMaxBytes =
       getVal("kafka", "message.max.bytes", Kafka.MessageMaxBytes);

@@ -64,6 +64,7 @@ public:
   struct Kafka {
     std::string Topic{"nmx_detector"};
     std::string Broker{"172.17.5.38:9092"};
+    std::string Source{""};
     std::string MessageMaxBytes{"10000000"};
     std::string FetchMessagMaxBytes{"10000000"};
     std::string ReplicaFetchMaxBytes{"10000000"};

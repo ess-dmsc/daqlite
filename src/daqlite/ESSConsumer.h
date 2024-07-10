@@ -10,14 +10,17 @@
 
 #pragma once
 
-#include <string>
+#include "da00_dataarray_generated.h"
+#include "flatbuffers/flatbuffers.h"
 #include <Configuration.h>
 #include <librdkafka/rdkafkacpp.h>
+#include <string>
 
 class ESSConsumer {
 public:
   /// \brief Constructor needs the configured Broker and Topic
-  ESSConsumer(Configuration &Config, std::vector<std::pair<std::string, std::string>> &KafkaConfig);
+  ESSConsumer(Configuration &Config,
+              std::vector<std::pair<std::string, std::string>> &KafkaConfig);
 
   /// \brief wrapper function for librdkafka consumer
   RdKafka::Message *consume();
@@ -34,6 +37,9 @@ public:
 
   /// \brief histograms the event pixelids and ignores TOF
   uint32_t processEV44Data(RdKafka::Message *Msg);
+
+  /// \brief histograms the DA00 TOF data bins
+  uint32_t processDA00Data(RdKafka::Message *Msg);
 
   /// \brief return a random group id so that simultaneous consume from
   /// multiple applications is possible.
@@ -54,8 +60,6 @@ public:
   uint64_t EventAccept{0};
   uint64_t EventDiscard{0};
 
-
-
 private:
   RdKafka::Conf *mConf;
   RdKafka::Conf *mTConf;
@@ -64,9 +68,11 @@ private:
 
   /// \brief configuration obtained from main()
   Configuration &mConfig;
-  
+
   /// \brief loadable Kafka-specific configuration
   std::vector<std::pair<std::string, std::string>> &mKafkaConfig;
+
+  std::vector<int64_t> getDataVector(const da00_Variable &Variable) const;
 
   /// \brief Some stat counters
   /// \todo use or delete?
