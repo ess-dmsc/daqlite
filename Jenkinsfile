@@ -4,7 +4,6 @@ import ecdcpipeline.PipelineBuilder
 
 project = "daqlite"
 coverage_on = "centos"
-archive_what = "ubuntu2204"
 
 // Set number of old builds to keep.
 properties([[
@@ -105,38 +104,9 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}/build
             . ./activate_run.sh
-            make everything -j${pipeline_builder.numMakeJobs}
+            make everything -j4
         """
     }  // stage
-    
-    if (container.key == archive_what) {
-        pipeline_builder.stage("${container.key}: archive") {
-            container.sh """
-                                mkdir -p archive/daqlite
-                                cp -r ${project}/build/bin archive/daqlite
-                                cp -r ${project}/build/lib archive/daqlite
-                                cp -r ${project}/build/licenses archive/daqlite
-                                mkdir archive/daqlite/configs
-                                cp -r ${project}/configs archive/daqlite/
-                                mkdir archive/daqlite/scripts
-                                cp -r ${project}/scripts archive/daqlite/scripts
-
-                                cp ${project}/build/CONAN_INFO archive/daqlite
-
-                                # Create file with build information
-                                touch archive/daqlite/BUILD_INFO
-                                echo 'Repository: ${project}/${env.BRANCH_NAME}' >> archive/daqlite/BUILD_INFO
-                                echo 'Commit: ${scm_vars.GIT_COMMIT}' >> archive/daqlite/BUILD_INFO
-                                echo 'Jenkins build: ${BUILD_NUMBER}' >> archive/daqlite/BUILD_INFO
-
-                                cd archive
-                                tar czvf daqlite-ubuntu2204.tar.gz daqlite
-                            """
-            container.copyFrom("/home/jenkins/archive/daqlite-ubuntu2204.tar.gz", '.')
-            container.copyFrom("/home/jenkins/archive/daqlite/BUILD_INFO", '.')
-            archiveArtifacts "daqlite-ubuntu2204.tar.gz,BUILD_INFO"
-        }
-    }
 
 
 }  // createBuilders
