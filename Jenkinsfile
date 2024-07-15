@@ -4,7 +4,6 @@ import ecdcpipeline.PipelineBuilder
 
 project = "daqlite"
 coverage_on = "centos"
-archive_what = "ubuntu2204"
 
 // Set number of old builds to keep.
 properties([[
@@ -105,7 +104,7 @@ builders = pipeline_builder.createBuilders { container ->
         container.sh """
             cd ${project}/build
             . ./activate_run.sh
-            make everything -j${pipeline_builder.numMakeJobs}
+            make everything -j4
         """
     }  // stage
     
@@ -120,6 +119,8 @@ builders = pipeline_builder.createBuilders { container ->
                                 cp -r ${project}/configs archive/daqlite/
                                 mkdir archive/daqlite/scripts
                                 cp -r ${project}/scripts archive/daqlite/scripts
+
+                                cp ${project}/build/CONAN_INFO archive/daqlite
 
                                 # Create file with build information
                                 touch archive/daqlite/BUILD_INFO
