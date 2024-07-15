@@ -4,6 +4,7 @@ import ecdcpipeline.PipelineBuilder
 
 project = "daqlite"
 coverage_on = "centos"
+archive_what = "ubuntu2204"
 
 // Set number of old builds to keep.
 properties([[
