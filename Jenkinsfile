@@ -121,8 +121,6 @@ builders = pipeline_builder.createBuilders { container ->
                                 mkdir archive/daqlite/scripts
                                 cp -r ${project}/scripts archive/daqlite/scripts
 
-                                cp ${project}/build/CONAN_INFO archive/daqlite
-
                                 # Create file with build information
                                 touch archive/daqlite/BUILD_INFO
                                 echo 'Repository: ${project}/${env.BRANCH_NAME}' >> archive/daqlite/BUILD_INFO
