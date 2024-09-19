@@ -8,12 +8,14 @@
 
 #pragma once
 
+#include <AbstractPlot.h>
 #include <Configuration.h>
 #include <Custom2DPlot.h>
 #include <CustomAMOR2DTOFPlot.h>
 #include <CustomTofPlot.h>
 #include <QMainWindow>
 #include <WorkerThread.h>
+#include <memory>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -23,6 +25,11 @@ QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
+
+  // typedef std::variant<std::unique_ptr<Custom2DPlot>,
+  //                      std::unique_ptr<CustomAMOR2DTOFPlot>,
+  //                      std::unique_ptr<CustomTofPlot>>
+  //     PlotVariants;
 
 public:
   MainWindow(Configuration &Config, QWidget *parent = nullptr);
@@ -52,21 +59,16 @@ public slots:
 
 private:
   Ui::MainWindow *ui;
-  enum PlotType {none, pixels, tof, tof2d};
-  PlotType plottype{none};
 
-  CustomAMOR2DTOFPlot *PlotTOF2D; /// Experimental
-  Custom2DPlot *Plot2DXY; // xy plots
-  Custom2DPlot *Plot2DXZ; // xz plots
-  Custom2DPlot *Plot2DYZ; // yz plots
-  CustomTofPlot *PlotTOF;
+  std::vector<std::unique_ptr<AbstractPlot>> Plots;
 
-  //Q3DScatter scatter;
+  void registerPlot(AbstractPlot* Plot) const;
+
+  // Q3DScatter scatter;
 
   /// \brief configuration obtained from main()
   Configuration mConfig;
 
   /// \brief
   WorkerThread *KafkaConsumerThread;
-
 };

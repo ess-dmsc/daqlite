@@ -10,10 +10,12 @@
 
 #pragma once
 
+#include "ThreadSafeVector.h"
 #include "da00_dataarray_generated.h"
 #include "flatbuffers/flatbuffers.h"
 #include <Configuration.h>
 #include <librdkafka/rdkafkacpp.h>
+#include <mutex>
 #include <string>
 
 class ESSConsumer {
@@ -23,7 +25,7 @@ public:
               std::vector<std::pair<std::string, std::string>> &KafkaConfig);
 
   /// \brief wrapper function for librdkafka consumer
-  RdKafka::Message *consume();
+  std::unique_ptr<RdKafka::Message> consume();
 
   /// \brief setup librdkafka parameters for Broker and Topic
   RdKafka::KafkaConsumer *subscribeTopic() const;
@@ -46,15 +48,10 @@ public:
   static std::string randomGroupString(size_t length);
 
   // Histogram(s) and counts
-  std::vector<uint32_t> mHistogramPlot;
-  std::vector<uint32_t> mHistogram;
-  std::vector<uint32_t> mHistogramTofPlot;
-  std::vector<uint32_t> mHistogramTof;
-
-  std::vector<uint32_t> mPixelIDs;
-  std::vector<uint32_t> mPixelIDsPlot;
-  std::vector<uint32_t> mTOFs;
-  std::vector<uint32_t> mTOFsPlot;
+  ThreadSafeVector<uint32_t> mHistogram;
+  ThreadSafeVector<uint32_t> mHistogramTof;
+  ThreadSafeVector<uint32_t> mPixelIDs;
+  ThreadSafeVector<uint32_t> mTOFs;
 
   uint64_t EventCount{0};
   uint64_t EventAccept{0};

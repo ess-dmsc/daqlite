@@ -1,11 +1,11 @@
 // Copyright (C) 2020 - 2021 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file CustomTofPlot.cpp
+/// \file HistogramPlot.cpp
 ///
 //===----------------------------------------------------------------------===//
 
-#include <CustomTofPlot.h>
+#include <HistogramPlot.h>
 #include <QPlot/qcustomplot/qcustomplot.h>
 #include <WorkerThread.h>
 #include <algorithm>
@@ -13,7 +13,7 @@
 #include <fmt/format.h>
 #include <string>
 
-CustomTofPlot::CustomTofPlot(Configuration &Config) : mConfig(Config) {
+HistogramPlot::HistogramPlot(Configuration &Config) : mConfig(Config) {
 
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
@@ -59,7 +59,7 @@ CustomTofPlot::CustomTofPlot(Configuration &Config) : mConfig(Config) {
   t1 = std::chrono::high_resolution_clock::now();
 }
 
-void CustomTofPlot::setCustomParameters() {
+void HistogramPlot::setCustomParameters() {
   if (mConfig.Plot.LogScale) {
     yAxis->setScaleType(QCPAxis::stLogarithmic);
   } else {
@@ -67,7 +67,7 @@ void CustomTofPlot::setCustomParameters() {
   }
 }
 
-void CustomTofPlot::plotDetectorImage(bool Force) {
+void HistogramPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
   mGraph->data()->clear();
   uint32_t MaxY{0};
@@ -92,16 +92,13 @@ void CustomTofPlot::plotDetectorImage(bool Force) {
   replot();
 }
 
-void CustomTofPlot::updateData() {
+void HistogramPlot::addData(std::vector<uint32_t> &Histogram) {
   // printf("addData (TOF) Histogram size %lu\n", Histogram.size());
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
-  // Get histogram data from Consumer and clear it
-  std::vector<uint32_t> Histogram = mConsumer->mHistogramTof;
-  mConsumer->mHistogramTof.fill(0);
-
   // Periodically clear the histogram
+  //
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
   if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
@@ -116,13 +113,14 @@ void CustomTofPlot::updateData() {
   return;
 }
 
-void CustomTofPlot::clearDetectorImage() {
+void HistogramPlot::clearDetectorImage() {
   std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
+  addData(HistogramTofData);
   plotDetectorImage(true);
 }
 
 // MouseOver, display coordinate and data in tooltip
-void CustomTofPlot::showPointToolTip(QMouseEvent *event) {
+void HistogramPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
 
   // Calculate x coord width of the graphical representation of the column

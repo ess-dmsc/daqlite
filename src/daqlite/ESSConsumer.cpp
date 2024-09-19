@@ -17,6 +17,7 @@
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <iostream>
+#include <memory>
 #include <unistd.h>
 #include <vector>
 
@@ -104,9 +105,11 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
     } else {
       EventAccept++;
       Pixel = Pixel - mConfig.Geometry.Offset;
-      mHistogram[Pixel]++;
+
+      mHistogram.increment_element(Pixel);
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
-      mHistogramTof[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
+      mHistogramTof.increment_element(Tof * (mConfig.TOF.BinSize - 1) /
+                                      mConfig.TOF.MaxValue);
     }
   }
   EventCount += PixelIds->size();
@@ -130,6 +133,7 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
   std::vector<int64_t> DataBins = getDataVector(*DataBinsVariable);
 
   if (TimeBins.size() != DataBins.size()) {
+    EventDiscard++;
     return 0;
   }
 
@@ -153,10 +157,12 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
 
     int index = TimeBin / ((mConfig.TOF.MaxValue * mConfig.TOF.Scale) /
                            (mConfig.TOF.BinSize - 1));
-    mHistogramTof[index] += DataBin;
+
+    mHistogramTof.add_to_element(index, DataBin);
   }
 
   EventCount++;
+  EventAccept++;
   return mHistogramTof.size();
 }
 
@@ -184,9 +190,10 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     } else {
       EventAccept++;
       Pixel = Pixel - mConfig.Geometry.Offset;
-      mHistogram[Pixel]++;
+      mHistogram.increment_element(Pixel);
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
-      mHistogramTof[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
+      mHistogramTof.increment_element(Tof * (mConfig.TOF.BinSize - 1) /
+                                      mConfig.TOF.MaxValue);
     }
   }
   EventCount += PixelIds->size();
@@ -292,4 +299,7 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
 }
 
 /// \todo is timeout reasonable?
-RdKafka::Message *ESSConsumer::consume() { return mConsumer->consume(1000); }
+std::unique_ptr<RdKafka::Message> ESSConsumer::consume() {
+  std::unique_ptr<RdKafka::Message> msg(mConsumer->consume(1000));
+  return msg;
+}

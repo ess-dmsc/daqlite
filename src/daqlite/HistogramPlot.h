@@ -1,9 +1,10 @@
 // Copyright (C) 2020 - 2021 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file CustomTofPlot.h
+/// \file HistogramPlot.h
 ///
-/// \brief Creates a QCustomPlot based on the configuration parameters
+/// \brief Creates a hiostogram plot based on QCustomPlot and
+///  on the configuration parameters
 //===----------------------------------------------------------------------===//
 
 #pragma once
@@ -14,16 +15,15 @@
 #include <chrono>
 #include <logical_geometry/ESSGeometry.h>
 
-class CustomTofPlot : public AbstractPlot {
+class HistogramPlot : public AbstractPlot {
   Q_OBJECT
 public:
-
   /// \brief plot needs the configurable plotting options
-  CustomTofPlot(Configuration &Config);
+  HistogramPlot(Configuration &Config);
 
   /// \brief adds histogram data, clears periodically then calls
   /// plotDetectorImage()
-  void updateData() override;
+  void addData(std::vector<uint32_t> &Histogram);
 
   /// \brief update plot based on (possibly dynamic) config settings
   void setCustomParameters();
@@ -33,7 +33,7 @@ public:
 
 public slots:
   void showPointToolTip(QMouseEvent *event);
-  
+
 private:
   /// \brief updates the image
   /// \param Force forces updates of histogram data with zero count

@@ -15,13 +15,12 @@
 CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config)
     : mConfig(Config) {
 
-  if ((not (mConfig.Geometry.YDim <= TOF2DY) or
-      (not (mConfig.TOF.BinSize <= TOF2DX)))) {
+  if ((not(mConfig.Geometry.YDim <= TOF2DY) or
+       (not(mConfig.TOF.BinSize <= TOF2DX)))) {
     throw(std::runtime_error("2D TOF histogram size mismatch"));
   }
 
   memset(HistogramData2D, 0, sizeof(HistogramData2D));
-
 
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
           SLOT(showPointToolTip(QMouseEvent *)));
@@ -30,7 +29,7 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config)
   auto &geom = mConfig.Geometry;
 
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
-  //HistogramData.resize(LogicalGeometry->max_pixel() + 1);
+  // HistogramData.resize(LogicalGeometry->max_pixel() + 1);
 
   // this will also allow rescaling the color scale by dragging/zooming
   setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
@@ -101,7 +100,8 @@ void CustomAMOR2DTOFPlot::setCustomParameters() {
 
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
-QCPColorGradient CustomAMOR2DTOFPlot::getColorGradient(std::string GradientName) {
+QCPColorGradient
+CustomAMOR2DTOFPlot::getColorGradient(std::string GradientName) {
   if (mGradients.find(GradientName) != mGradients.end()) {
     return mGradients.find(GradientName)->second;
   } else {
@@ -115,7 +115,8 @@ QCPColorGradient CustomAMOR2DTOFPlot::getColorGradient(std::string GradientName)
   }
 }
 
-std::string CustomAMOR2DTOFPlot::getNextColorGradient(std::string GradientName) {
+std::string
+CustomAMOR2DTOFPlot::getNextColorGradient(std::string GradientName) {
   bool SaveFirst{true};
   bool SaveNext{false};
   std::string RetVal;
@@ -136,10 +137,7 @@ std::string CustomAMOR2DTOFPlot::getNextColorGradient(std::string GradientName) 
   return RetVal;
 }
 
-void CustomAMOR2DTOFPlot::clearDetectorImage(std::vector<uint32_t> &PixelIDs,
-    std::vector<uint32_t> &TOFs) {
-  PixelIDs.clear();
-  TOFs.clear();
+void CustomAMOR2DTOFPlot::clearDetectorImage() {
   memset(HistogramData2D, 0, sizeof(HistogramData2D));
   plotDetectorImage(true);
 }
@@ -152,7 +150,7 @@ void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
       if ((HistogramData2D[x][y] == 0) and (not Force)) {
         continue;
       }
-      //printf("debug x %u, y %u, z %u\n", x, y, HistogramData2D[x][y]);
+      // printf("debug x %u, y %u, z %u\n", x, y, HistogramData2D[x][y]);
       mColorMap->data()->setCell(x, y, HistogramData2D[x][y]);
     }
   }
@@ -164,10 +162,16 @@ void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
   replot();
 }
 
-void CustomAMOR2DTOFPlot::addData(std::vector<uint32_t> &PixelIDs,
-    std::vector<uint32_t> &TOFs) {
+void CustomAMOR2DTOFPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
+
+  // Get newest histogram data from Consumer
+  std::vector<uint32_t> PixelIDs = mConsumer->mPixelIDs;
+  std::vector<uint32_t> TOFs = mConsumer->mTOFs;
+
+  mConsumer->mPixelIDs.clear();
+  mConsumer->mTOFs.clear();
 
   // Accumulate counts, PixelId 0 does not exist
   if (PixelIDs.size() == 0) {
@@ -178,8 +182,8 @@ void CustomAMOR2DTOFPlot::addData(std::vector<uint32_t> &PixelIDs,
     if (PixelIDs[i] == 0) {
       continue;
     }
-    int tof  = TOFs[i];
-    int yvals = (PixelIDs[i] - 1)/mConfig.Geometry.XDim;
+    int tof = TOFs[i];
+    int yvals = (PixelIDs[i] - 1) / mConfig.Geometry.XDim;
     HistogramData2D[tof][yvals]++;
   }
   plotDetectorImage(false);
