@@ -9,6 +9,7 @@
 #pragma once
 
 #include "AbstractPlot.h"
+#include "ESSConsumer.h"
 #include <Configuration.h>
 #include <QPlot/QPlot.h>
 #include <chrono>
@@ -20,7 +21,7 @@ public:
   enum Projection {ProjectionXY, ProjectionXZ, ProjectionYZ};
 
   /// \brief plot needs the configurable plotting options
-  Custom2DPlot(Configuration &Config, Projection Proj);
+  Custom2DPlot(Configuration &Config, ESSConsumer&, Projection Proj);
 
   /// \brief adds histogram data, clears periodically then calls
   /// plotDetectorImage()

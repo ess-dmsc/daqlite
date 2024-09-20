@@ -19,7 +19,7 @@ class HistogramPlot : public AbstractPlot {
   Q_OBJECT
 public:
   /// \brief plot needs the configurable plotting options
-  HistogramPlot(Configuration &Config);
+  HistogramPlot(Configuration &Config, ESSConsumer &Consumer);
 
   /// \brief adds histogram data, clears periodically then calls
   /// plotDetectorImage()

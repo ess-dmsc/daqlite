@@ -5,6 +5,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "AbstractPlot.h"
+#include "ESSConsumer.h"
 #include <Custom2DPlot.h>
 #include <WorkerThread.h>
 #include <algorithm>
@@ -12,8 +14,9 @@
 #include <fmt/format.h>
 #include <string>
 
-Custom2DPlot::Custom2DPlot(Configuration &Config, Projection Proj)
-    : mConfig(Config), mProjection(Proj) {
+Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
+                           Projection Proj)
+    : AbstractPlot(PIXEL, Consumer), mConfig(Config), mProjection(Proj) {
 
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
@@ -190,15 +193,15 @@ void Custom2DPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // update histogram data from consumer of worker thread
-  std::vector<uint32_t> Histogram = mConsumer->mHistogram;
-  mConsumer->mPixelIDs.fill(0);
+  std::vector<uint32_t> Histogram = mConsumer.mHistogram;
+  mConsumer.mPixelIDs.fill(0);
 
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
   if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     t1 = std::chrono::high_resolution_clock::now();
     std::fill(HistogramData.begin(), HistogramData.end(), 0);
-    plotDetectorImage(true);// Periodically clear the histogram
-  //
+    plotDetectorImage(true); // Periodically clear the histogram
+    //
   }
 
   // Accumulate counts, PixelId 0 does not exist

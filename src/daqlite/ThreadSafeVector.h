@@ -45,19 +45,19 @@ public:
         mVector.resize(newSize);
     }
 
-    void increment_element(const size_t index) {
-        std::lock_guard<std::mutex> lock(mMutex);
-        ++mVector[index];
-    }
-    
-    void add_to_element(const size_t index, const T& value) {
-        std::lock_guard<std::mutex> lock(mMutex);
-        mVector[index] += value;
-    }
-
     void fill(const T& value) {
         std::lock_guard<std::mutex> lock(mMutex);
         std::fill(mVector.begin(), mVector.end(), value);
+    }
+
+    void add_values(const std::vector<T>& other) {
+        std::lock_guard<std::mutex> lock(mMutex);
+        if (mVector.size() < other.size()) {
+            mVector.resize(other.size());
+        }
+        for (size_t i = 0; i < other.size(); ++i) {
+            mVector[i] += other[i];
+        }
     }
 
     ThreadSafeVector<T>& operator=(const std::vector<T>& other) {

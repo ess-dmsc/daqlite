@@ -5,6 +5,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "AbstractPlot.h"
+#include "ESSConsumer.h"
 #include <CustomAMOR2DTOFPlot.h>
 #include <WorkerThread.h>
 #include <algorithm>
@@ -12,8 +14,9 @@
 #include <fmt/format.h>
 #include <string>
 
-CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config)
-    : mConfig(Config) {
+CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
+                                         ESSConsumer &Consumer)
+    : AbstractPlot(TOF2D, Consumer), mConfig(Config) {
 
   if ((not(mConfig.Geometry.YDim <= TOF2DY) or
        (not(mConfig.TOF.BinSize <= TOF2DX)))) {
@@ -167,11 +170,11 @@ void CustomAMOR2DTOFPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get newest histogram data from Consumer
-  std::vector<uint32_t> PixelIDs = mConsumer->mPixelIDs;
-  std::vector<uint32_t> TOFs = mConsumer->mTOFs;
+  std::vector<uint32_t> PixelIDs = mConsumer.mPixelIDs;
+  std::vector<uint32_t> TOFs = mConsumer.mTOFs;
 
-  mConsumer->mPixelIDs.clear();
-  mConsumer->mTOFs.clear();
+  mConsumer.mPixelIDs.clear();
+  mConsumer.mTOFs.clear();
 
   // Accumulate counts, PixelId 0 does not exist
   if (PixelIDs.size() == 0) {

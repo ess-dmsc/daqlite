@@ -9,6 +9,7 @@
 #pragma once
 
 #include "AbstractPlot.h"
+#include "ESSConsumer.h"
 #include <Configuration.h>
 #include <QPlot/QPlot.h>
 #include <chrono>
@@ -18,7 +19,7 @@ class CustomAMOR2DTOFPlot : public AbstractPlot {
   Q_OBJECT
 public:
   /// \brief plot needs the configurable plotting options
-  CustomAMOR2DTOFPlot(Configuration &Config);
+  CustomAMOR2DTOFPlot(Configuration &Config, ESSConsumer &Consumer);
 
   /// \brief adds histogram data, clears periodically then calls
   /// plotDetectorImage()

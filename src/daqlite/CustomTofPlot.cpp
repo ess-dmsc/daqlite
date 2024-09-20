@@ -5,6 +5,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "AbstractPlot.h"
+#include "ESSConsumer.h"
 #include <CustomTofPlot.h>
 #include <QPlot/qcustomplot/qcustomplot.h>
 #include <WorkerThread.h>
@@ -13,7 +15,8 @@
 #include <fmt/format.h>
 #include <string>
 
-CustomTofPlot::CustomTofPlot(Configuration &Config) : mConfig(Config) {
+CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
+    : AbstractPlot(TOF, Consumer), mConfig(Config) {
 
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
@@ -41,7 +44,7 @@ CustomTofPlot::CustomTofPlot(Configuration &Config) : mConfig(Config) {
   // mGraph->setLineStyle(QCPGraph::lsNone);
   mGraph->setBrush(QBrush(QColor(0, 0, 255, 20)));
   mGraph->setLineStyle(QCPGraph::lsStepCenter);
-  mGraph->  setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+  mGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 
   // we want the color map to have nx * ny data points
 
@@ -86,7 +89,7 @@ void CustomTofPlot::plotDetectorImage(bool Force) {
   if (mConfig.TOF.AutoScaleX) {
     xAxis->setRange(0, mConfig.TOF.MaxValue * 1.05);
   }
-  if (mConfig.TOF.AutoScaleY){
+  if (mConfig.TOF.AutoScaleY) {
     yAxis->setRange(0, MaxY * 1.05);
   }
   replot();
@@ -98,8 +101,8 @@ void CustomTofPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get histogram data from Consumer and clear it
-  std::vector<uint32_t> Histogram = mConsumer->mHistogramTof;
-  mConsumer->mHistogramTof.fill(0);
+  std::vector<uint32_t> Histogram = mConsumer.mHistogramTof;
+  mConsumer.mHistogramTof.fill(0);
 
   // Periodically clear the histogram
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;

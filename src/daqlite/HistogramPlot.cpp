@@ -5,6 +5,8 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "AbstractPlot.h"
+#include "ESSConsumer.h"
 #include <HistogramPlot.h>
 #include <QPlot/qcustomplot/qcustomplot.h>
 #include <WorkerThread.h>
@@ -13,7 +15,8 @@
 #include <fmt/format.h>
 #include <string>
 
-HistogramPlot::HistogramPlot(Configuration &Config) : mConfig(Config) {
+HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
+    : AbstractPlot(HISTOGRAM, Consumer), mConfig(Config) {
 
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
@@ -41,7 +44,7 @@ HistogramPlot::HistogramPlot(Configuration &Config) : mConfig(Config) {
   // mGraph->setLineStyle(QCPGraph::lsNone);
   mGraph->setBrush(QBrush(QColor(0, 0, 255, 20)));
   mGraph->setLineStyle(QCPGraph::lsStepCenter);
-  mGraph->  setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
+  mGraph->setScatterStyle(QCPScatterStyle(QCPScatterStyle::ssCircle, 5));
 
   // we want the color map to have nx * ny data points
 
@@ -86,7 +89,7 @@ void HistogramPlot::plotDetectorImage(bool Force) {
   if (mConfig.TOF.AutoScaleX) {
     xAxis->setRange(0, mConfig.TOF.MaxValue * 1.05);
   }
-  if (mConfig.TOF.AutoScaleY){
+  if (mConfig.TOF.AutoScaleY) {
     yAxis->setRange(0, MaxY * 1.05);
   }
   replot();

@@ -16,8 +16,8 @@
 #include <KafkaConfig.h>
 #include <QMutex>
 #include <QThread>
-#include <QMutex>
 #include <iostream>
+#include <memory>
 
 class WorkerThread : public QThread {
   Q_OBJECT
@@ -25,16 +25,19 @@ class WorkerThread : public QThread {
 public:
   WorkerThread(Configuration &Config) : mConfig(Config) {
     KafkaConfig KafkaCfg(Config.KafkaConfigFile);
-    Consumer = new ESSConsumer(Config, KafkaCfg.CfgParms);
+    Consumer = std::make_unique<ESSConsumer>(Config, KafkaCfg.CfgParms);
   };
-
-  ~WorkerThread(){};
 
   /// \brief thread main loop
   void run() override;
 
   /// \brief Getter for the consumer
-  ESSConsumer *consumer() { return Consumer; }
+  ESSConsumer& getConsumer() {
+    if (!Consumer) {
+      throw std::runtime_error("Consumer is not initialized");
+    }
+    return *Consumer;
+  }
 
 signals:
   /// \brief this signal is 'emitted' when there is new data to be plotted
@@ -46,5 +49,5 @@ private:
   Configuration &mConfig;
 
   /// \brief Kafka consumer
-  ESSConsumer *Consumer;
+  std::unique_ptr<ESSConsumer> Consumer;
 };

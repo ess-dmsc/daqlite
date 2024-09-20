@@ -19,7 +19,7 @@ class CustomTofPlot : public AbstractPlot {
 public:
 
   /// \brief plot needs the configurable plotting options
-  CustomTofPlot(Configuration &Config);
+  CustomTofPlot(Configuration &Config, ESSConsumer &Consumer);
 
   /// \brief adds histogram data, clears periodically then calls
   /// plotDetectorImage()

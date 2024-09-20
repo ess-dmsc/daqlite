@@ -70,5 +70,5 @@ private:
   Configuration mConfig;
 
   /// \brief
-  WorkerThread *KafkaConsumerThread;
+  std::unique_ptr<WorkerThread> KafkaConsumerThread;
 };
