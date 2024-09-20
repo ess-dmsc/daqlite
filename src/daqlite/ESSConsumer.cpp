@@ -152,7 +152,8 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  std::vector<uint32_t> CountBinValuesVector(mHistogramTof.size(), 0);
+  std::vector<uint32_t> CountBinValueVector;
+  std::vector<uint32_t> BinTofValueVector;
 
   for (size_t i = 0; i < TimeBins.size(); i++) {
     int64_t TimeBin = TimeBins[i];
@@ -166,13 +167,12 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
       continue;
     }
 
-    int index = TimeBin / ((mConfig.TOF.MaxValue * mConfig.TOF.Scale) /
-                           (mConfig.TOF.BinSize - 1));
-
-    CountBinValuesVector[index] += DataBin;
+    CountBinValueVector[i] += DataBin;
+    BinTofValueVector[i] = TimeBin;
   }
 
-  mHistogramTof.add_values(CountBinValuesVector);
+  mHistogram.add_values(CountBinValueVector);
+  mTOFs = BinTofValueVector;
 
   EventCount++;
   EventAccept++;

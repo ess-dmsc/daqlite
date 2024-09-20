@@ -193,8 +193,7 @@ void Custom2DPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // update histogram data from consumer of worker thread
-  std::vector<uint32_t> Histogram = mConsumer.mHistogram;
-  mConsumer.mPixelIDs.fill(0);
+  std::vector<uint32_t> Histogram = mConsumer.readOutHistogram();
 
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
   if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {

@@ -12,8 +12,10 @@
 #include <WorkerThread.h>
 #include <algorithm>
 #include <assert.h>
+#include <cstdint>
 #include <fmt/format.h>
 #include <string>
+#include <vector>
 
 HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
     : AbstractPlot(HISTOGRAM, Consumer), mConfig(Config) {
@@ -76,7 +78,7 @@ void HistogramPlot::plotDetectorImage(bool Force) {
   uint32_t MaxY{0};
   for (unsigned int i = 0; i < HistogramTofData.size(); i++) {
     if ((HistogramTofData[i] != 0) or (Force)) {
-      uint32_t x = i * mConfig.TOF.MaxValue / mConfig.TOF.BinSize;
+      uint32_t x = i * mConfig.TOF.MaxValue / HistogramTofData.size();
       uint32_t y = HistogramTofData[i];
       if (y > MaxY) {
         MaxY = y;
@@ -95,10 +97,13 @@ void HistogramPlot::plotDetectorImage(bool Force) {
   replot();
 }
 
-void HistogramPlot::addData(std::vector<uint32_t> &Histogram) {
+void HistogramPlot::updateData() {
   // printf("addData (TOF) Histogram size %lu\n", Histogram.size());
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
+
+  std::vector<uint32_t> YAxisValus = mConsumer.readOutHistogram();
+  std::vector<uint32_t> XAxisValus = mConsumer.readOutTOFs();
 
   // Periodically clear the histogram
   //
@@ -106,6 +111,10 @@ void HistogramPlot::addData(std::vector<uint32_t> &Histogram) {
   if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
     t1 = std::chrono::high_resolution_clock::now();
+  }
+
+  if (YAxisValus.size() < HistogramTofData.size()) {
+    HistogramTofData.resize(YAxisValus.size());
   }
 
   // Accumulate counts, PixelId 0 does not exist
@@ -118,7 +127,6 @@ void HistogramPlot::addData(std::vector<uint32_t> &Histogram) {
 
 void HistogramPlot::clearDetectorImage() {
   std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
-  addData(HistogramTofData);
   plotDetectorImage(true);
 }
 

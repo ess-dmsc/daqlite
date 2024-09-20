@@ -23,7 +23,7 @@ public:
 
   /// \brief adds histogram data, clears periodically then calls
   /// plotDetectorImage()
-  void addData(std::vector<uint32_t> &Histogram);
+  void updateData() override;
 
   /// \brief update plot based on (possibly dynamic) config settings
   void setCustomParameters();

@@ -101,8 +101,7 @@ void CustomTofPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get histogram data from Consumer and clear it
-  std::vector<uint32_t> Histogram = mConsumer.mHistogramTof;
-  mConsumer.mHistogramTof.fill(0);
+  std::vector<uint32_t> Histogram = mConsumer.readOutHistogram();
 
   // Periodically clear the histogram
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;

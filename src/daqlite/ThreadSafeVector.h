@@ -9,6 +9,7 @@
 #pragma once
 
 #include <vector>
+#include <map>
 #include <mutex>
 #include <cstdint>
 

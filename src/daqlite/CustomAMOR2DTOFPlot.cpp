@@ -170,11 +170,8 @@ void CustomAMOR2DTOFPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get newest histogram data from Consumer
-  std::vector<uint32_t> PixelIDs = mConsumer.mPixelIDs;
-  std::vector<uint32_t> TOFs = mConsumer.mTOFs;
-
-  mConsumer.mPixelIDs.clear();
-  mConsumer.mTOFs.clear();
+  std::vector<uint32_t> PixelIDs = mConsumer.readOutPixelIDs();
+  std::vector<uint32_t> TOFs = mConsumer.readOutTOFs();
 
   // Accumulate counts, PixelId 0 does not exist
   if (PixelIDs.size() == 0) {
