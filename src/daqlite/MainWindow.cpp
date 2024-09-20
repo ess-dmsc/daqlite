@@ -13,6 +13,39 @@
 #include <memory>
 #include <string.h>
 
+MainWindow::MainWindow(Configuration &Config, QWidget *parent)
+    : QMainWindow(parent), ui(new Ui::MainWindow), mConfig(Config),
+      KafkaConsumerThread(std::make_unique<WorkerThread>(Config)) {
+
+  ui->setupUi(this);
+
+  setupPlots();
+
+  ui->lblDescriptionText->setText(mConfig.Plot.PlotTitle.c_str());
+  ui->lblEventRateText->setText("0");
+
+  connect(ui->pushButtonQuit, SIGNAL(clicked()), this,
+          SLOT(handleExitButton()));
+  connect(ui->pushButtonClear, SIGNAL(clicked()), this,
+          SLOT(handleClearButton()));
+  connect(ui->pushButtonLog, SIGNAL(clicked()), this, SLOT(handleLogButton()));
+  connect(ui->pushButtonGradient, SIGNAL(clicked()), this,
+          SLOT(handleGradientButton()));
+  connect(ui->pushButtonInvert, SIGNAL(clicked()), this,
+          SLOT(handleInvertButton()));
+  connect(ui->pushButtonAutoScaleX, SIGNAL(clicked()), this,
+          SLOT(handleAutoScaleXButton()));
+  connect(ui->pushButtonAutoScaleY, SIGNAL(clicked()), this,
+          SLOT(handleAutoScaleYButton()));
+
+  updateGradientLabel();
+  updateAutoScaleLabels();
+  show();
+  startKafkaConsumerThread();
+}
+
+MainWindow::~MainWindow() {delete ui;}
+
 void MainWindow::setupPlots() {
   if (strcmp(mConfig.Plot.PlotType.c_str(), "tof2d") == 0) {
     Plots.push_back(std::make_unique<CustomAMOR2DTOFPlot>(
@@ -74,39 +107,6 @@ void MainWindow::registerPlot(AbstractPlot *Plot) const {
     ui->gridLayout->addWidget(Plot, 0, 0, 1, 1);
   }
 }
-
-MainWindow::MainWindow(Configuration &Config, QWidget *parent)
-    : QMainWindow(parent), ui(new Ui::MainWindow), mConfig(Config),
-      KafkaConsumerThread(std::make_unique<WorkerThread>(Config)) {
-
-  ui->setupUi(this);
-
-  setupPlots();
-
-  ui->lblDescriptionText->setText(mConfig.Plot.PlotTitle.c_str());
-  ui->lblEventRateText->setText("0");
-
-  connect(ui->pushButtonQuit, SIGNAL(clicked()), this,
-          SLOT(handleExitButton()));
-  connect(ui->pushButtonClear, SIGNAL(clicked()), this,
-          SLOT(handleClearButton()));
-  connect(ui->pushButtonLog, SIGNAL(clicked()), this, SLOT(handleLogButton()));
-  connect(ui->pushButtonGradient, SIGNAL(clicked()), this,
-          SLOT(handleGradientButton()));
-  connect(ui->pushButtonInvert, SIGNAL(clicked()), this,
-          SLOT(handleInvertButton()));
-  connect(ui->pushButtonAutoScaleX, SIGNAL(clicked()), this,
-          SLOT(handleAutoScaleXButton()));
-  connect(ui->pushButtonAutoScaleY, SIGNAL(clicked()), this,
-          SLOT(handleAutoScaleYButton()));
-
-  updateGradientLabel();
-  updateAutoScaleLabels();
-  show();
-  startKafkaConsumerThread();
-}
-
-MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::startKafkaConsumerThread() {
   qRegisterMetaType<int>("int&");

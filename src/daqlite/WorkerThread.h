@@ -28,11 +28,17 @@ public:
     Consumer = std::make_unique<ESSConsumer>(Config, KafkaCfg.CfgParms);
   };
 
+  ~WorkerThread() {
+    this->terminate();
+    this->wait();
+    this->exit();
+  }
+
   /// \brief thread main loop
   void run() override;
 
   /// \brief Getter for the consumer
-  ESSConsumer& getConsumer() {
+  ESSConsumer &getConsumer() {
     if (!Consumer) {
       throw std::runtime_error("Consumer is not initialized");
     }
