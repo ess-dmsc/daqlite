@@ -74,7 +74,7 @@ void HistogramPlot::setCustomParameters() {
 void HistogramPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
   mGraph->data()->clear();
-  uint32_t MaxY{0};
+  uint32_t MaxY{1};
   for (unsigned int i = 0; i < HistogramXAxisValues.size(); i++) {
     if ((HistogramXAxisValues[i] != 0) or (Force)) {
       if (HistogramYAxisValues[i] > MaxY) {
