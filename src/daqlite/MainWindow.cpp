@@ -8,6 +8,7 @@
 #include "AbstractPlot.h"
 #include "CustomAMOR2DTOFPlot.h"
 #include "CustomTofPlot.h"
+#include "HistogramPlot.h"
 #include "ui_MainWindow.h"
 #include <MainWindow.h>
 #include <memory>
@@ -44,7 +45,7 @@ MainWindow::MainWindow(Configuration &Config, QWidget *parent)
   startKafkaConsumerThread();
 }
 
-MainWindow::~MainWindow() {delete ui;}
+MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::setupPlots() {
   if (strcmp(mConfig.Plot.PlotType.c_str(), "tof2d") == 0) {
@@ -52,14 +53,26 @@ void MainWindow::setupPlots() {
         mConfig, KafkaConsumerThread->getConsumer()));
 
     // register plot on ui
-    registerPlot(Plots.back().get());
+    ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
   } else if (strcmp(mConfig.Plot.PlotType.c_str(), "tof") == 0) {
     Plots.push_back(std::make_unique<CustomTofPlot>(
         mConfig, KafkaConsumerThread->getConsumer()));
 
     // register plot on ui
-    registerPlot(Plots.back().get());
+    ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
+
+    // Hide irrelevant buttons for TOF
+    ui->pushButtonGradient->setVisible(false);
+    ui->pushButtonInvert->setVisible(false);
+    ui->lblGradientText->setVisible(false);
+    ui->lblGradient->setVisible(false);
+
+  } else if (strcmp(mConfig.Plot.PlotType.c_str(), "histogram") == 0) {
+    Plots.push_back(std::make_unique<HistogramPlot>(
+        mConfig, KafkaConsumerThread->getConsumer()));
+
+    ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
     // Hide irrelevant buttons for TOF
     ui->pushButtonGradient->setVisible(false);
@@ -74,37 +87,31 @@ void MainWindow::setupPlots() {
         mConfig, KafkaConsumerThread->getConsumer(),
         Custom2DPlot::ProjectionXY));
 
-    registerPlot(Plots.back().get());
+    ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
     // If detector is 3D, also create XZ and YZ
     if (mConfig.Geometry.ZDim > 1) {
       Plots.push_back(std::make_unique<Custom2DPlot>(
           mConfig, KafkaConsumerThread->getConsumer(),
           Custom2DPlot::ProjectionXZ));
-      registerPlot(Plots.back().get());
+      ui->gridLayout->addWidget(Plots.back().get(), 0, 1, 1, 1);
       Plots.push_back(std::make_unique<Custom2DPlot>(
           mConfig, KafkaConsumerThread->getConsumer(),
           Custom2DPlot::ProjectionYZ));
-      registerPlot(Plots.back().get());
+      ui->gridLayout->addWidget(Plots.back().get(), 0, 2, 1, 1);
     }
   } else {
     throw(std::runtime_error("No valid plot type specified"));
   }
 
-  // Autoscale buttons are only relevant for TOF
-  if (Plots[0]->getPlotType() == TOF) {
-    ui->pushButtonAutoScaleX->setVisible(false);
-    ui->lblAutoScaleXText->setVisible(false);
-    ui->lblAutoScaleX->setVisible(false);
-    ui->pushButtonAutoScaleY->setVisible(false);
-    ui->lblAutoScaleYText->setVisible(false);
-    ui->lblAutoScaleY->setVisible(false);
-  }
-}
-
-void MainWindow::registerPlot(AbstractPlot *Plot) const {
-  if (Plot != nullptr) {
-    ui->gridLayout->addWidget(Plot, 0, 0, 1, 1);
+  // Autoscale buttons are only relevant for TOF and HISTOGRAM
+  if (Plots[0]->getPlotType() == TOF || Plots[0]->getPlotType() == HISTOGRAM) {
+    ui->pushButtonAutoScaleX->setVisible(true);
+    ui->lblAutoScaleXText->setVisible(true);
+    ui->lblAutoScaleX->setVisible(true);
+    ui->pushButtonAutoScaleY->setVisible(true);
+    ui->lblAutoScaleYText->setVisible(true);
+    ui->lblAutoScaleY->setVisible(true);
   }
 }
 
@@ -150,7 +157,7 @@ void MainWindow::handleClearButton() {
 void MainWindow::updateGradientLabel() {
 
   for (auto &Plot : Plots) {
-    if (Plot->getPlotType() != TOF) {
+    if (Plot->getPlotType() == PIXEL) {
       if (mConfig.Plot.InvertGradient) {
         ui->lblGradientText->setText(
             QString::fromStdString(mConfig.Plot.ColorGradient + " (I)"));
@@ -164,7 +171,7 @@ void MainWindow::updateGradientLabel() {
 
 /// \brief Autoscale is only relevant for TOF
 void MainWindow::updateAutoScaleLabels() {
-  if (Plots[0]->getPlotType() != TOF) {
+  if (Plots[0]->getPlotType() == TOF || Plots[0]->getPlotType() == HISTOGRAM) {
     if (mConfig.TOF.AutoScaleX) {
       ui->lblAutoScaleXText->setText(QString::fromStdString("on"));
     } else {
@@ -186,7 +193,7 @@ void MainWindow::handleLogButton() {
 
 // toggle the invert gradient flag (irrelevant for TOF)
 void MainWindow::handleInvertButton() {
-  if (Plots[0]->getPlotType() != TOF) {
+  if (Plots[0]->getPlotType() == PIXEL || Plots[0]->getPlotType() == TOF2D) {
     mConfig.Plot.InvertGradient = not mConfig.Plot.InvertGradient;
     updateGradientLabel();
   }
@@ -194,7 +201,7 @@ void MainWindow::handleInvertButton() {
 
 // toggle the auto scale x button
 void MainWindow::handleAutoScaleXButton() {
-  if (Plots[0]->getPlotType() == TOF) {
+  if (Plots[0]->getPlotType() == TOF || Plots[0]->getPlotType() == HISTOGRAM) {
     mConfig.TOF.AutoScaleX = not mConfig.TOF.AutoScaleX;
     updateAutoScaleLabels();
   }
@@ -202,7 +209,7 @@ void MainWindow::handleAutoScaleXButton() {
 
 // toggle the auto scale y button
 void MainWindow::handleAutoScaleYButton() {
-  if (Plots[0]->getPlotType() == TOF) {
+  if (Plots[0]->getPlotType() == TOF || Plots[0]->getPlotType() == HISTOGRAM) {
     mConfig.TOF.AutoScaleY = not mConfig.TOF.AutoScaleY;
     updateAutoScaleLabels();
   }

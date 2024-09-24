@@ -148,7 +148,7 @@ void CustomAMOR2DTOFPlot::clearDetectorImage() {
 void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
 
-  for (unsigned int y = 0; y < mConfig.Geometry.YDim; y++) {
+  for (int y = 0; y < mConfig.Geometry.YDim; y++) {
     for (unsigned int x = 0; x < mConfig.TOF.BinSize; x++) {
       if ((HistogramData2D[x][y] == 0) and (not Force)) {
         continue;
@@ -166,12 +166,9 @@ void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
 }
 
 void CustomAMOR2DTOFPlot::updateData() {
-  auto t2 = std::chrono::high_resolution_clock::now();
-  std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
-
   // Get newest histogram data from Consumer
-  std::vector<uint32_t> PixelIDs = mConsumer.readOutPixelIDs();
-  std::vector<uint32_t> TOFs = mConsumer.readOutTOFs();
+  std::vector<uint32_t> PixelIDs = mConsumer.readResetPixelIDs();
+  std::vector<uint32_t> TOFs = mConsumer.readResetTOFs();
 
   // Accumulate counts, PixelId 0 does not exist
   if (PixelIDs.size() == 0) {

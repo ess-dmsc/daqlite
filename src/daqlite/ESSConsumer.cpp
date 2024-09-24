@@ -31,8 +31,8 @@ ESSConsumer::ESSConsumer(
   mMaxPixel = geom.Offset + NumPixels;
   assert(mMaxPixel != 0);
   assert(mMinPixel < mMaxPixel);
-  mHistogram.resize(NumPixels);
-  mHistogramTof.resize(mConfig.TOF.BinSize);
+  // mHistogram.resize(NumPixels);
+  // mHistogramTof.resize(mConfig.TOF.BinSize);
 
   mConsumer = subscribeTopic();
   assert(mConsumer != nullptr);
@@ -152,31 +152,20 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  std::vector<uint32_t> CountBinValueVector;
-  std::vector<uint32_t> BinTofValueVector;
+  std::vector<uint32_t> TimeBinsUInt32(TimeBins.size());
+  std::transform(TimeBins.begin(), TimeBins.end(), TimeBinsUInt32.begin(),
+                 [](int64_t val) { return static_cast<uint32_t>(val); });
 
-  for (size_t i = 0; i < TimeBins.size(); i++) {
-    int64_t TimeBin = TimeBins[i];
-    int64_t DataBin = DataBins[i];
+  std::vector<uint32_t> DataBinsUInt32(DataBins.size());
+  std::transform(DataBins.begin(), DataBins.end(), DataBinsUInt32.begin(),
+                 [](int64_t val) { return static_cast<uint32_t>(val); });
 
-    if (TimeBin > MaxTime) {
-      continue;
-    }
-
-    if (DataBin < 0) {
-      continue;
-    }
-
-    CountBinValueVector[i] += DataBin;
-    BinTofValueVector[i] = TimeBin;
-  }
-
-  mHistogram.add_values(CountBinValueVector);
-  mTOFs = BinTofValueVector;
+  mHistogram.add_values(DataBinsUInt32);
+  mTOFs = TimeBinsUInt32;
 
   EventCount++;
   EventAccept++;
-  return mHistogramTof.size();
+  return mHistogram.size();
 }
 
 uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {

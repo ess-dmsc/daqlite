@@ -14,6 +14,8 @@
 #include <QPlot/QPlot.h>
 #include <chrono>
 #include <logical_geometry/ESSGeometry.h>
+#include <qvector.h>
+#include <vector>
 
 class HistogramPlot : public AbstractPlot {
   Q_OBJECT
@@ -45,7 +47,8 @@ private:
   /// \brief configuration obtained from main()
   Configuration &mConfig;
 
-  std::vector<uint32_t> HistogramTofData;
+  std::vector<uint32_t> HistogramYAxisValues;
+  std::vector<uint32_t> HistogramXAxisValues;
 
   /// \brief for calculating x, y, z from pixelid
   ESSGeometry *LogicalGeometry;

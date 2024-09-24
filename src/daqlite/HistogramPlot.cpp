@@ -12,8 +12,10 @@
 #include <WorkerThread.h>
 #include <algorithm>
 #include <assert.h>
+#include <cstddef>
 #include <cstdint>
 #include <fmt/format.h>
+#include <qvector.h>
 #include <string>
 #include <vector>
 
@@ -29,7 +31,7 @@ HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
 
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
 
-  HistogramTofData.resize(mConfig.TOF.BinSize);
+  HistogramYAxisValues.resize(mConfig.TOF.BinSize);
 
   // this will also allow rescaling the color scale by dragging/zooming
   setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
@@ -56,7 +58,7 @@ HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
     xAxis->setLabel(mConfig.Plot.XAxis.c_str());
   }
 
-  yAxis->setLabel("Counts");
+  yAxis->setLabel("Value Sum");
   xAxis->setRange(0, 50000);
 
   setCustomParameters();
@@ -76,14 +78,16 @@ void HistogramPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
   mGraph->data()->clear();
   uint32_t MaxY{0};
-  for (unsigned int i = 0; i < HistogramTofData.size(); i++) {
-    if ((HistogramTofData[i] != 0) or (Force)) {
-      uint32_t x = i * mConfig.TOF.MaxValue / HistogramTofData.size();
-      uint32_t y = HistogramTofData[i];
-      if (y > MaxY) {
-        MaxY = y;
+  for (unsigned int i = 0; i < HistogramXAxisValues.size(); i++) {
+    if ((HistogramXAxisValues[i] != 0) or (Force)) {
+      if (HistogramYAxisValues[i] > MaxY) {
+        // Calculate the maximum Y value for scaling
+        MaxY = HistogramYAxisValues[i];
       }
-      mGraph->addData(x, y);
+
+      double ScaledXValue = static_cast<double>(HistogramXAxisValues[i]) / mConfig.TOF.Scale;
+
+      mGraph->addData(ScaledXValue, HistogramYAxisValues[i]);
     }
   }
 
@@ -102,31 +106,39 @@ void HistogramPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
-  std::vector<uint32_t> YAxisValus = mConsumer.readOutHistogram();
-  std::vector<uint32_t> XAxisValus = mConsumer.readOutTOFs();
+  std::vector<uint32_t> YAxisValus = mConsumer.readResetHistogram();
+  HistogramXAxisValues = mConsumer.getTofs();
 
-  // Periodically clear the histogram
+  if (YAxisValus.size() != HistogramXAxisValues.size()) {
+    fmt::print("HistogramPlot::updateData() - TOF and Count vectors are not "
+               "the same size\n");
+    return;
+  }
+
+  // Periodically clear the histogram data sets
   //
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
   if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
-    std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
+    std::fill(HistogramYAxisValues.begin(), HistogramYAxisValues.end(), 0);
+    std::fill(HistogramXAxisValues.begin(), HistogramXAxisValues.end(), 0);
     t1 = std::chrono::high_resolution_clock::now();
   }
 
-  if (YAxisValus.size() < HistogramTofData.size()) {
-    HistogramTofData.resize(YAxisValus.size());
+  if (HistogramYAxisValues.size() < YAxisValus.size()) {
+    HistogramYAxisValues.resize(YAxisValus.size());
   }
 
   // Accumulate counts, PixelId 0 does not exist
-  for (unsigned int i = 1; i < Histogram.size(); i++) {
-    HistogramTofData[i] += Histogram[i];
+  for (unsigned int i = 1; i < YAxisValus.size(); i++) {
+    HistogramYAxisValues[i] += YAxisValus[i];
   }
+
   plotDetectorImage(false);
   return;
 }
 
 void HistogramPlot::clearDetectorImage() {
-  std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
+  std::fill(HistogramYAxisValues.begin(), HistogramYAxisValues.end(), 0);
   plotDetectorImage(true);
 }
 
@@ -146,5 +158,5 @@ void HistogramPlot::showPointToolTip(QMouseEvent *event) {
   // Get the count value from the data store
   double count = mGraph->data()->at(xCoordDataIndex)->mainValue();
 
-  setToolTip(QString("Tof: %1 Count: %2").arg(xCoordTofValue).arg(count));
+  setToolTip(QString("Tof: %1 Value: %2").arg(xCoordTofValue).arg(count));
 }

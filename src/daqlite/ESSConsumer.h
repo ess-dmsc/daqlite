@@ -18,6 +18,7 @@
 #include <librdkafka/rdkafkacpp.h>
 #include <mutex>
 #include <string>
+#include <vector>
 
 /// \class ESSConsumer
 /// \brief A class to handle Kafka consumer operations for ESS data.
@@ -75,27 +76,36 @@ public:
   uint64_t EventDiscard{0};
 
   /// \brief read out the histogram data and reset it
-  std::vector<uint32_t> readOutHistogram() {
-    return mHistogram;
+  std::vector<uint32_t> readResetHistogram() {
+    std::vector<uint32_t> ret = mHistogram;
     mHistogram.fill(0);
+    return ret;
   }
 
   /// \brief read out the TOF histogram data and reset it
-  std::vector<uint32_t> readOutHistogramTof() {
-    return mHistogramTof;
+  std::vector<uint32_t> readResetHistogramTof() {
+    std::vector<uint32_t> ret = mHistogramTof;
     mHistogramTof.fill(0);
+    return ret;
   }
 
   /// \brief read out the event pixel IDs and clear the vector
-  std::vector<uint32_t> readOutPixelIDs() {
-    return mPixelIDs;
+  std::vector<uint32_t> readResetPixelIDs() {
+    std::vector<uint32_t> ret = mPixelIDs;
     mPixelIDs.clear();
+    return ret;
   }
 
   /// \brief read out the event TOFs and clear the vector
-  std::vector<uint32_t> readOutTOFs() {
-    return mTOFs;
+  std::vector<uint32_t> readResetTOFs() {
+    std::vector<uint32_t> ret = mTOFs;
     mTOFs.clear();
+    return ret;
+  }
+
+  std::vector<uint32_t> getTofs() const {
+    std::vector<uint32_t> ret = mTOFs;
+    return ret;
   }
 
 private:

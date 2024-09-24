@@ -62,8 +62,6 @@ private:
 
   std::vector<std::unique_ptr<AbstractPlot>> Plots;
 
-  void registerPlot(AbstractPlot* Plot) const;
-
   // Q3DScatter scatter;
 
   /// \brief configuration obtained from main()
