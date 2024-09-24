@@ -1,4 +1,4 @@
-// Copyright (C) 2020 - 2022 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2020 - 2024 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file ESSConsumer.h
@@ -10,9 +10,9 @@
 
 #pragma once
 
-#include "ThreadSafeVector.h"
-#include "da00_dataarray_generated.h"
-#include "flatbuffers/flatbuffers.h"
+#include <ThreadSafeVector.h>
+#include <da00_dataarray_generated.h>
+#include <flatbuffers/flatbuffers.h>
 #include <Configuration.h>
 #include <cstdint>
 #include <librdkafka/rdkafkacpp.h>

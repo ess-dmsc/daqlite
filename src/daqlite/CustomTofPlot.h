@@ -1,4 +1,4 @@
-// Copyright (C) 2020 - 2021 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2020 - 2024 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file CustomTofPlot.h
@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "AbstractPlot.h"
+#include <AbstractPlot.h>
 #include <Configuration.h>
 #include <QPlot/QPlot.h>
 #include <chrono>

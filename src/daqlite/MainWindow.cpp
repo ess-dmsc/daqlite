@@ -5,11 +5,11 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "AbstractPlot.h"
-#include "CustomAMOR2DTOFPlot.h"
-#include "CustomTofPlot.h"
-#include "HistogramPlot.h"
-#include "ui_MainWindow.h"
+#include <HistogramPlot.h>
+#include <Custom2DPlot.h>
+#include <CustomAMOR2DTOFPlot.h>
+#include <CustomTofPlot.h>
+#include <ui_MainWindow.h>
 #include <MainWindow.h>
 #include <memory>
 #include <string.h>

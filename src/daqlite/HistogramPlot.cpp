@@ -5,8 +5,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "AbstractPlot.h"
-#include "ESSConsumer.h"
 #include <HistogramPlot.h>
 #include <QPlot/qcustomplot/qcustomplot.h>
 #include <WorkerThread.h>
@@ -15,7 +13,6 @@
 #include <cstddef>
 #include <cstdint>
 #include <fmt/format.h>
-#include <qvector.h>
 #include <string>
 #include <vector>
 

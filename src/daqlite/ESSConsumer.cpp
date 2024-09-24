@@ -5,11 +5,9 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "Configuration.h"
-#include "da00_dataarray_generated.h"
-#include "ev42_events_generated.h"
-#include "ev44_events_generated.h"
-#include "flatbuffers/flatbuffers.h"
+#include <da00_dataarray_generated.h>
+#include <ev42_events_generated.h>
+#include <ev44_events_generated.h>
 #include <ESSConsumer.h>
 #include <algorithm>
 #include <cstddef>

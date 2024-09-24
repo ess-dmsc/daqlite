@@ -1,4 +1,4 @@
-// Copyright (C) 2020 - 2022 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2020 - 2024 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file MainWindow.h
@@ -10,9 +10,6 @@
 
 #include <AbstractPlot.h>
 #include <Configuration.h>
-#include <Custom2DPlot.h>
-#include <CustomAMOR2DTOFPlot.h>
-#include <CustomTofPlot.h>
 #include <QMainWindow>
 #include <WorkerThread.h>
 #include <memory>

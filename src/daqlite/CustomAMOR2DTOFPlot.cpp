@@ -5,8 +5,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "AbstractPlot.h"
-#include "ESSConsumer.h"
 #include <CustomAMOR2DTOFPlot.h>
 #include <WorkerThread.h>
 #include <algorithm>

@@ -5,8 +5,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "AbstractPlot.h"
-#include "ESSConsumer.h"
 #include <Custom2DPlot.h>
 #include <WorkerThread.h>
 #include <algorithm>

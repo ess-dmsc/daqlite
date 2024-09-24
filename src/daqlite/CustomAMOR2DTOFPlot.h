@@ -1,4 +1,4 @@
-// Copyright (C) 2022 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2022-2024 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file CustomAMOR2DTOFPlot.h
@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "AbstractPlot.h"
-#include "ESSConsumer.h"
+#include <AbstractPlot.h>
+#include <ESSConsumer.h>
 #include <Configuration.h>
 #include <QPlot/QPlot.h>
 #include <chrono>

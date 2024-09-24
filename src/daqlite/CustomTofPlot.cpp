@@ -5,8 +5,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "AbstractPlot.h"
-#include "ESSConsumer.h"
 #include <CustomTofPlot.h>
 #include <QPlot/qcustomplot/qcustomplot.h>
 #include <WorkerThread.h>
