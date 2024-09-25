@@ -12,22 +12,21 @@
   },
 
   "geometry" : {
-    "xdim" : 1024,
-    "ydim" : 1024,
+    "xdim" : 10,
+    "ydim" : 10,
     "zdim" : 1,
     "offset" : 1
   },
 
   "tof" : {
     "scale" : 1000,
-    "max_value" : 71428,
-    "bin_size" : 512
+    "max_value" : 71428
   },
 
   "plot": {
-    "plot_type" : "tof",
-    "window_title" : "CBM TOF",
-    "plot_title" : "TOF",
+    "plot_type" : "histogram",
+    "window_title" : "CBM ADC TOF",
+    "plot_title" : "CBM ADC TOF",
     "clear_periodic" : false,
     "clear_interval_seconds" : 30,
     "interpolate_pixels" : false,
