@@ -150,17 +150,8 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  // convert vectors to uint32_t
-  std::vector<uint32_t> TimeBinsUInt32(TimeBins.size());
-  std::transform(TimeBins.begin(), TimeBins.end(), TimeBinsUInt32.begin(),
-                 [](int64_t val) { return static_cast<uint32_t>(val); });
-
-  std::vector<uint32_t> DataBinsUInt32(DataBins.size());
-  std::transform(DataBins.begin(), DataBins.end(), DataBinsUInt32.begin(),
-                 [](int64_t val) { return static_cast<uint32_t>(val); });
-
-  mHistogram.add_values(DataBinsUInt32);
-  mTOFs = TimeBinsUInt32;
+  mHistogram.add_values(DataBins);
+  mTOFs = TimeBins;
 
   mConfig.TOF.BinSize = TimeBins.size();
 

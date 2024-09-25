@@ -10,11 +10,11 @@
 
 #pragma once
 
+#include <Configuration.h>
 #include <ThreadSafeVector.h>
+#include <cstdint>
 #include <da00_dataarray_generated.h>
 #include <flatbuffers/flatbuffers.h>
-#include <Configuration.h>
-#include <cstdint>
 #include <librdkafka/rdkafkacpp.h>
 #include <mutex>
 #include <string>
@@ -78,14 +78,14 @@ public:
   /// \brief read out the histogram data and reset it
   std::vector<uint32_t> readResetHistogram() {
     std::vector<uint32_t> ret = mHistogram;
-    mHistogram = std::vector<uint32_t>(mConfig.TOF.BinSize, 0);
+    mHistogram.clear();
     return ret;
   }
 
   /// \brief read out the TOF histogram data and reset it
   std::vector<uint32_t> readResetHistogramTof() {
     std::vector<uint32_t> ret = mHistogramTof;
-    mHistogramTof.fill(0);
+    mHistogramTof.clear();
     return ret;
   }
 
@@ -115,10 +115,10 @@ private:
   RdKafka::Topic *mTopic;
 
   // Thread safe histogram data storage
-  ThreadSafeVector<uint32_t> mHistogram;
-  ThreadSafeVector<uint32_t> mHistogramTof;
-  ThreadSafeVector<uint32_t> mPixelIDs;
-  ThreadSafeVector<uint32_t> mTOFs;
+  ThreadSafeVector<uint32_t, int64_t> mHistogram;
+  ThreadSafeVector<uint32_t, int64_t> mHistogramTof;
+  ThreadSafeVector<uint32_t, int64_t> mPixelIDs;
+  ThreadSafeVector<uint32_t, int64_t> mTOFs;
 
   /// \brief configuration obtained from main()
   Configuration &mConfig;
