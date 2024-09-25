@@ -5,13 +5,13 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include <da00_dataarray_generated.h>
-#include <ev42_events_generated.h>
-#include <ev44_events_generated.h>
 #include <ESSConsumer.h>
 #include <algorithm>
 #include <cstddef>
 #include <cstdint>
+#include <da00_dataarray_generated.h>
+#include <ev42_events_generated.h>
+#include <ev44_events_generated.h>
 #include <fmt/core.h>
 #include <fmt/format.h>
 #include <iostream>
@@ -150,6 +150,7 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
+  // convert vectors to uint32_t
   std::vector<uint32_t> TimeBinsUInt32(TimeBins.size());
   std::transform(TimeBins.begin(), TimeBins.end(), TimeBinsUInt32.begin(),
                  [](int64_t val) { return static_cast<uint32_t>(val); });
@@ -160,6 +161,8 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
 
   mHistogram.add_values(DataBinsUInt32);
   mTOFs = TimeBinsUInt32;
+
+  mConfig.TOF.BinSize = TimeBins.size();
 
   EventCount++;
   EventAccept++;

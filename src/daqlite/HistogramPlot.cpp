@@ -75,6 +75,7 @@ void HistogramPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
   mGraph->data()->clear();
   uint32_t MaxY{1};
+
   for (unsigned int i = 0; i < HistogramXAxisValues.size(); i++) {
     if ((HistogramXAxisValues[i] != 0) or (Force)) {
       if (HistogramYAxisValues[i] > MaxY) {
@@ -103,10 +104,10 @@ void HistogramPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
-  std::vector<uint32_t> YAxisValus = mConsumer.readResetHistogram();
+  std::vector<uint32_t> YAxisValues = mConsumer.readResetHistogram();
   HistogramXAxisValues = mConsumer.getTofs();
 
-  if (YAxisValus.size() != HistogramXAxisValues.size()) {
+  if (YAxisValues.size() != HistogramXAxisValues.size()) {
     fmt::print("HistogramPlot::updateData() - TOF and Count vectors are not "
                "the same size\n");
     return;
@@ -121,13 +122,13 @@ void HistogramPlot::updateData() {
     t1 = std::chrono::high_resolution_clock::now();
   }
 
-  if (HistogramYAxisValues.size() < YAxisValus.size()) {
-    HistogramYAxisValues.resize(YAxisValus.size());
+  if (HistogramYAxisValues.size() < YAxisValues.size()) {
+    HistogramYAxisValues.resize(YAxisValues.size());
   }
 
   // Accumulate counts, PixelId 0 does not exist
-  for (unsigned int i = 1; i < YAxisValus.size(); i++) {
-    HistogramYAxisValues[i] += YAxisValus[i];
+  for (unsigned int i = 1; i < YAxisValues.size(); i++) {
+    HistogramYAxisValues[i] += YAxisValues[i];
   }
 
   plotDetectorImage(false);

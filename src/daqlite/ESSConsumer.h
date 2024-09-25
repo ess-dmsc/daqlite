@@ -78,7 +78,7 @@ public:
   /// \brief read out the histogram data and reset it
   std::vector<uint32_t> readResetHistogram() {
     std::vector<uint32_t> ret = mHistogram;
-    mHistogram.fill(0);
+    mHistogram = std::vector<uint32_t>(mConfig.TOF.BinSize, 0);
     return ret;
   }
 

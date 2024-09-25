@@ -62,7 +62,7 @@ private:
   // Q3DScatter scatter;
 
   /// \brief configuration obtained from main()
-  Configuration mConfig;
+  Configuration &mConfig;
 
   /// \brief
   std::unique_ptr<WorkerThread> KafkaConsumerThread;

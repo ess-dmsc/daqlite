@@ -5,6 +5,7 @@
 ///
 //===----------------------------------------------------------------------===//
 
+#include "AbstractPlot.h"
 #include <HistogramPlot.h>
 #include <Custom2DPlot.h>
 #include <CustomAMOR2DTOFPlot.h>
@@ -113,6 +114,11 @@ void MainWindow::setupPlots() {
     ui->lblAutoScaleYText->setVisible(true);
     ui->lblAutoScaleY->setVisible(true);
   }
+
+  if (Plots[0]->getPlotType() == HISTOGRAM) {
+    ui->lblBinSizeText->setVisible(true);
+    ui->lblBinSize->setVisible(true);
+  }
 }
 
 void MainWindow::startKafkaConsumerThread() {
@@ -133,6 +139,7 @@ void MainWindow::handleKafkaData(int ElapsedCountMS) {
   ui->lblEventRateText->setText(QString::number(EventRate));
   ui->lblAcceptRateText->setText(QString::number(EventAccept));
   ui->lblDiscardedPixelsText->setText(QString::number(EventDiscardRate));
+  ui->lblBinSizeText->setText(QString::number(mConfig.TOF.BinSize));
 
   for (auto &Plot : Plots) {
     Plot->updateData();
