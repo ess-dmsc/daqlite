@@ -1,9 +1,9 @@
 // Copyright (C) 2022-2024 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file CustomAMOR2DTOFPlot.h
+/// \file WorkerThread.cpp
 ///
-/// \brief Creates (maybe) a QCustomPlot based on the configuration parameters
+/// \brief main consumer loop implementation for Daquiri Light (daqlite)
 //===----------------------------------------------------------------------===//
 
 #include <WorkerThread.h>

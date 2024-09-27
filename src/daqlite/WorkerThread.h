@@ -6,8 +6,8 @@
 /// \brief main consumer loop for Daquiri Light (daqlite)
 /// The worker thread continuously calls ESSConsumer::consume() and
 /// ESSConsumer::handleMessage() to histogram the pixelids. Once every second
-/// the histogram is copied and the plotting thread (qt main thread?) is
-/// notified.
+/// the plotting thread (qt main thread?) is
+/// notified to update and plot new data.
 //===----------------------------------------------------------------------===//
 
 #pragma once
