@@ -4,7 +4,7 @@ date/3.0.1
 eigen/3.3.9      #bump to 3.4.0 requires conan upgrade
 gtest/1.10.0
 fmt/6.2.0        #bump to 8.1.1 requires upgrade of spdlog as well
-librdkafka/2.0.2
+librdkafka/2.0.2#47048b3f05407bab726e359b27740c46
 nlohmann_json/3.10.5
 spdlog/1.8.5     #bump to 1.9.2 requires conan upgrade
 h5cpp/0.4.1@ess-dmsc/stable
