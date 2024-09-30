@@ -24,13 +24,11 @@ ESSConsumer::ESSConsumer(
     std::vector<std::pair<std::string, std::string>> &KafkaConfig)
     : mConfig(Config), mKafkaConfig(KafkaConfig) {
   auto &geom = mConfig.Geometry;
-  uint32_t NumPixels = geom.XDim * geom.YDim * geom.ZDim;
+  mNumPixels = geom.XDim * geom.YDim * geom.ZDim;
   mMinPixel = geom.Offset + 1;
-  mMaxPixel = geom.Offset + NumPixels;
+  mMaxPixel = geom.Offset + mNumPixels;
   assert(mMaxPixel != 0);
   assert(mMinPixel < mMaxPixel);
-  // mHistogram.resize(NumPixels);
-  // mHistogramTof.resize(mConfig.TOF.BinSize);
 
   mConsumer = subscribeTopic();
   assert(mConsumer != nullptr);
@@ -89,8 +87,8 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
   }
 
   // local temporary histograms to avoid locking during processing
-  std::vector<uint32_t> CountPixelsVector(mHistogram.size(), 0);
-  std::vector<uint32_t> CountTofVector(mHistogramTof.size(), 0);
+  std::vector<uint32_t> PixelVector(mNumPixels, 0);
+  std::vector<uint32_t> TofBinVector(mConfig.TOF.BinSize, 0);
 
   for (uint i = 0; i < PixelIds->size(); i++) {
     uint32_t Pixel = (*PixelIds)[i];
@@ -108,16 +106,16 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
       EventAccept++;
 
       Pixel = Pixel - mConfig.Geometry.Offset;
-      CountPixelsVector[Pixel]++;
+      PixelVector[Pixel]++;
 
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
-      CountTofVector[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
+      TofBinVector[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
     }
   }
 
   // update thread safe histograms storage with new data
-  mHistogram.add_values(CountPixelsVector);
-  mHistogramTof.add_values(CountTofVector);
+  mHistogram.add_values(PixelVector);
+  mHistogramTof.add_values(TofBinVector);
 
   EventCount += PixelIds->size();
   return PixelIds->size();
@@ -169,8 +167,8 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  std::vector<uint32_t> CountPixelsVector(mHistogram.size(), 0);
-  std::vector<uint32_t> CountTofVector(mHistogramTof.size(), 0);
+  std::vector<uint32_t> PixelVector(mNumPixels, 0);
+  std::vector<uint32_t> TofBinVector(mConfig.TOF.BinSize, 0);
 
   for (uint i = 0; i < PixelIds->size(); i++) {
     uint32_t Pixel = (*PixelIds)[i];
@@ -187,14 +185,14 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     } else {
       EventAccept++;
       Pixel = Pixel - mConfig.Geometry.Offset;
-      CountPixelsVector[Pixel]++;
+      PixelVector[Pixel]++;
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
-      CountTofVector[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
+      TofBinVector[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
     }
   }
 
-  mHistogram.add_values(CountPixelsVector);
-  mHistogramTof.add_values(CountTofVector);
+  mHistogram.add_values(PixelVector);
+  mHistogramTof.add_values(TofBinVector);
 
   EventCount += PixelIds->size();
   return PixelIds->size();

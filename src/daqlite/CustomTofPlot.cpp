@@ -99,7 +99,7 @@ void CustomTofPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get histogram data from Consumer and clear it
-  std::vector<uint32_t> Histogram = mConsumer.readResetHistogram();
+  std::vector<uint32_t> HistogramTof = mConsumer.readResetHistogramTof();
 
   // Periodically clear the histogram
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
@@ -109,8 +109,8 @@ void CustomTofPlot::updateData() {
   }
 
   // Accumulate counts, PixelId 0 does not exist
-  for (unsigned int i = 1; i < Histogram.size(); i++) {
-    HistogramTofData[i] += Histogram[i];
+  for (unsigned int i = 1; i < HistogramTof.size(); i++) {
+    HistogramTofData[i] += HistogramTof[i];
   }
   plotDetectorImage(false);
   return;

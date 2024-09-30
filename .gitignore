@@ -7,7 +7,7 @@
 *.gcda
 *.gcno
 a.out
-*/core
+*core
 *.crt
 
 # Misc programs
