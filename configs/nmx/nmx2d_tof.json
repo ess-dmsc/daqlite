@@ -18,8 +18,10 @@
   },
 
   "plot": {
-    "plot_type" : "pixels",
-    "window_title" : "NMX - full instrument",
+    "plot_type" : "pixels_tof",
+    "tof_start" : 3000,
+    "tof_end" : 20000,
+    "window_title" : "NMX - full instrument ToF filter",
     "plot_title" : "pixels",
     "clear_periodic" : false,
     "clear_interval_seconds" : 30,

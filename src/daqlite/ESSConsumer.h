@@ -81,6 +81,13 @@ public:
     mHistogram.clear();
     return ret;
   }
+  
+  /// \brief read out the histogram with ToF filter and reset it
+  std::vector<uint32_t> readResetHistogram_2D_TOF() {
+    std::vector<uint32_t> ret = mHistogram_2D_TOF;
+    mHistogram_2D_TOF.clear();
+    return ret;
+  }
 
   /// \brief read out the TOF histogram data and reset it
   std::vector<uint32_t> readResetHistogramTof() {
@@ -116,6 +123,7 @@ private:
 
   // Thread safe histogram data storage
   ThreadSafeVector<uint32_t, int64_t> mHistogram;
+  ThreadSafeVector<uint32_t, int64_t> mHistogram_2D_TOF;
   ThreadSafeVector<uint32_t, int64_t> mHistogramTof;
   ThreadSafeVector<uint32_t, int64_t> mPixelIDs;
   ThreadSafeVector<uint32_t, int64_t> mTOFs;

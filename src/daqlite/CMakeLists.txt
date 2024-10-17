@@ -6,6 +6,7 @@ set(daqlite_src
   daqlite.cpp
   Configuration.cpp
   Custom2DPlot.cpp
+  Custom2DPlotTOF.cpp
   CustomAMOR2DTOFPlot.cpp
   CustomTofPlot.cpp
   HistogramPlot.cpp
@@ -18,6 +19,7 @@ set(daqlite_src
 set(daqlite_inc
   Configuration.h
   Custom2DPlot.h
+  Custom2DPlotTOF.h
   CustomAMOR2DTOFPlot.h
   CustomTofPlot.h
   HistogramPlot.h

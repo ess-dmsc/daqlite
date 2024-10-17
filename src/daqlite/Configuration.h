@@ -85,6 +85,9 @@ public:
     std::string XAxis{""};
     int Width{600};  // default window width
     int Height{400}; // default window height
+    int64_t tof_start{std::numeric_limits<int64_t>::min()};
+    int64_t tof_end{std::numeric_limits<int64_t>::max()};
+    
   };
 
 //

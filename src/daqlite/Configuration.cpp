@@ -71,6 +71,9 @@ void Configuration::getPlotConfig() {
   Plot.XAxis = getVal("plot", "xaxis", Plot.XAxis);
   Plot.Width = getVal("plot", "window_width", Plot.Width);
   Plot.Height = getVal("plot", "window_height", Plot.Height);
+  
+  Plot.tof_start = getVal("plot", "tof_start", Plot.tof_start);
+  Plot.tof_end = getVal("plot", "tof_end", Plot.tof_end);
 }
 
 void Configuration::getTOFConfig() {

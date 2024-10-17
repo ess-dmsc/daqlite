@@ -1,7 +1,7 @@
 {
   "kafka" : {
     "broker" : "127.0.0.1:9092",
-    "topic" : "nmx_detector",
+    "topic" : "nmx_beam_monitor",
 
     "message.max.bytes" : "10000000",
     "fetch.message.max.bytes" : "10000000",
@@ -11,21 +11,27 @@
   },
 
   "geometry" : {
-    "xdim" : 256,
-    "ydim" : 256,
+    "xdim" : 1,
+    "ydim" : 1,
     "zdim" : 1,
     "offset" : 0
   },
 
+  "tof" : {
+    "scale" : 1000,
+    "max_value" : 130000,
+    "bin_size" : 512
+  },
+
   "plot": {
-    "plot_type" : "pixels",
-    "window_title" : "NMX - full instrument",
-    "plot_title" : "pixels",
+    "plot_type" : "tof",
+    "window_title" : "NMX MON TOF",
+    "plot_title" : "TOF",
     "clear_periodic" : false,
     "clear_interval_seconds" : 30,
     "interpolate_pixels" : false,
     "color_gradient" : "hot",
     "invert_gradient" : false,
-    "log_scale" : true
+    "log_scale" : false
   }
 }

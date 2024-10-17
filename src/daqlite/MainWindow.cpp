@@ -8,6 +8,7 @@
 #include "AbstractPlot.h"
 #include <HistogramPlot.h>
 #include <Custom2DPlot.h>
+#include <Custom2DPlotTOF.h>
 #include <CustomAMOR2DTOFPlot.h>
 #include <CustomTofPlot.h>
 #include <ui_MainWindow.h>
@@ -99,6 +100,27 @@ void MainWindow::setupPlots() {
       Plots.push_back(std::make_unique<Custom2DPlot>(
           mConfig, KafkaConsumerThread->getConsumer(),
           Custom2DPlot::ProjectionYZ));
+      ui->gridLayout->addWidget(Plots.back().get(), 0, 2, 1, 1);
+    }
+  }
+  else if (strcmp(mConfig.Plot.PlotType.c_str(), "pixels_tof") == 0) {
+
+    // Always create the XY plot
+    Plots.push_back(std::make_unique<Custom2DPlotTOF>(
+        mConfig, KafkaConsumerThread->getConsumer(),
+        Custom2DPlotTOF::ProjectionXY));
+
+    ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
+
+    // If detector is 3D, also create XZ and YZ
+    if (mConfig.Geometry.ZDim > 1) {
+      Plots.push_back(std::make_unique<Custom2DPlotTOF>(
+          mConfig, KafkaConsumerThread->getConsumer(),
+          Custom2DPlotTOF::ProjectionXZ));
+      ui->gridLayout->addWidget(Plots.back().get(), 0, 1, 1, 1);
+      Plots.push_back(std::make_unique<Custom2DPlotTOF>(
+          mConfig, KafkaConsumerThread->getConsumer(),
+          Custom2DPlotTOF::ProjectionYZ));
       ui->gridLayout->addWidget(Plots.back().get(), 0, 2, 1, 1);
     }
   } else {

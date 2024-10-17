@@ -89,6 +89,7 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
   // local temporary histograms to avoid locking during processing
   std::vector<uint32_t> PixelVector(mNumPixels, 0);
   std::vector<uint32_t> TofBinVector(mConfig.TOF.BinSize, 0);
+  std::vector<uint32_t> PixelVector_2D_TOF(mNumPixels, 0);
 
   for (uint i = 0; i < PixelIds->size(); i++) {
     uint32_t Pixel = (*PixelIds)[i];
@@ -104,19 +105,21 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
       EventDiscard++;
     } else {
       EventAccept++;
-
       Pixel = Pixel - mConfig.Geometry.Offset;
       PixelVector[Pixel]++;
-
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
       TofBinVector[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
+      if(Tof >= mConfig.Plot.tof_start && Tof <= mConfig.Plot.tof_end) {
+      	PixelVector_2D_TOF[Pixel]++;
+      }
     }
   }
 
   // update thread safe histograms storage with new data
   mHistogram.add_values(PixelVector);
   mHistogramTof.add_values(TofBinVector);
-
+  mHistogram_2D_TOF.add_values(PixelVector_2D_TOF);
+  
   EventCount += PixelIds->size();
   return PixelIds->size();
 }
@@ -169,6 +172,7 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
 
   std::vector<uint32_t> PixelVector(mNumPixels, 0);
   std::vector<uint32_t> TofBinVector(mConfig.TOF.BinSize, 0);
+  std::vector<uint32_t> PixelVector_2D_TOF(mNumPixels, 0);
 
   for (uint i = 0; i < PixelIds->size(); i++) {
     uint32_t Pixel = (*PixelIds)[i];
@@ -184,16 +188,21 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
       EventDiscard++;
     } else {
       EventAccept++;
+      
       Pixel = Pixel - mConfig.Geometry.Offset;
       PixelVector[Pixel]++;
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
       TofBinVector[Tof * (mConfig.TOF.BinSize - 1) / mConfig.TOF.MaxValue]++;
+      if(Tof >= mConfig.Plot.tof_start && Tof <= mConfig.Plot.tof_end) {
+      	PixelVector_2D_TOF[Pixel]++;
+      }
     }
   }
 
   mHistogram.add_values(PixelVector);
   mHistogramTof.add_values(TofBinVector);
-
+  mHistogram_2D_TOF.add_values(PixelVector_2D_TOF);
+  
   EventCount += PixelIds->size();
   return PixelIds->size();
 }

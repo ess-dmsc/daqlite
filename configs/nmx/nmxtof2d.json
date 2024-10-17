@@ -17,12 +17,18 @@
     "offset" : 0
   },
 
+  "tof" : {
+    "scale" : 1000,
+    "max_value" : 130000,
+    "bin_size" : 512
+  },
+
   "plot": {
-    "plot_type" : "pixels",
-    "window_title" : "NMX - full instrument",
-    "plot_title" : "pixels",
+    "plot_type" : "tof2d",
+    "window_title" : "NMX 2d TOF",
+    "plot_title" : "Pixels",
     "clear_periodic" : false,
-    "clear_interval_seconds" : 30,
+    "clear_interval_seconds" : 5,
     "interpolate_pixels" : false,
     "color_gradient" : "hot",
     "invert_gradient" : false,
