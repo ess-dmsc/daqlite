@@ -1,0 +1,54 @@
+# docker build --build-arg VNC_PASSWORD=<secret> -f Dockerfile.deploy -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:<x.x> .
+
+FROM ubuntu:22.04
+
+ENV DEBIAN_FRONTEND=noninteractive
+ENV USER=root
+ENV DISPLAY=:1
+ARG VNC_PASSWORD=password
+ENV VNC_PASSWORD=${VNC_PASSWORD}
+ENV LD_LIBRARY_PATH="/ess/ecdc/daqlite/lib"
+
+# Install necessary packages
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        tightvncserver \
+        xfce4 \
+        xfce4-goodies \
+        qtcreator \
+        qtbase5-dev \
+        qt5-qmake \
+        vim-tiny \
+        x11-xserver-utils \
+        gedit \
+        xfonts-base \
+        xfonts-75dpi \
+        dbus-x11 && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+
+# Create directories
+RUN mkdir -p /ess/ecdc/daqlite/build /ess/ecdc/daqlite/configs
+
+# Copy application files
+COPY build/bin /ess/ecdc/daqlite/build/bin
+COPY build/configs /ess/ecdc/daqlite/configs
+COPY build/lib /ess/ecdc/daqlite/build/lib
+COPY build/licenses /ess/ecdc/daqlite/build/licenses
+COPY build/scripts /ess/ecdc/daqlite/build/scripts
+COPY Dockerfile_entrypoint.sh /ess/ecdc/daqlite/entrypoint.sh
+RUN chmod +x /ess/ecdc/daqlite/entrypoint.sh
+
+ENV DAQLITE_BROKER=""
+
+ENV DAQLITE_HOME="/ess/ecdc/daqlite/build"
+ENV DAQLITE_CONFIG="/ess/ecdc/daqlite/configs"
+ENV DAQLITE_PRODUCTION=false
+ENV PATH="/ess/ecdc/daqlite/build/scripts:${PATH}"
+
+# Expose VNC port
+EXPOSE 5901
+
+# Start the container with the startup script
+CMD ["/ess/ecdc/daqlite/entrypoint.sh"]
