@@ -18,7 +18,7 @@ chmod +x /root/.vnc/xstartup
 RUN dbus-launch
 
 # Start VNC server
-tightvncserver :1 -geometry 1280x800 -depth 24
+tightvncserver :1 -geometry ${VNC_RESOLUTION} -depth 24
 
 # Keep the container running
 tail -f /dev/null
