@@ -45,7 +45,7 @@ ENV DAQLITE_BROKER=""
 
 ENV DAQLITE_HOME="/ess/ecdc/daqlite/build"
 ENV DAQLITE_CONFIG="/ess/ecdc/daqlite/configs"
-ENV DAQLITE_PRODUCTION=false
+ENV DAQLITE_PRODUCTION=true
 ENV PATH="/ess/ecdc/daqlite/build/scripts:${PATH}"
 
 # Expose VNC port
