@@ -15,7 +15,7 @@ startxfce4 &" > /root/.vnc/xstartup
 chmod +x /root/.vnc/xstartup
 
 # Start DBus
-RUN dbus-launch
+dbus-launch
 
 # Start VNC server
 tightvncserver :1 -geometry ${VNC_RESOLUTION} -depth 24
