@@ -1,0 +1,48 @@
+workflow:
+  rules:
+    - if: '$CI_COMMIT_BRANCH == "ECDC-4352-daqlite-docker-container"'
+      when: always
+    - when: never
+
+default:
+  tags:
+    - docker
+
+stages:
+  - build
+  - publish
+
+build_job:
+  stage: build
+  image: "docker:20.10"
+  services:
+    - docker:dind
+  before_script:
+    - |
+      docker login \
+        -u "$CI_REGISTRY_USER" \
+        -p "$CI_REGISTRY_PASSWORD" \
+        "$CI_REGISTRY"
+  script:
+    - |
+      docker build \
+        --file .ci/docker/Dockerfile \
+        --build-arg https_proxy="http://172.20.72.11:8888" \
+        --build-arg http_proxy="http://172.20.72.11:8888" \
+        -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:latest \
+        .
+
+publish_job:
+  stage: publish
+  image: "docker:20.10"
+  services:
+    - docker:dind
+  before_script:
+    - |
+      docker login \
+        -u "$CI_REGISTRY_USER" \
+        -p "$CI_REGISTRY_PASSWORD" \
+        "$CI_REGISTRY"
+  script:
+    - |
+      docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:latest
