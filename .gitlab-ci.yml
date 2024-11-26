@@ -1,6 +1,6 @@
 workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "ECDC-4352-daqlite-docker-container"'
+    - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
     - when: never
 
