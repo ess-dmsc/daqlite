@@ -1,4 +1,4 @@
-# Use Ubuntu 22.04 as the base image
+# docker build --build-arg VNC_PASSWORD=seecrett -f .ci/docker/Dockerfile -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:<x.x> .
 FROM registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0 AS builder
 
 USER root
