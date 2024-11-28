@@ -61,7 +61,7 @@ publish_docker_job:
           --build-arg http_proxy="http://172.20.72.11:8888" \
           -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG \
           -f .ci/docker/Dockerfile.deploy .
-    # - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG
+    - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG
 
 publish_tar_job:
   stage: publish
