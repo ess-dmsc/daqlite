@@ -2,6 +2,8 @@ workflow:
   rules:
     - if: '$CI_COMMIT_BRANCH == "main"'
       when: always
+    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+      when: always
     - when: never
 
 default:
@@ -14,27 +16,26 @@ stages:
 
 build_job:
   stage: build
-  image: "docker:20.10"
-  services:
-    - docker:dind
-  before_script:
-    - |
-      docker login \
-        -u "$CI_REGISTRY_USER" \
-        -p "$CI_REGISTRY_PASSWORD" \
-        "$CI_REGISTRY"
+  image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
   script:
-    - |
-      docker build \
-        --file .ci/docker/Dockerfile \
-        --build-arg https_proxy="http://172.20.72.11:8888" \
-        --build-arg http_proxy="http://172.20.72.11:8888" \
-        -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:latest \
-        .
+      - mkdir -p build
+      - cd build
+      - conan remote add --insert 0 --force ecdc-conan-external https://artifactory.esss.lu.se/artifactory/api/conan/ecdc-conan-external
+      - conan install ..
+      - cmake ..
+      - make
+  artifacts:
+    paths:
+      - build/bin
+      - build/lib
+      - build/licenses
+    expire_in: 1 week
 
-publish_job:
+publish_docker_job:
   stage: publish
   image: "docker:20.10"
+  dependencies:
+    - build_job
   services:
     - docker:dind
   before_script:
@@ -44,5 +45,38 @@ publish_job:
         -p "$CI_REGISTRY_PASSWORD" \
         "$CI_REGISTRY"
   script:
+    # Determine the Docker tag based on the branch or tag
     - |
-      docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:latest
+      if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
+        DOCKER_TAG="latest"
+      elif [[ -n "$CI_COMMIT_TAG" ]]; then
+        DOCKER_TAG="$CI_COMMIT_TAG"
+      else
+        echo "Not on master or tag, skipping Docker publish."
+        exit 1
+      fi
+    - |
+      docker build \
+          --build-arg https_proxy="http://172.20.72.11:8888" \
+          --build-arg http_proxy="http://172.20.72.11:8888" \
+          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG \
+          -f .ci/docker/Dockerfile.deploy .
+    # - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG
+
+publish_tar_job:
+  stage: publish
+  image: alpine:latest
+  dependencies:
+    - build_job
+  artifacts:
+    paths:
+      - daqlite-ubuntu2204.tar.gz
+  script:
+    - apk update
+    - apk add --no-cache bash tar
+    - mkdir -p archive/daqlite-ubuntu2204
+    - cp -r build/bin archive/daqlite-ubuntu2204
+    - cp -r build/lib archive/daqlite-ubuntu2204
+    - cp -r scripts archive/daqlite-ubuntu2204
+    - cp -r configs archive/daqlite-ubuntu2204
+    - tar czvf daqlite-ubuntu2204.tar.gz archive/daqlite-ubuntu2204
