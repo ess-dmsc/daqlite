@@ -1,4 +1,4 @@
-# docker build --build-arg VNC_PASSWORD=<secret> -f Dockerfile.deploy -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:<x.x> .
+# docker build --build-arg VNC_PASSWORD=<secret> --build-arg VNC_RESOLUTION=1440×900 -f Dockerfile.deploy -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:<x.x> .
 
 FROM ubuntu:22.04
 
