@@ -1,0 +1,31 @@
+{
+  "kafka" : {
+    "broker" : "172.30.242.20:9092",
+    "topic" : "heimdal_detector",
+
+    "message.max.bytes" : "10000000",
+    "fetch.message.max.bytes" : "10000000",
+    "replica.fetch.max.bytes" : "10000000",
+    "enable.auto.commit" : "false",
+    "enable.auto.offset.store" : "false"
+  },
+
+  "geometry" : {
+    "xdim" : 141,
+    "ydim" : 2048,
+    "zdim" : 1,
+    "offset" : 0
+  },
+
+  "plot": {
+    "plot_type" : "pixels",
+    "window_title" : "HEIMDAL detector image",
+    "plot_title" : "Pixels",
+    "clear_periodic" : false,
+    "clear_interval_seconds" : 5,
+    "interpolate_pixels" : false,
+    "color_gradient" : "hot",
+    "invert_gradient" : false,
+    "log_scale" : true
+  }
+}
