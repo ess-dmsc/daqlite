@@ -1,0 +1,31 @@
+{
+  "kafka" : {
+    "broker" : "172.17.0.242:9092",
+    "topic" : "loki_detector_bank0",
+
+    "message.max.bytes" : "10000000",
+    "fetch.message.max.bytes" : "10000000",
+    "replica.fetch.max.bytes" : "10000000",
+    "enable.auto.commit" : "false",
+    "enable.auto.offset.store" : "false"
+  },
+
+  "geometry" : {
+    "xdim" : 512,
+    "ydim" : 672,
+    "zdim" : 1,
+    "offset" : 0
+  },
+
+  "plot": {
+    "plot_type" : "pixels",
+    "window_title" : "LOKI 12 RINGS - bank0",
+    "plot_title" : "pixels",
+    "clear_periodic" : false,
+    "clear_interval_seconds" : 30,
+    "interpolate_pixels" : false,
+    "color_gradient" : "hot",
+    "invert_gradient" : false,
+    "log_scale" : true
+  }
+}
