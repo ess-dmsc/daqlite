@@ -82,6 +82,12 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
   auto PixelIds = EvMsg->pixel_id();
   auto TOFs = EvMsg->time_of_flight();
 
+  // If source name is set in config, only process messages from that source
+  if (!mConfig.Kafka.Source.empty() &&
+      EvMsg->source_name()->str() != mConfig.Kafka.Source) {
+    return 0;
+  }
+
   if (PixelIds->size() != TOFs->size()) {
     return 0;
   }
@@ -127,18 +133,19 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  if (EvMsg->source_name()->str() != mConfig.Kafka.Source) {
+  if (!mConfig.Kafka.Source.empty() &&
+      EvMsg->source_name()->str() != mConfig.Kafka.Source) {
     return 0;
   }
 
   const auto TimeBinsVariable = EvMsg->data()->Get(0);
   const auto DataBinsVariable = EvMsg->data()->Get(1);
 
-  std::vector<int64_t> BinEdges = getDataVector(*TimeBinsVariable);
-  std::vector<int64_t> DataBins = getDataVector(*DataBinsVariable);
+  auto BinEdges = getDataVector(*TimeBinsVariable);
+  auto DataBins = getDataVector(*DataBinsVariable);
 
-  // Bin edges has one plus element to describe last edge compared to the data which
-  // has as many elements as bins
+  // Bin edges has one plus element to describe last edge compared to the data
+  // which has as many elements as bins
   if (BinEdges.size() != DataBins.size() + 1) {
     EventDiscard++;
     return 0;
@@ -164,6 +171,12 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
   auto EvMsg = GetEventMessage(Msg->payload());
   auto PixelIds = EvMsg->detector_id();
   auto TOFs = EvMsg->time_of_flight();
+
+  // If source name is set in config, only process messages from that source
+  if (!mConfig.Kafka.Source.empty() &&
+      EvMsg->source_name()->str() != mConfig.Kafka.Source) {
+    return 0;
+  }
 
   if (PixelIds->size() != TOFs->size()) {
     return 0;
@@ -270,26 +283,39 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
   std::vector<int64_t> Data;
 
   auto data = Variable.unit()->str();
+  auto shape = Variable.shape()->Get(0);
 
   switch (Variable.data_type()) {
   case da00_dtype::int32: {
     auto dataPtr = reinterpret_cast<const int32_t *>(Variable.data());
-    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+
+    // skip the first element which is the legth of the data
+    dataPtr++;
+    Data.assign(dataPtr, dataPtr + shape);
     break;
   }
   case da00_dtype::int64: {
     auto dataPtr = reinterpret_cast<const int64_t *>(Variable.data());
-    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+
+    // skip the first element which is the legth of the data
+    dataPtr++;
+    Data.assign(dataPtr, dataPtr + shape);
     break;
   }
   case da00_dtype::uint32: {
     auto dataPtr = reinterpret_cast<const uint32_t *>(Variable.data());
-    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+
+    // skip the first element which is the legth of the data
+    dataPtr++;
+    Data.assign(dataPtr, dataPtr + shape);
     break;
   }
   case da00_dtype::uint64: {
     auto dataPtr = reinterpret_cast<const uint64_t *>(Variable.data());
-    Data.assign(dataPtr, dataPtr + Variable.shape()->Get(0));
+
+    // skip the first element which is the legth of the data
+    dataPtr++;
+    Data.assign(dataPtr, dataPtr + shape);
     break;
   }
   default:

@@ -75,22 +75,21 @@ void HistogramPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
   mGraph->data()->clear();
 
-  for (unsigned int i = 0;
-       (i < HistogramXAxisValues.size()) and (i < HistogramYAxisValues.size());
-       i++) {
-    if ((HistogramXAxisValues[i] != 0) or (Force)) {
+  for (unsigned int i = 0; i < HistogramYAxisValues.size(); i++) {
+    // calculate the middle x value of the bin to place the data point
+    auto binWidth = HistogramXAxisValues[i + 1] - HistogramXAxisValues[i];
+    auto middleXValue = HistogramXAxisValues[i] + binWidth / 2.0;
 
-      double ScaledXValue =
-          static_cast<double>(HistogramXAxisValues[i]) / mConfig.TOF.Scale;
+    double ScaledXValue = middleXValue / mConfig.TOF.Scale;
 
-      mGraph->addData(ScaledXValue, HistogramYAxisValues[i]);
-    }
+    mGraph->addData(ScaledXValue, HistogramYAxisValues[i]);
   }
 
   // yAxis->rescale();
   if (mConfig.TOF.AutoScaleX && !HistogramXAxisValues.empty()) {
     double MaxX = *std::max_element(HistogramXAxisValues.begin(),
                                     HistogramXAxisValues.end());
+
     xAxis->setRange(0, MaxX / mConfig.TOF.Scale * 1.05);
   }
   if (mConfig.TOF.AutoScaleY && !HistogramYAxisValues.empty()) {
@@ -98,6 +97,7 @@ void HistogramPlot::plotDetectorImage(bool Force) {
                                   HistogramYAxisValues.end());
     yAxis->setRange(0, MaxY * 1.05);
   }
+
   replot();
 }
 
