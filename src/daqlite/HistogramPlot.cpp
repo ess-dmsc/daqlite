@@ -90,7 +90,10 @@ void HistogramPlot::plotDetectorImage(bool Force) {
     double MaxX = *std::max_element(HistogramXAxisValues.begin(),
                                     HistogramXAxisValues.end());
 
-    xAxis->setRange(0, MaxX / mConfig.TOF.Scale * 1.05);
+    double MinX = *std::min_element(HistogramXAxisValues.begin(),
+                                    HistogramXAxisValues.end());
+
+    xAxis->setRange(MinX / mConfig.TOF.Scale, MaxX / mConfig.TOF.Scale * 1.05);
   }
   if (mConfig.TOF.AutoScaleY && !HistogramYAxisValues.empty()) {
     auto MaxY = *std::max_element(HistogramYAxisValues.begin(),
