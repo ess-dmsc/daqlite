@@ -2,4 +2,15 @@
 
 BROKER=${DAQLITE_BROKER:-}
 
-../build/bin/daqlite $BROKER -f ../configs/heimdal/heimdal.json
+KAFKA_CONFIG=""
+
+# Check if we are in production environment and set KAFKA_CONFIG accordingly
+# or set dev environment variables
+if [ "$DAQLITE_PRODUCTION" = "true" ]; then
+    KAFKA_CONFIG="-k $DAQLITE_CONFIG/kafka-config-daqlite.json"
+else
+    DAQLITE_HOME="../build"
+    DAQLITE_CONFIG="../configs"
+fi
+
+$DAQLITE_HOME/bin/daqlite $BROKER -f $DAQLITE_CONFIG/heimdal/heimdal.json $KAFKA_CONFIG
