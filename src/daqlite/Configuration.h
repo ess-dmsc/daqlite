@@ -22,7 +22,10 @@ public:
   Configuration(){};
 
   /// \brief loads configuration from json file
-  void fromJsonFile(std::string fname);
+  void fromJsonObj(const nlohmann::json &obj);
+
+  /// \brief loads configuration from json file
+  void fromJsonFile(const std::string &fname);
 
   // get the Kafka related config options
   void getKafkaConfig();

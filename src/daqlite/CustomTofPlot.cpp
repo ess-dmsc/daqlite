@@ -14,7 +14,7 @@
 #include <string>
 
 CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
-    : AbstractPlot(TOF, Consumer), mConfig(Config) {
+    : AbstractPlot(PlotType::TOF, Consumer), mConfig(Config) {
 
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,

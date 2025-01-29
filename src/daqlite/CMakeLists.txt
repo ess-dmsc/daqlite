@@ -16,6 +16,7 @@ set(daqlite_src
   )
 
 set(daqlite_inc
+  Common.h
   Configuration.h
   Custom2DPlot.h
   CustomAMOR2DTOFPlot.h

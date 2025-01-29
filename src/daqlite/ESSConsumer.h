@@ -10,8 +10,10 @@
 
 #pragma once
 
+#include <Common.h>
 #include <Configuration.h>
 #include <ThreadSafeVector.h>
+
 #include <cstddef>
 #include <cstdint>
 #include <da00_dataarray_generated.h>
@@ -20,6 +22,9 @@
 #include <mutex>
 #include <string>
 #include <vector>
+#include <fmt/format.h>
+
+
 
 /// \class ESSConsumer
 /// \brief A class to handle Kafka consumer operations for ESS data.
@@ -82,9 +87,22 @@ public:
   size_t getTOFsSize() const { return mTOFs.size(); }
 
   /// \brief read out the histogram data and reset it
-  std::vector<uint32_t> readResetHistogram() {
+  std::vector<uint32_t> readResetHistogram(PlotType Type=PlotType::NONE) {
+    if (Type == PlotType::NONE) {
+      return std::vector<uint32_t>();
+    }
+
     std::vector<uint32_t> ret = mHistogram;
-    mHistogram.clear();
+
+
+    mDeliveryCount[Type] += 1;
+    fmt::print("  ESSConsumer::readResetHistogram: State = {} {} {}\n", Type, mSubscriptionCount[Type], mDeliveryCount[Type]);
+    if (mDeliveryCount[Type] == mSubscriptionCount[Type]) {
+      mDeliveryCount[Type] = 0;
+      mHistogram.clear();
+      fmt::print("  ESSConsumer::readResetHistogram: Clearing = {} {} {}\n\n", Type, mSubscriptionCount[Type], mDeliveryCount[Type]);
+    }
+
     return ret;
   }
 
@@ -113,6 +131,8 @@ public:
     std::vector<uint32_t> ret = mTOFs;
     return ret;
   }
+
+  void addSubscriber(PlotType type);
 
 private:
   RdKafka::Conf *mConf;
@@ -157,4 +177,7 @@ private:
   uint32_t mNumPixels{0}; ///< Number of pixels
   uint32_t mMinPixel{0};  ///< Offset
   uint32_t mMaxPixel{0};  ///< Number of pixels + offset
+
+  std::map<PlotType, size_t> mDeliveryCount;
+  std::map<PlotType, size_t> mSubscriptionCount;
 };

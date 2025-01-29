@@ -16,6 +16,8 @@
 #include <QApplication>
 #include <QCommandLineParser>
 #include <QPlot/QPlot.h>
+
+#include <memory>
 #include <fmt/format.h>
 #include <stdio.h>
 
@@ -40,6 +42,41 @@ int main(int argc, char *argv[]) {
 
   CLI.process(app);
 
+
+
+  // Parent button used to quit all plot widgets
+  QWidget mainWidget;
+  QPushButton button("&Quit");
+  QVBoxLayout layout;
+  mainWidget.setLayout(&layout);
+  layout.addWidget(&button);
+
+  button.connect(&button, &QPushButton::clicked, app.quit);
+  mainWidget.show();
+
+  // ---------------------------------------------------------------------------
+  // Parse main config file
+  const std::string FileName = CLI.value(fileOption).toStdString();
+  std::ifstream ifs(FileName, std::ofstream::in);
+  if (!ifs.good()) {
+    throw(std::runtime_error("Unable to create ifstream (bad filename?), exiting ..."));
+  }
+
+  nlohmann::json MainJsonObj;
+  ifs >> MainJsonObj;
+  std::cout << MainJsonObj << "\n\n";
+
+  // // Generate mother config
+  // Configuration config;
+  // config.fromJsonObj(MainJsonObj);
+
+  // WorkerThread SingleWorker(config);
+
+  // Loop over all plots
+  fmt::print("Getting all plots\n");
+  nlohmann::json plots = MainJsonObj["plots"]; 
+
+
   Configuration Config;
   if (CLI.isSet(fileOption)) {
     std::string FileName = CLI.value(fileOption).toStdString();
@@ -57,15 +94,68 @@ int main(int argc, char *argv[]) {
     Config.Kafka.Topic = KafkaTopic;
     printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.Kafka.Topic.c_str());
   }
+  
 
-  if (CLI.isSet(kafkaConfigOption)) {
-    std::string FileName = CLI.value(kafkaConfigOption).toStdString();
-    Config.KafkaConfigFile = FileName;
+  // Generate json for each plot and set up a CustomPlot
+  int count = 0;
+  for (const auto& plot : plots.items()) {
+    // nlohmann::json PlotObj = MainJsonObj;
+
+    // const auto iter = PlotObj.find("plots");
+    // if (iter != PlotObj.cend()) {
+    //   PlotObj.erase(iter);
+    // }
+
+    // PlotObj["plot"] = plot.value();
+
+    // std::cout << PlotObj << "\n\n";
+    
+    // Configuration Config;
+    // Config.fromJsonObj(PlotObj);
+
+    // if (CLI.isSet(kafkaBrokerOption)) {
+    //   std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
+    //   Config.Kafka.Broker = KafkaBroker;
+    //   printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.Kafka.Broker.c_str());
+    // }
+
+    // if (CLI.isSet(kafkaTopicOption)) {
+    //   std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
+    //   Config.Kafka.Topic = KafkaTopic;
+    //   printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.Kafka.Topic.c_str());
+    // }
+
+    // if (CLI.isSet(kafkaConfigOption)) {
+    //   std::string FileName = CLI.value(kafkaConfigOption).toStdString();
+    //   Config.KafkaConfigFile = FileName;
+    // }
+
+//    MainWindow* w = new MainWindow(Config, SingleWorker);
+    // MainWindow* w = new MainWindow(Config);
+    // w->setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + std::to_string(count)));
+    // // w->resize(Config.Plot.Width, Config.Plot.Height);
+    // w->setParent(&mainWidget, Qt::Window);
+    // w->show();
+
+    count += 1;
   }
 
-  MainWindow w(Config);
-  w.setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle));
-  w.resize(Config.Plot.Width, Config.Plot.Height);
+  WorkerThread SingleWorker(Config);
+
+  Config.Kafka.Broker = "kafka2:9092";
+  MainWindow w1(Config, SingleWorker);
+  w1.setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + " 1"));
+  w1.resize(Config.Plot.Width, Config.Plot.Height);
+
+  Config.Kafka.Broker = "kafka2:9092";
+  MainWindow w2(Config, SingleWorker);
+  w2.setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + " 2"));
+  w2.resize(Config.Plot.Width, Config.Plot.Height);
+
+  SingleWorker.start();
+
+
+  mainWidget.raise();
 
   return app.exec();
 }

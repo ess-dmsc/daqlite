@@ -17,7 +17,7 @@
 #include <vector>
 
 HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
-    : AbstractPlot(HISTOGRAM, Consumer), mConfig(Config) {
+    : AbstractPlot(PlotType::HISTOGRAM, Consumer), mConfig(Config) {
 
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,

@@ -6,6 +6,8 @@
 //===----------------------------------------------------------------------===//
 
 #include <CustomAMOR2DTOFPlot.h>
+#include "Common.h"
+
 #include <WorkerThread.h>
 #include <algorithm>
 #include <assert.h>
@@ -14,7 +16,7 @@
 
 CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
                                          ESSConsumer &Consumer)
-    : AbstractPlot(TOF2D, Consumer), mConfig(Config) {
+    : AbstractPlot(PlotType::TOF2D, Consumer), mConfig(Config) {
 
   if ((not(mConfig.Geometry.YDim <= TOF2DY) or
        (not(mConfig.TOF.BinSize <= TOF2DX)))) {

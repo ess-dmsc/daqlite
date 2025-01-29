@@ -9,6 +9,9 @@
 
 #pragma once
 
+#include "Common.h"
+
+
 #include <AbstractPlot.h>
 #include <ESSConsumer.h>
 #include <Configuration.h>

@@ -8,7 +8,17 @@
 #include <Configuration.h>
 #include <fmt/format.h>
 
-void Configuration::fromJsonFile(std::string fname) {
+void Configuration::fromJsonObj(const nlohmann::json &obj) {
+  JsonObj = obj;
+
+  getGeometryConfig();
+  getKafkaConfig();
+  getPlotConfig();
+  getTOFConfig();
+  print();
+}
+
+void Configuration::fromJsonFile(const std::string &fname) {
   std::ifstream ifs(fname, std::ofstream::in);
   if (!ifs.good()) {
     throw(std::runtime_error("Unable to create ifstream (bad filename?), exiting ..."));

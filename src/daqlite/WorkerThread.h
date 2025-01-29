@@ -23,7 +23,9 @@ class WorkerThread : public QThread {
   Q_OBJECT
 
 public:
-  WorkerThread(Configuration &Config) : mConfig(Config) {
+  WorkerThread(Configuration &Config) 
+  : mConfig(Config) 
+  {
     KafkaConfig KafkaCfg(Config.KafkaConfigFile);
     Consumer = std::make_unique<ESSConsumer>(Config, KafkaCfg.CfgParms);
   };

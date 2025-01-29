@@ -22,7 +22,9 @@
 ESSConsumer::ESSConsumer(
     Configuration &Config,
     std::vector<std::pair<std::string, std::string>> &KafkaConfig)
-    : mConfig(Config), mKafkaConfig(KafkaConfig) {
+    : mConfig(Config)
+    , mKafkaConfig(KafkaConfig) 
+{
   auto &geom = mConfig.Geometry;
   mNumPixels = geom.XDim * geom.YDim * geom.ZDim;
   mMinPixel = geom.Offset + 1;
@@ -32,6 +34,12 @@ ESSConsumer::ESSConsumer(
 
   mConsumer = subscribeTopic();
   assert(mConsumer != nullptr);
+
+  std::array<PlotType, 4> types = {PlotType::TOF2D, PlotType::TOF, PlotType::PIXEL, PlotType::HISTOGRAM};
+  for (PlotType t: types) {
+    mSubscriptionCount[t] = 0;
+    mDeliveryCount[t] = 0;
+  }
 }
 
 RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
@@ -328,4 +336,9 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
 std::unique_ptr<RdKafka::Message> ESSConsumer::consume() {
   std::unique_ptr<RdKafka::Message> msg(mConsumer->consume(1000));
   return msg;
+}
+
+void ESSConsumer::addSubscriber(PlotType type) {
+  mSubscriptionCount[type] += 1;
+  fmt::print("  ESSConsumer::addSubscriber {} {}\n", type, mSubscriptionCount[type]);
 }

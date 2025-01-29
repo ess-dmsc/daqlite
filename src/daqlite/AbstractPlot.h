@@ -8,10 +8,10 @@
 
 #pragma once
 
+#include "Common.h"
 #include "ESSConsumer.h"
-#include <QPlot/QPlot.h>
 
-enum PlotType { TOF2D, TOF, PIXEL, HISTOGRAM };
+#include <QPlot/QPlot.h>
 
 class AbstractPlot : public QCustomPlot {
   Q_OBJECT
@@ -20,7 +20,10 @@ class AbstractPlot : public QCustomPlot {
 
 protected:
   AbstractPlot(PlotType Type, ESSConsumer &Consumer)
-      : mPlotType(Type), mConsumer(Consumer) {}
+  : mPlotType(Type)
+  , mConsumer(Consumer) 
+  {
+  };
 
   ESSConsumer &mConsumer;
 

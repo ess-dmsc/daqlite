@@ -8,6 +8,8 @@
 
 #pragma once
 
+#include "Common.h"
+
 #include <AbstractPlot.h>
 #include <Configuration.h>
 #include <QMainWindow>
@@ -29,7 +31,7 @@ class MainWindow : public QMainWindow {
   //     PlotVariants;
 
 public:
-  MainWindow(Configuration &Config, QWidget *parent = nullptr);
+  MainWindow(Configuration &Config, WorkerThread &Worker, QWidget *parent = nullptr);
   ~MainWindow();
 
   /// \brief create the plot widgets
@@ -63,7 +65,9 @@ private:
 
   /// \brief configuration obtained from main()
   Configuration &mConfig;
+  WorkerThread *mWorker;
 
   /// \brief
-  std::unique_ptr<WorkerThread> KafkaConsumerThread;
+//  std::unique_ptr<WorkerThread> KafkaConsumerThread;
+  size_t mCount;
 };

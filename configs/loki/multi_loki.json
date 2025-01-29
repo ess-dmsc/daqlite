@@ -1,0 +1,83 @@
+{
+  "kafka" : {
+    "broker" : "172.17.0.3:9092",
+    "topic" : "loki_detector",
+
+    "message.max.bytes" : "10000000",
+    "fetch.message.max.bytes" : "10000000",
+    "replica.fetch.max.bytes" : "10000000",
+    "enable.auto.commit" : "false",
+    "enable.auto.offset.store" : "false"
+  },
+
+  "geometry" : {
+    "xdim" : 512,
+    "ydim" : 6271,
+    "zdim" : 1,
+    "offset" : 0
+  },
+
+  "plot": {
+    "plot_type" : "pixels",
+    "window_title" : "MULTI Loki - full instrument",
+    "plot_title" : "pixels",
+    "clear_periodic" : false,
+    "clear_interval_seconds" : 30,
+    "interpolate_pixels" : false,
+    "color_gradient" : "hot",
+    "invert_gradient" : false,
+    "log_scale" : true
+  },
+
+  "plots": {
+    "plot1" : {
+        "plot_type"              : "pixels",
+        "window_title"           : "1 LOKI - full instrument",
+        "plot_title"             : "pixels",
+        "clear_periodic"         : false,
+        "clear_interval_seconds" : 30,
+        "interpolate_pixels"     : false,
+        "color_gradient"         : "hot",
+        "invert_gradient"        : false,
+        "log_scale"              : true
+    },
+
+    "plot2" : {
+        "plot_type"              : "pixels",
+        "window_title"           : "2 LOKI - full instrument",
+        "plot_title"             : "pixels",
+        "clear_periodic"         : false,
+        "clear_interval_seconds" : 30,
+        "interpolate_pixels"     : false,
+        "color_gradient"         : "hot",
+        "invert_gradient"        : false,
+        "log_scale"              : true
+    },
+
+    "plot3": {
+      "plot_type"              : "tof",
+      "window_title"           : "LOKI TOF",
+      "plot_title"             : "mon 0",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "color_gradient"         : "hot",
+      "invert_gradient"        : false,
+      "log_scale"              : false
+    },  
+
+    "plot4": {
+      "plot_type"              : "histogram",
+      "window_title"           : "CBM ADC TOF",
+      "plot_title"             : "CBM ADC TOF",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "color_gradient"         : "hot",
+      "invert_gradient"        : false,
+      "log_scale"              : false,
+      "window_height"          : 400,
+      "window_width"           : 1200
+     }
+  }
+}

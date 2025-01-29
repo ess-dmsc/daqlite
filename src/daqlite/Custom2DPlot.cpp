@@ -14,9 +14,10 @@
 
 Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
-    : AbstractPlot(PIXEL, Consumer), mConfig(Config), mProjection(Proj) {
+    : AbstractPlot(PlotType::PIXEL, Consumer), mConfig(Config), mProjection(Proj) {
 
   // Register callback functions for events
+  Consumer.addSubscriber(getPlotType());
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
           SLOT(showPointToolTip(QMouseEvent *)));
   setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -191,7 +192,7 @@ void Custom2DPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // update histogram data from consumer of worker thread
-  std::vector<uint32_t> Histogram = mConsumer.readResetHistogram();
+  std::vector<uint32_t> Histogram = mConsumer.readResetHistogram(PlotType::PIXEL);
 
   int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
   if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
