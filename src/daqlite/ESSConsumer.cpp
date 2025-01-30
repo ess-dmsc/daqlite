@@ -35,8 +35,7 @@ ESSConsumer::ESSConsumer(
   mConsumer = subscribeTopic();
   assert(mConsumer != nullptr);
 
-  std::array<PlotType, 4> types = {PlotType::TOF2D, PlotType::TOF, PlotType::PIXEL, PlotType::HISTOGRAM};
-  for (PlotType t: types) {
+  for (DataType t: {DataType::NONE, DataType::ANY, DataType::TOF, DataType::HISTOGRAM, DataType::HISTOGRAM_TOF, DataType::PIXEL_ID}) {
     mSubscriptionCount[t] = 0;
     mDeliveryCount[t] = 0;
   }
@@ -115,9 +114,9 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
     mTOFs.push_back(TofBin);
 
     if ((Pixel > mMaxPixel) or (Pixel < mMinPixel)) {
-      EventDiscard++;
+      mEventDiscard++;
     } else {
-      EventAccept++;
+      mEventAccept++;
 
       Pixel = Pixel - mConfig.Geometry.Offset;
       PixelVector[Pixel]++;
@@ -131,7 +130,7 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
   mHistogram.add_values(PixelVector);
   mHistogramTof.add_values(TofBinVector);
 
-  EventCount += PixelIds->size();
+  mEventCount += PixelIds->size();
   return PixelIds->size();
 }
 
@@ -155,7 +154,7 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
   // Bin edges has one plus element to describe last edge compared to the data
   // which has as many elements as bins
   if (BinEdges.size() != DataBins.size() + 1) {
-    EventDiscard++;
+    mEventDiscard++;
     return 0;
   }
 
@@ -170,8 +169,8 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
 
   mConfig.TOF.BinSize = BinEdges.size() - 1;
 
-  EventCount++;
-  EventAccept++;
+  mEventCount++;
+  mEventAccept++;
   return mHistogram.size();
 }
 
@@ -204,9 +203,9 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     mTOFs.push_back(TofBin);
 
     if ((Pixel > mMaxPixel) or (Pixel < mMinPixel)) {
-      EventDiscard++;
+      mEventDiscard++;
     } else {
-      EventAccept++;
+      mEventAccept++;
       Pixel = Pixel - mConfig.Geometry.Offset;
       PixelVector[Pixel]++;
       Tof = std::min(Tof, mConfig.TOF.MaxValue);
@@ -217,7 +216,7 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
   mHistogram.add_values(PixelVector);
   mHistogramTof.add_values(TofBinVector);
 
-  EventCount += PixelIds->size();
+  mEventCount += PixelIds->size();
   return PixelIds->size();
 }
 
@@ -338,7 +337,116 @@ std::unique_ptr<RdKafka::Message> ESSConsumer::consume() {
   return msg;
 }
 
-void ESSConsumer::addSubscriber(PlotType type) {
-  mSubscriptionCount[type] += 1;
-  fmt::print("  ESSConsumer::addSubscriber {} {}\n", type, mSubscriptionCount[type]);
+
+/// \brief read out the histogram data and reset it
+std::vector<uint32_t> ESSConsumer::readResetHistogram() {
+  std::vector<uint32_t> ret = mHistogram;
+
+  if (checkDelivery(DataType::HISTOGRAM)) {
+    mHistogram.clear();
+  }
+
+  return ret;
 }
+
+/// \brief read out the TOF histogram data and reset it
+std::vector<uint32_t> ESSConsumer::readResetHistogramTof() {
+  std::vector<uint32_t> ret = mHistogramTof;
+
+  if (checkDelivery(DataType::HISTOGRAM_TOF)) {
+    mHistogramTof.clear();
+  }
+
+  return ret;
+}
+
+/// \brief read out the event pixel IDs and clear the vector
+std::vector<uint32_t> ESSConsumer::readResetPixelIDs() {
+  std::vector<uint32_t> ret = mPixelIDs;
+
+  if (checkDelivery(DataType::PIXEL_ID)) {
+    mPixelIDs.clear();
+  }
+
+
+  return ret;
+}
+
+/// \brief read out the event TOFs and clear the vector
+std::vector<uint32_t> ESSConsumer::readResetTOFs() {
+  std::vector<uint32_t> ret = mTOFs;
+
+  if (checkDelivery(DataType::TOF)) {
+    mTOFs.clear();
+  }
+
+  return ret;
+}
+
+std::vector<uint32_t> ESSConsumer::getTofs() const {
+  std::vector<uint32_t> ret = mTOFs;
+
+  return ret;
+}
+
+bool ESSConsumer::checkDelivery(DataType Type) {
+  mDeliveryCount[Type] += 1;
+  if (mDeliveryCount[Type] == mSubscriptionCount[Type]) {
+    mDeliveryCount[Type] = 0;
+
+    return true;
+  }
+
+  return false;
+}
+
+void ESSConsumer::addSubscriber(PlotType Type) {
+  mSubscribers += 1;
+
+  // Increment the total number of plots
+  mSubscriptionCount[DataType::ANY] += 1;
+
+  // Register data types for the plot type
+  switch (Type)
+  {
+    case PlotType::TOF:
+      mSubscriptionCount[DataType::HISTOGRAM_TOF] += 1;
+      break;
+
+    case PlotType::TOF2D:
+      mSubscriptionCount[DataType::PIXEL_ID] += 1;
+      mSubscriptionCount[DataType::TOF] += 1;
+      break;
+
+    case PlotType::PIXEL:
+      mSubscriptionCount[DataType::HISTOGRAM] += 1;
+      break;
+
+    case PlotType::HISTOGRAM:
+      mSubscriptionCount[DataType::HISTOGRAM] += 1;
+      break;
+
+    default:
+      break;
+  }
+
+  // for (const auto& dt: mDataTypes) {
+  //   fmt::print("ESSConsumer::addSubscriber {} {}\n", Type, mSubscriptionCount[dt]);
+  // }
+}
+
+void ESSConsumer::gotEventRequest() {
+  mEventRequests += 1;
+
+  // Reset if all event requests have been delivered
+  if (mEventRequests == mSubscriptionCount[DataType::ANY]) {
+      mEventCount = 0;
+      mEventAccept = 0;
+      mEventDiscard = 0;
+
+      mEventRequests = 0;
+  }
+}
+
+
+

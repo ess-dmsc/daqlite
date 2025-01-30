@@ -21,6 +21,12 @@
 #include <fmt/format.h>
 #include <stdio.h>
 
+
+void prettyJson(nlohmann::json &obj, const std::string &header, int indent=4) {
+  fmt::print("{}:\n", header);
+  std::cout << obj.dump(indent) << "\n\n" << std::endl;
+}
+
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
@@ -66,95 +72,69 @@ int main(int argc, char *argv[]) {
   ifs >> MainJsonObj;
   std::cout << MainJsonObj << "\n\n";
 
-  // // Generate mother config
-  // Configuration config;
-  // config.fromJsonObj(MainJsonObj);
-
-  // WorkerThread SingleWorker(config);
-
-  // Loop over all plots
-  fmt::print("Getting all plots\n");
-  nlohmann::json plots = MainJsonObj["plots"]; 
-
-
-  Configuration Config;
-  if (CLI.isSet(fileOption)) {
-    std::string FileName = CLI.value(fileOption).toStdString();
-    Config.fromJsonFile(FileName);
-  }
+  // Generate mother config
+  Configuration MainConfig;
+  MainConfig.fromJsonObj(MainJsonObj);
 
   if (CLI.isSet(kafkaBrokerOption)) {
     std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
-    Config.Kafka.Broker = KafkaBroker;
-    printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.Kafka.Broker.c_str());
+    MainConfig.Kafka.Broker = KafkaBroker;
+    printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", MainConfig.Kafka.Broker.c_str());
   }
 
   if (CLI.isSet(kafkaTopicOption)) {
     std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
-    Config.Kafka.Topic = KafkaTopic;
-    printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.Kafka.Topic.c_str());
+    MainConfig.Kafka.Topic = KafkaTopic;
+    printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", MainConfig.Kafka.Topic.c_str());
   }
-  
+
+  std::shared_ptr<WorkerThread> MainWorker = std::make_shared<WorkerThread>(MainConfig);
+//  WorkerThread MainWorker(MainConfig);
+
+
+  // Loop over all plots
+  nlohmann::json plots = MainJsonObj["plots"];
+  prettyJson(plots, "All Plots");
 
   // Generate json for each plot and set up a CustomPlot
   int count = 0;
   for (const auto& plot : plots.items()) {
-    // nlohmann::json PlotObj = MainJsonObj;
+    nlohmann::json PlotObj = MainJsonObj;
 
-    // const auto iter = PlotObj.find("plots");
-    // if (iter != PlotObj.cend()) {
-    //   PlotObj.erase(iter);
-    // }
+    const auto iter = PlotObj.find("plots");
+    if (iter != PlotObj.cend()) {
+      PlotObj.erase(iter);
+    }
+    PlotObj["plot"] = plot.value();
 
-    // PlotObj["plot"] = plot.value();
+    prettyJson(PlotObj, "Plot " + std::to_string(count));
 
-    // std::cout << PlotObj << "\n\n";
-    
-    // Configuration Config;
-    // Config.fromJsonObj(PlotObj);
+  
+    Configuration Config;
+    Config.fromJsonObj(PlotObj);
 
-    // if (CLI.isSet(kafkaBrokerOption)) {
-    //   std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
-    //   Config.Kafka.Broker = KafkaBroker;
-    //   printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.Kafka.Broker.c_str());
-    // }
+    if (CLI.isSet(kafkaBrokerOption)) {
+      std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
+      Config.Kafka.Broker = KafkaBroker;
+      printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.Kafka.Broker.c_str());
+    }
 
-    // if (CLI.isSet(kafkaTopicOption)) {
-    //   std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
-    //   Config.Kafka.Topic = KafkaTopic;
-    //   printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.Kafka.Topic.c_str());
-    // }
+    if (CLI.isSet(kafkaTopicOption)) {
+      std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
+      Config.Kafka.Topic = KafkaTopic;
+      printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.Kafka.Topic.c_str());
+    }
 
-    // if (CLI.isSet(kafkaConfigOption)) {
-    //   std::string FileName = CLI.value(kafkaConfigOption).toStdString();
-    //   Config.KafkaConfigFile = FileName;
-    // }
-
-//    MainWindow* w = new MainWindow(Config, SingleWorker);
-    // MainWindow* w = new MainWindow(Config);
-    // w->setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + std::to_string(count)));
-    // // w->resize(Config.Plot.Width, Config.Plot.Height);
-    // w->setParent(&mainWidget, Qt::Window);
-    // w->show();
+    MainWorker.get();
+    MainWindow* w = new MainWindow(Config, MainWorker.get());
+    w->setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + " " + std::to_string(count)));
+    w->setParent(&mainWidget, Qt::Window);
+    w->show();
 
     count += 1;
   }
 
-  WorkerThread SingleWorker(Config);
-
-  Config.Kafka.Broker = "kafka2:9092";
-  MainWindow w1(Config, SingleWorker);
-  w1.setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + " 1"));
-  w1.resize(Config.Plot.Width, Config.Plot.Height);
-
-  Config.Kafka.Broker = "kafka2:9092";
-  MainWindow w2(Config, SingleWorker);
-  w2.setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + " 2"));
-  w2.resize(Config.Plot.Width, Config.Plot.Height);
-
-  SingleWorker.start();
-
-
+  MainWorker->start();
   mainWidget.raise();
 
   return app.exec();

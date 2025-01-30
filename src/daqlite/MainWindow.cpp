@@ -15,17 +15,14 @@
 #include <memory>
 #include <string.h>
 
-MainWindow::MainWindow(Configuration &Config, WorkerThread &Worker, QWidget *parent)
+MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , mConfig(Config)
-  , mWorker(&Worker) 
+  , mWorker(Worker) 
   , mCount(0)
-  {
-  // KafkaConsumerThread(std::make_unique<WorkerThread>(Config)), mCount(0) {
-
+{
   ui->setupUi(this);
-
   setupPlots();
 
   ui->lblDescriptionText->setText(mConfig.Plot.PlotTitle.c_str());
@@ -61,7 +58,9 @@ void MainWindow::setupPlots() {
     // register plot on ui
     ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
-  } else if (strcmp(mConfig.Plot.PlotType.c_str(), "tof") == 0) {
+  } 
+  
+  else if (strcmp(mConfig.Plot.PlotType.c_str(), "tof") == 0) {
     Plots.push_back(std::make_unique<CustomTofPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -74,7 +73,9 @@ void MainWindow::setupPlots() {
     ui->lblGradientText->setVisible(false);
     ui->lblGradient->setVisible(false);
 
-  } else if (strcmp(mConfig.Plot.PlotType.c_str(), "histogram") == 0) {
+  } 
+  
+  else if (strcmp(mConfig.Plot.PlotType.c_str(), "histogram") == 0) {
     Plots.push_back(std::make_unique<HistogramPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -86,7 +87,9 @@ void MainWindow::setupPlots() {
     ui->lblGradientText->setVisible(false);
     ui->lblGradient->setVisible(false);
 
-  } else if (strcmp(mConfig.Plot.PlotType.c_str(), "pixels") == 0) {
+  } 
+  
+  else if (strcmp(mConfig.Plot.PlotType.c_str(), "pixels") == 0) {
 
     // Always create the XY plot
     Plots.push_back(std::make_unique<Custom2DPlot>(
@@ -112,7 +115,9 @@ void MainWindow::setupPlots() {
           Custom2DPlot::ProjectionYZ));
       ui->gridLayout->addWidget(Plots.back().get(), 0, 2, 1, 1);
     }
-  } else {
+  } 
+  
+  else {
     throw(std::runtime_error("No valid plot type specified"));
   }
 
@@ -142,9 +147,9 @@ void MainWindow::startKafkaConsumerThread() {
 void MainWindow::handleKafkaData(int ElapsedCountMS) {
   auto &Consumer = mWorker->getConsumer();
 
-  uint64_t EventRate = Consumer.EventCount * 1000ULL / ElapsedCountMS;
-  uint64_t EventAccept = Consumer.EventAccept * 1000ULL / ElapsedCountMS;
-  uint64_t EventDiscardRate = Consumer.EventDiscard * 1000ULL / ElapsedCountMS;
+  uint64_t EventRate = Consumer.getEventCount() * 1000ULL / ElapsedCountMS;
+  uint64_t EventAccept = Consumer.getEventAccept() * 1000ULL / ElapsedCountMS;
+  uint64_t EventDiscardRate = Consumer.getEventDiscard() * 1000ULL / ElapsedCountMS;
 
   ui->lblEventRateText->setText(QString::number(EventRate));
   ui->lblAcceptRateText->setText(QString::number(EventAccept));
@@ -154,10 +159,9 @@ void MainWindow::handleKafkaData(int ElapsedCountMS) {
   for (auto &Plot : Plots) {
     Plot->updateData();
   }
+  Consumer.gotEventRequest();
 
-  Consumer.EventCount = 0;
-  Consumer.EventAccept = 0;
-  Consumer.EventDiscard = 0;
+
   mCount += 1;
 }
 

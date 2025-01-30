@@ -10,7 +10,6 @@
 #include <chrono>
 
 void WorkerThread::run() {
-
   auto t2 = std::chrono::high_resolution_clock::now();
   auto t1 = std::chrono::high_resolution_clock::now();
 
@@ -28,7 +27,7 @@ void WorkerThread::run() {
 
       int ElapsedCountMS = elapsed.count()/1000000;
       emit resultReady(ElapsedCountMS);
-
+   
       t1 = std::chrono::high_resolution_clock::now();
     }
   }

@@ -25,13 +25,8 @@ QT_END_NAMESPACE
 class MainWindow : public QMainWindow {
   Q_OBJECT
 
-  // typedef std::variant<std::unique_ptr<Custom2DPlot>,
-  //                      std::unique_ptr<CustomAMOR2DTOFPlot>,
-  //                      std::unique_ptr<CustomTofPlot>>
-  //     PlotVariants;
-
 public:
-  MainWindow(Configuration &Config, WorkerThread &Worker, QWidget *parent = nullptr);
+  MainWindow(const Configuration &Config, WorkerThread *Worker, QWidget *parent = nullptr);
   ~MainWindow();
 
   /// \brief create the plot widgets
@@ -64,10 +59,9 @@ private:
   // Q3DScatter scatter;
 
   /// \brief configuration obtained from main()
-  Configuration &mConfig;
+  Configuration mConfig;
   WorkerThread *mWorker;
 
   /// \brief
-//  std::unique_ptr<WorkerThread> KafkaConsumerThread;
   size_t mCount;
 };

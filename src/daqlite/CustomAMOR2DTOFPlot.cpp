@@ -16,8 +16,9 @@
 
 CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
                                          ESSConsumer &Consumer)
-    : AbstractPlot(PlotType::TOF2D, Consumer), mConfig(Config) {
-
+    : AbstractPlot(PlotType::TOF2D, Consumer)
+    , mConfig(Config) 
+{
   if ((not(mConfig.Geometry.YDim <= TOF2DY) or
        (not(mConfig.TOF.BinSize <= TOF2DX)))) {
     throw(std::runtime_error("2D TOF histogram size mismatch"));
@@ -184,6 +185,7 @@ void CustomAMOR2DTOFPlot::updateData() {
     HistogramData2D[tof][yvals]++;
   }
   plotDetectorImage(false);
+
   return;
 }
 

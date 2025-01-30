@@ -17,8 +17,9 @@
 #include <vector>
 
 HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
-    : AbstractPlot(PlotType::HISTOGRAM, Consumer), mConfig(Config) {
-
+    : AbstractPlot(PlotType::HISTOGRAM, Consumer)
+    , mConfig(Config)
+{
   // Register callback functions for events
   connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
           SLOT(showPointToolTip(QMouseEvent *)));
@@ -109,7 +110,7 @@ void HistogramPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
-  // continure the the update only if we have data available from the consumer
+  // continue the the update only if we have data available from the consumer
   if (mConsumer.getHistogramSize() == 0 or mConsumer.getTOFsSize() == 0) {
     return;
   }

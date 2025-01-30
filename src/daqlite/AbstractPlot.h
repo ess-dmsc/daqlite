@@ -16,23 +16,25 @@
 class AbstractPlot : public QCustomPlot {
   Q_OBJECT
 
-  PlotType mPlotType;
 
 protected:
   AbstractPlot(PlotType Type, ESSConsumer &Consumer)
   : mPlotType(Type)
   , mConsumer(Consumer) 
-  {
-  };
+{
+  mConsumer.addSubscriber(mPlotType);
+};
+
+  PlotType mPlotType;
 
   ESSConsumer &mConsumer;
 
 public:
+  PlotType getPlotType() { return mPlotType; }
+
   virtual void clearDetectorImage() = 0;
 
   virtual void updateData() = 0;
 
   virtual void plotDetectorImage(bool Force) = 0;
-
-  PlotType getPlotType() { return mPlotType; }
 };
