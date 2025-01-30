@@ -19,7 +19,7 @@
 
   "plot": {
     "plot_type" : "pixels",
-    "window_title" : "ODIN all detectors image",
+    "window_title" : "ODIN Next Image",
     "plot_title" : "Pixels",
     "clear_periodic" : false,
     "clear_interval_seconds" : 5,

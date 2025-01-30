@@ -25,7 +25,7 @@
 
   "plot": {
     "plot_type" : "tof",
-    "window_title" : "ODIN TOF",
+    "window_title" : "ODIN ToF",
     "plot_title" : "TOF",
     "clear_periodic" : false,
     "clear_interval_seconds" : 30,
