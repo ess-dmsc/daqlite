@@ -22,11 +22,11 @@ CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
           SLOT(showPointToolTip(QMouseEvent *)));
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
-  auto &geom = mConfig.Geometry;
+  auto &geom = mConfig.mGeometry;
 
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
 
-  HistogramTofData.resize(mConfig.TOF.BinSize);
+  HistogramTofData.resize(mConfig.mTOF.BinSize);
 
   // this will also allow rescaling the color scale by dragging/zooming
   setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
@@ -47,10 +47,10 @@ CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
 
   // we want the color map to have nx * ny data points
 
-  if (mConfig.Plot.XAxis.empty()) {
+  if (mConfig.mPlot.XAxis.empty()) {
     xAxis->setLabel("TOF (us)");
   } else {
-    xAxis->setLabel(mConfig.Plot.XAxis.c_str());
+    xAxis->setLabel(mConfig.mPlot.XAxis.c_str());
   }
 
   yAxis->setLabel("Counts");
@@ -62,7 +62,7 @@ CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
 }
 
 void CustomTofPlot::setCustomParameters() {
-  if (mConfig.Plot.LogScale) {
+  if (mConfig.mPlot.LogScale) {
     yAxis->setScaleType(QCPAxis::stLogarithmic);
   } else {
     yAxis->setScaleType(QCPAxis::stLinear);
@@ -75,7 +75,7 @@ void CustomTofPlot::plotDetectorImage(bool Force) {
   uint32_t MaxY{0};
   for (unsigned int i = 0; i < HistogramTofData.size(); i++) {
     if ((HistogramTofData[i] != 0) or (Force)) {
-      uint32_t x = i * mConfig.TOF.MaxValue / mConfig.TOF.BinSize;
+      uint32_t x = i * mConfig.mTOF.MaxValue / mConfig.mTOF.BinSize;
       uint32_t y = HistogramTofData[i];
       if (y > MaxY) {
         MaxY = y;
@@ -85,10 +85,10 @@ void CustomTofPlot::plotDetectorImage(bool Force) {
   }
 
   // yAxis->rescale();
-  if (mConfig.TOF.AutoScaleX) {
-    xAxis->setRange(0, mConfig.TOF.MaxValue * 1.05);
+  if (mConfig.mTOF.AutoScaleX) {
+    xAxis->setRange(0, mConfig.mTOF.MaxValue * 1.05);
   }
-  if (mConfig.TOF.AutoScaleY) {
+  if (mConfig.mTOF.AutoScaleY) {
     yAxis->setRange(0, MaxY * 1.05);
   }
   replot();
@@ -103,8 +103,8 @@ void CustomTofPlot::updateData() {
   std::vector<uint32_t> HistogramTof = mConsumer.readResetHistogramTof();
 
   // Periodically clear the histogram
-  int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
-  if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
+  int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
+  if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
     t1 = std::chrono::high_resolution_clock::now();
   }
@@ -127,7 +127,7 @@ void CustomTofPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
 
   // Calculate x coord width of the graphical representation of the column
-  int xCoordStep = int(mConfig.TOF.MaxValue / mConfig.TOF.BinSize);
+  int xCoordStep = int(mConfig.mTOF.MaxValue / mConfig.mTOF.BinSize);
 
   // Get the index in data store for the x coordinate
   int xCoordDataIndex = int((x - xCoordStep / 2) / xCoordStep);

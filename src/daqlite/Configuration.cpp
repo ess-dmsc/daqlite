@@ -9,7 +9,7 @@
 #include <fmt/format.h>
 
 void Configuration::fromJsonObj(const nlohmann::json &obj) {
-  JsonObj = obj;
+  mJsonObj = obj;
 
   getGeometryConfig();
   getKafkaConfig();
@@ -25,7 +25,7 @@ void Configuration::fromJsonFile(const std::string &fname) {
   }
 
   try {
-    ifs >> JsonObj;
+    ifs >> mJsonObj;
   } catch (...) {
     throw(std::runtime_error("File is not valid JSON"));
   }
@@ -39,83 +39,83 @@ void Configuration::fromJsonFile(const std::string &fname) {
 
 void Configuration::getGeometryConfig() {
   /// 'geometry' field is mandatory
-  Geometry.XDim = getVal("geometry", "xdim", Geometry.XDim, true);
-  Geometry.YDim = getVal("geometry", "ydim", Geometry.YDim, true);
-  Geometry.ZDim = getVal("geometry", "zdim", Geometry.ZDim, true);
-  Geometry.Offset = getVal("geometry", "offset", Geometry.Offset);
+  mGeometry.XDim = getVal("geometry", "xdim", mGeometry.XDim, true);
+  mGeometry.YDim = getVal("geometry", "ydim", mGeometry.YDim, true);
+  mGeometry.ZDim = getVal("geometry", "zdim", mGeometry.ZDim, true);
+  mGeometry.Offset = getVal("geometry", "offset", mGeometry.Offset);
 }
 
 void Configuration::getKafkaConfig() {
   /// 'broker' and 'topic' must be specified
   using std::operator""s;
-  Kafka.Broker = getVal("kafka", "broker", "n/a"s, true);
-  Kafka.Topic = getVal("kafka", "topic", "n/a"s, true);
-  Kafka.Source = getVal("kafka", "source", ""s, false);
+  mKafka.Broker = getVal("kafka", "broker", "n/a"s, true);
+  mKafka.Topic = getVal("kafka", "topic", "n/a"s, true);
+  mKafka.Source = getVal("kafka", "source", ""s, false);
   /// The rest are optional, using default values
-  Kafka.MessageMaxBytes =
-      getVal("kafka", "message.max.bytes", Kafka.MessageMaxBytes);
-  Kafka.FetchMessagMaxBytes =
-      getVal("kafka", "fetch.message.max.bytes", Kafka.FetchMessagMaxBytes);
-  Kafka.ReplicaFetchMaxBytes =
-      getVal("kafka", "replica.fetch.max.bytes", Kafka.ReplicaFetchMaxBytes);
-  Kafka.EnableAutoCommit =
-      getVal("kafka", "enable.auto.commit", Kafka.EnableAutoCommit);
-  Kafka.EnableAutoOffsetStore =
-      getVal("kafka", "enable.auto.offset.store", Kafka.EnableAutoOffsetStore);
+  mKafka.MessageMaxBytes =
+      getVal("kafka", "message.max.bytes", mKafka.MessageMaxBytes);
+  mKafka.FetchMessagMaxBytes =
+      getVal("kafka", "fetch.message.max.bytes", mKafka.FetchMessagMaxBytes);
+  mKafka.ReplicaFetchMaxBytes =
+      getVal("kafka", "replica.fetch.max.bytes", mKafka.ReplicaFetchMaxBytes);
+  mKafka.EnableAutoCommit =
+      getVal("kafka", "enable.auto.commit", mKafka.EnableAutoCommit);
+  mKafka.EnableAutoOffsetStore =
+      getVal("kafka", "enable.auto.offset.store", mKafka.EnableAutoOffsetStore);
 }
 
 void Configuration::getPlotConfig() {
   // Plot options - all are optional
-  Plot.PlotType = getVal("plot", "plot_type", Plot.PlotType);
-  Plot.ClearPeriodic = getVal("plot", "clear_periodic", Plot.ClearPeriodic);
-  Plot.ClearEverySeconds =
-      getVal("plot", "clear_interval_seconds", Plot.ClearEverySeconds);
-  Plot.Interpolate = getVal("plot", "interpolate_pixels", Plot.Interpolate);
-  Plot.ColorGradient = getVal("plot", "color_gradient", Plot.ColorGradient);
-  Plot.InvertGradient = getVal("plot", "invert_gradient", Plot.InvertGradient);
-  Plot.LogScale = getVal("plot", "log_scale", Plot.LogScale);
+  mPlot.PlotType = getVal("plot", "plot_type", mPlot.PlotType);
+  mPlot.ClearPeriodic = getVal("plot", "clear_periodic", mPlot.ClearPeriodic);
+  mPlot.ClearEverySeconds =
+      getVal("plot", "clear_interval_seconds", mPlot.ClearEverySeconds);
+  mPlot.Interpolate = getVal("plot", "interpolate_pixels", mPlot.Interpolate);
+  mPlot.ColorGradient = getVal("plot", "color_gradient", mPlot.ColorGradient);
+  mPlot.InvertGradient = getVal("plot", "invert_gradient", mPlot.InvertGradient);
+  mPlot.LogScale = getVal("plot", "log_scale", mPlot.LogScale);
 
   // Window options - all are optional
-  Plot.WindowTitle = getVal("plot", "window_title", Plot.WindowTitle);
-  Plot.PlotTitle = getVal("plot", "plot_title", Plot.PlotTitle);
-  Plot.XAxis = getVal("plot", "xaxis", Plot.XAxis);
-  Plot.Width = getVal("plot", "window_width", Plot.Width);
-  Plot.Height = getVal("plot", "window_height", Plot.Height);
+  mPlot.WindowTitle = getVal("plot", "window_title", mPlot.WindowTitle);
+  mPlot.PlotTitle = getVal("plot", "plot_title", mPlot.PlotTitle);
+  mPlot.XAxis = getVal("plot", "xaxis", mPlot.XAxis);
+  mPlot.Width = getVal("plot", "window_width", mPlot.Width);
+  mPlot.Height = getVal("plot", "window_height", mPlot.Height);
 }
 
 void Configuration::getTOFConfig() {
-  TOF.Scale = getVal("tof", "scale", TOF.Scale);
-  TOF.MaxValue = getVal("tof", "max_value", TOF.MaxValue);
-  TOF.BinSize = getVal("tof", "bin_size", TOF.BinSize);
-  TOF.AutoScaleX = getVal("tof", "auto_scale_x", TOF.AutoScaleX);
-  TOF.AutoScaleY = getVal("tof", "auto_scale_y", TOF.AutoScaleY);
+  mTOF.Scale = getVal("tof", "scale", mTOF.Scale);
+  mTOF.MaxValue = getVal("tof", "max_value", mTOF.MaxValue);
+  mTOF.BinSize = getVal("tof", "bin_size", mTOF.BinSize);
+  mTOF.AutoScaleX = getVal("tof", "auto_scale_x", mTOF.AutoScaleX);
+  mTOF.AutoScaleY = getVal("tof", "auto_scale_y", mTOF.AutoScaleY);
 }
 
 void Configuration::print() {
   fmt::print("[Kafka]\n");
-  fmt::print("  Broker {}\n", Kafka.Broker);
-  fmt::print("  Topic {}\n", Kafka.Topic);
+  fmt::print("  Broker {}\n", mKafka.Broker);
+  fmt::print("  Topic {}\n", mKafka.Topic);
   fmt::print("[Geometry]\n");
-  fmt::print("  Dimensions ({}, {}, {})\n", Geometry.XDim, Geometry.YDim,
-             Geometry.ZDim);
-  fmt::print("  Pixel Offset {}\n", Geometry.Offset);
+  fmt::print("  Dimensions ({}, {}, {})\n", mGeometry.XDim, mGeometry.YDim,
+             mGeometry.ZDim);
+  fmt::print("  Pixel Offset {}\n", mGeometry.Offset);
   fmt::print("[Plot]\n");
-  fmt::print("  WindowTitle {}\n", Plot.WindowTitle);
-  fmt::print("  Plot type {}\n", Plot.PlotType);
-  fmt::print("  Clear periodically {}\n", Plot.ClearPeriodic);
-  fmt::print("  Clear interval (s) {}\n", Plot.ClearEverySeconds);
-  fmt::print("  Interpolate image {}\n", Plot.Interpolate);
-  fmt::print("  Color gradient {}\n", Plot.ColorGradient);
-  fmt::print("  Invert gradient {}\n", Plot.InvertGradient);
-  fmt::print("  Log Scale {}\n", Plot.LogScale);
-  fmt::print("  PlotTitle {}\n", Plot.PlotTitle);
-  fmt::print("  X Axis {}\n", Plot.XAxis);
+  fmt::print("  WindowTitle {}\n", mPlot.WindowTitle);
+  fmt::print("  Plot type {}\n", mPlot.PlotType);
+  fmt::print("  Clear periodically {}\n", mPlot.ClearPeriodic);
+  fmt::print("  Clear interval (s) {}\n", mPlot.ClearEverySeconds);
+  fmt::print("  Interpolate image {}\n", mPlot.Interpolate);
+  fmt::print("  Color gradient {}\n", mPlot.ColorGradient);
+  fmt::print("  Invert gradient {}\n", mPlot.InvertGradient);
+  fmt::print("  Log Scale {}\n", mPlot.LogScale);
+  fmt::print("  PlotTitle {}\n", mPlot.PlotTitle);
+  fmt::print("  X Axis {}\n", mPlot.XAxis);
   fmt::print("[TOF]\n");
-  fmt::print("  Scale {}\n", TOF.Scale);
-  fmt::print("  Max value {}\n", TOF.MaxValue);
-  fmt::print("  Bin size {}\n", TOF.BinSize);
-  fmt::print("  Auto scale x {}\n", TOF.AutoScaleX);
-  fmt::print("  Auto scale y {}\n", TOF.AutoScaleY);
+  fmt::print("  Scale {}\n", mTOF.Scale);
+  fmt::print("  Max value {}\n", mTOF.MaxValue);
+  fmt::print("  Bin size {}\n", mTOF.BinSize);
+  fmt::print("  Auto scale x {}\n", mTOF.AutoScaleX);
+  fmt::print("  Auto scale y {}\n", mTOF.AutoScaleY);
 }
 
 //\brief getVal() template is used to effectively achieve
@@ -125,7 +125,7 @@ T Configuration::getVal(std::string Group, std::string Option, T Default,
                         bool Throw) {
   T ConfigVal;
   try {
-    ConfigVal = JsonObj[Group][Option];
+    ConfigVal = mJsonObj[Group][Option];
   } catch (nlohmann::json::exception &e) {
     fmt::print("Missing [{}][{}] configuration\n", Group, Option);
     if (Throw) {

@@ -25,7 +25,7 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
   ui->setupUi(this);
   setupPlots();
 
-  ui->lblDescriptionText->setText(mConfig.Plot.PlotTitle.c_str());
+  ui->lblDescriptionText->setText(mConfig.mPlot.PlotTitle.c_str());
   ui->lblEventRateText->setText("0");
 
   connect(ui->pushButtonQuit, SIGNAL(clicked()), this,
@@ -51,7 +51,7 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::setupPlots() {
-  if (strcmp(mConfig.Plot.PlotType.c_str(), "tof2d") == 0) {
+  if (strcmp(mConfig.mPlot.PlotType.c_str(), "tof2d") == 0) {
     Plots.push_back(std::make_unique<CustomAMOR2DTOFPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -60,7 +60,7 @@ void MainWindow::setupPlots() {
 
   } 
   
-  else if (strcmp(mConfig.Plot.PlotType.c_str(), "tof") == 0) {
+  else if (strcmp(mConfig.mPlot.PlotType.c_str(), "tof") == 0) {
     Plots.push_back(std::make_unique<CustomTofPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -75,7 +75,7 @@ void MainWindow::setupPlots() {
 
   } 
   
-  else if (strcmp(mConfig.Plot.PlotType.c_str(), "histogram") == 0) {
+  else if (strcmp(mConfig.mPlot.PlotType.c_str(), "histogram") == 0) {
     Plots.push_back(std::make_unique<HistogramPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -89,7 +89,7 @@ void MainWindow::setupPlots() {
 
   } 
   
-  else if (strcmp(mConfig.Plot.PlotType.c_str(), "pixels") == 0) {
+  else if (strcmp(mConfig.mPlot.PlotType.c_str(), "pixels") == 0) {
 
     // Always create the XY plot
     Plots.push_back(std::make_unique<Custom2DPlot>(
@@ -105,7 +105,7 @@ void MainWindow::setupPlots() {
     // ui->gridLayout->addWidget(Plots.back().get(), 0, 1, 1, 1);
 
     // If detector is 3D, also create XZ and YZ
-    if (mConfig.Geometry.ZDim > 1) {
+    if (mConfig.mGeometry.ZDim > 1) {
       Plots.push_back(std::make_unique<Custom2DPlot>(
           mConfig, mWorker->getConsumer(),
           Custom2DPlot::ProjectionXZ));
@@ -154,7 +154,7 @@ void MainWindow::handleKafkaData(int ElapsedCountMS) {
   ui->lblEventRateText->setText(QString::number(EventRate));
   ui->lblAcceptRateText->setText(QString::number(EventAccept));
   ui->lblDiscardedPixelsText->setText(QString::number(EventDiscardRate));
-  ui->lblBinSizeText->setText(QString::number(mConfig.TOF.BinSize) + " " + QString::number(mCount));
+  ui->lblBinSizeText->setText(QString::number(mConfig.mTOF.BinSize) + " " + QString::number(mCount));
 
   for (auto &Plot : Plots) {
     Plot->updateData();
@@ -179,12 +179,12 @@ void MainWindow::updateGradientLabel() {
 
   for (auto &Plot : Plots) {
     if (Plot->getPlotType() == PlotType::PIXEL) {
-      if (mConfig.Plot.InvertGradient) {
+      if (mConfig.mPlot.InvertGradient) {
         ui->lblGradientText->setText(
-            QString::fromStdString(mConfig.Plot.ColorGradient + " (I)"));
+            QString::fromStdString(mConfig.mPlot.ColorGradient + " (I)"));
       } else {
         ui->lblGradientText->setText(
-            QString::fromStdString(mConfig.Plot.ColorGradient));
+            QString::fromStdString(mConfig.mPlot.ColorGradient));
       }
     }
   }
@@ -193,13 +193,13 @@ void MainWindow::updateGradientLabel() {
 /// \brief Autoscale is only relevant for TOF
 void MainWindow::updateAutoScaleLabels() {
   if (Plots[0]->getPlotType() ==  PlotType::TOF || Plots[0]->getPlotType() ==  PlotType::HISTOGRAM) {
-    if (mConfig.TOF.AutoScaleX) {
+    if (mConfig.mTOF.AutoScaleX) {
       ui->lblAutoScaleXText->setText(QString::fromStdString("on"));
     } else {
       ui->lblAutoScaleXText->setText(QString::fromStdString("off"));
     }
 
-    if (mConfig.TOF.AutoScaleY) {
+    if (mConfig.mTOF.AutoScaleY) {
       ui->lblAutoScaleYText->setText(QString::fromStdString("on"));
     } else {
       ui->lblAutoScaleYText->setText(QString::fromStdString("off"));
@@ -209,13 +209,13 @@ void MainWindow::updateAutoScaleLabels() {
 
 // toggle the log scale flag
 void MainWindow::handleLogButton() {
-  mConfig.Plot.LogScale = not mConfig.Plot.LogScale;
+  mConfig.mPlot.LogScale = not mConfig.mPlot.LogScale;
 }
 
 // toggle the invert gradient flag (irrelevant for TOF)
 void MainWindow::handleInvertButton() {
   if (Plots[0]->getPlotType() ==  PlotType::PIXEL || Plots[0]->getPlotType() ==  PlotType::TOF2D) {
-    mConfig.Plot.InvertGradient = not mConfig.Plot.InvertGradient;
+    mConfig.mPlot.InvertGradient = not mConfig.mPlot.InvertGradient;
     updateGradientLabel();
   }
 }
@@ -223,7 +223,7 @@ void MainWindow::handleInvertButton() {
 // toggle the auto scale x button
 void MainWindow::handleAutoScaleXButton() {
   if (Plots[0]->getPlotType() ==  PlotType::TOF || Plots[0]->getPlotType() ==  PlotType::HISTOGRAM) {
-    mConfig.TOF.AutoScaleX = not mConfig.TOF.AutoScaleX;
+    mConfig.mTOF.AutoScaleX = not mConfig.mTOF.AutoScaleX;
     updateAutoScaleLabels();
   }
 }
@@ -231,7 +231,7 @@ void MainWindow::handleAutoScaleXButton() {
 // toggle the auto scale y button
 void MainWindow::handleAutoScaleYButton() {
   if (Plots[0]->getPlotType() ==  PlotType::TOF || Plots[0]->getPlotType() ==  PlotType::HISTOGRAM) {
-    mConfig.TOF.AutoScaleY = not mConfig.TOF.AutoScaleY;
+    mConfig.mTOF.AutoScaleY = not mConfig.mTOF.AutoScaleY;
     updateAutoScaleLabels();
   }
 }
@@ -245,16 +245,16 @@ void MainWindow::handleGradientButton() {
 
       /// \todo unnecessary code here could be part of the object since it has
       /// the config at construction
-      mConfig.Plot.ColorGradient =
-          Plot2D->getNextColorGradient(mConfig.Plot.ColorGradient);
+      mConfig.mPlot.ColorGradient =
+          Plot2D->getNextColorGradient(mConfig.mPlot.ColorGradient);
 
     } else if (Plot->getPlotType() != PlotType::TOF2D) {
 
       CustomAMOR2DTOFPlot *PlotTOF2D =
           dynamic_cast<CustomAMOR2DTOFPlot *>(Plot.get());
 
-      mConfig.Plot.ColorGradient =
-          PlotTOF2D->getNextColorGradient(mConfig.Plot.ColorGradient);
+      mConfig.mPlot.ColorGradient =
+          PlotTOF2D->getNextColorGradient(mConfig.mPlot.ColorGradient);
 
     } else {
       return;

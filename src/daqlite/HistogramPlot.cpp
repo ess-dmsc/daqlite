@@ -25,11 +25,11 @@ HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
           SLOT(showPointToolTip(QMouseEvent *)));
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
-  auto &geom = mConfig.Geometry;
+  auto &geom = mConfig.mGeometry;
 
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
 
-  HistogramYAxisValues.resize(mConfig.TOF.BinSize);
+  HistogramYAxisValues.resize(mConfig.mTOF.BinSize);
 
   // this will also allow rescaling the color scale by dragging/zooming
   setInteractions(QCP::iRangeDrag | QCP::iRangeZoom);
@@ -50,10 +50,10 @@ HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
 
   // we want the color map to have nx * ny data points
 
-  if (mConfig.Plot.XAxis.empty()) {
+  if (mConfig.mPlot.XAxis.empty()) {
     xAxis->setLabel("TOF (us)");
   } else {
-    xAxis->setLabel(mConfig.Plot.XAxis.c_str());
+    xAxis->setLabel(mConfig.mPlot.XAxis.c_str());
   }
 
   yAxis->setLabel("Value Sum");
@@ -65,7 +65,7 @@ HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
 }
 
 void HistogramPlot::setCustomParameters() {
-  if (mConfig.Plot.LogScale) {
+  if (mConfig.mPlot.LogScale) {
     yAxis->setScaleType(QCPAxis::stLogarithmic);
   } else {
     yAxis->setScaleType(QCPAxis::stLinear);
@@ -81,22 +81,22 @@ void HistogramPlot::plotDetectorImage(bool Force) {
     auto binWidth = HistogramXAxisValues[i + 1] - HistogramXAxisValues[i];
     auto middleXValue = HistogramXAxisValues[i] + binWidth / 2.0;
 
-    double ScaledXValue = middleXValue / mConfig.TOF.Scale;
+    double ScaledXValue = middleXValue / mConfig.mTOF.Scale;
 
     mGraph->addData(ScaledXValue, HistogramYAxisValues[i]);
   }
 
   // yAxis->rescale();
-  if (mConfig.TOF.AutoScaleX && !HistogramXAxisValues.empty()) {
+  if (mConfig.mTOF.AutoScaleX && !HistogramXAxisValues.empty()) {
     double MaxX = *std::max_element(HistogramXAxisValues.begin(),
                                     HistogramXAxisValues.end());
 
     double MinX = *std::min_element(HistogramXAxisValues.begin(),
                                     HistogramXAxisValues.end());
 
-    xAxis->setRange(MinX / mConfig.TOF.Scale, MaxX / mConfig.TOF.Scale * 1.05);
+    xAxis->setRange(MinX / mConfig.mTOF.Scale, MaxX / mConfig.mTOF.Scale * 1.05);
   }
-  if (mConfig.TOF.AutoScaleY && !HistogramYAxisValues.empty()) {
+  if (mConfig.mTOF.AutoScaleY && !HistogramYAxisValues.empty()) {
     auto MaxY = *std::max_element(HistogramYAxisValues.begin(),
                                   HistogramYAxisValues.end());
     yAxis->setRange(0, MaxY * 1.05);
@@ -128,8 +128,8 @@ void HistogramPlot::updateData() {
 
   // Periodically clear the histogram data sets
   //
-  int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
-  if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
+  int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
+  if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     std::fill(HistogramYAxisValues.begin(), HistogramYAxisValues.end(), 0);
     std::fill(HistogramXAxisValues.begin(), HistogramXAxisValues.end(), 0);
     t1 = std::chrono::high_resolution_clock::now();
@@ -157,7 +157,7 @@ void HistogramPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
 
   // Calculate x coord width of the graphical representation of the column
-  int xCoordStep = int(mConfig.TOF.MaxValue / mConfig.TOF.BinSize);
+  int xCoordStep = int(mConfig.mTOF.MaxValue / mConfig.mTOF.BinSize);
 
   // Get the index in data store for the x coordinate
   int xCoordDataIndex = int((x - xCoordStep / 2) / xCoordStep);

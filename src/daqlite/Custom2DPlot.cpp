@@ -23,7 +23,7 @@ Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
           SLOT(showPointToolTip(QMouseEvent *)));
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
-  auto &geom = mConfig.Geometry;
+  auto &geom = mConfig.mGeometry;
 
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
   HistogramData.resize(LogicalGeometry->max_pixel() + 1);
@@ -74,7 +74,7 @@ Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
 
   // associate the color map with the color scale
   mColorMap->setColorScale(mColorScale);
-  mColorMap->setInterpolate(mConfig.Plot.Interpolate);
+  mColorMap->setInterpolate(mConfig.mPlot.Interpolate);
   mColorMap->setTightBoundary(false);
   mColorScale->axis()->setLabel("Counts");
 
@@ -94,14 +94,14 @@ Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
 
 void Custom2DPlot::setCustomParameters() {
   // set the color gradient of the color map to one of the presets:
-  QCPColorGradient Gradient(getColorGradient(mConfig.Plot.ColorGradient));
+  QCPColorGradient Gradient(getColorGradient(mConfig.mPlot.ColorGradient));
 
-  if (mConfig.Plot.InvertGradient) {
+  if (mConfig.mPlot.InvertGradient) {
     Gradient = Gradient.inverted();
   }
 
   mColorMap->setGradient(Gradient);
-  if (mConfig.Plot.LogScale) {
+  if (mConfig.mPlot.LogScale) {
     mColorMap->setDataScaleType(QCPAxis::stLogarithmic);
   } else {
     mColorMap->setDataScaleType(QCPAxis::stLinear);
@@ -195,8 +195,8 @@ void Custom2DPlot::updateData() {
   // update histogram data from consumer of worker thread
   std::vector<uint32_t> Histogram = mConsumer.readResetHistogram();
 
-  int64_t nsBetweenClear = 1000000000LL * mConfig.Plot.ClearEverySeconds;
-  if (mConfig.Plot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
+  int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
+  if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     t1 = std::chrono::high_resolution_clock::now();
     std::fill(HistogramData.begin(), HistogramData.end(), 0);
     plotDetectorImage(true); // Periodically clear the histogram

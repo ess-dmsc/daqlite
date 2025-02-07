@@ -26,7 +26,7 @@ public:
   WorkerThread(Configuration &Config) 
   : mConfig(Config) 
   {
-    KafkaConfig KafkaCfg(Config.KafkaConfigFile);
+    KafkaConfig KafkaCfg(Config.mKafkaConfigFile);
     Consumer = std::make_unique<ESSConsumer>(Config, KafkaCfg.CfgParms);
   };
 

@@ -49,7 +49,7 @@ public:
            bool Throw = false);
 
   // Configurable options
-  struct TOF {
+  struct TOFOptions {
     unsigned int Scale{1000};     // ns -> us
     unsigned int MaxValue{25000}; // us
     unsigned int BinSize{512};    // bins
@@ -57,14 +57,14 @@ public:
     bool AutoScaleY{true};
   };
 
-  struct Geometry {
+  struct GeometryOptions {
     int XDim{1};
     int YDim{1};
     int ZDim{1};
     int Offset{0};
   };
 
-  struct Kafka {
+  struct KafkaOptions {
     std::string Topic{"nmx_detector"};
     std::string Broker{"172.17.5.38:9092"};
     std::string Source{""};
@@ -75,7 +75,7 @@ public:
     std::string EnableAutoOffsetStore{"false"};
   };
 
-  struct Plot {
+  struct PlotOptions {
     std::string PlotType{"pixels"}; // "tof" and "tof2d" are also possible
     bool ClearPeriodic{false};
     uint32_t ClearEverySeconds{5};
@@ -90,14 +90,13 @@ public:
     int Height{400}; // default window height
   };
 
-//
-  struct TOF TOF;
-  struct Geometry Geometry;
-  struct Kafka Kafka;
-  struct Plot Plot;
+  struct TOFOptions mTOF;
+  struct GeometryOptions mGeometry;
+  struct KafkaOptions mKafka;
+  struct PlotOptions mPlot;
 
-  std::string KafkaConfigFile{""};
-  std::vector<std::pair<std::string, std::string>> KafkaConfig;
+  std::string mKafkaConfigFile{""};
+  std::vector<std::pair<std::string, std::string>> mKafkaConfig;
 
-  nlohmann::json JsonObj;
+  nlohmann::json mJsonObj;
 };

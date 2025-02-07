@@ -78,14 +78,14 @@ int main(int argc, char *argv[]) {
 
   if (CLI.isSet(kafkaBrokerOption)) {
     std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
-    MainConfig.Kafka.Broker = KafkaBroker;
-    printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", MainConfig.Kafka.Broker.c_str());
+    MainConfig.mKafka.Broker = KafkaBroker;
+    printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", MainConfig.mKafka.Broker.c_str());
   }
 
   if (CLI.isSet(kafkaTopicOption)) {
     std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
-    MainConfig.Kafka.Topic = KafkaTopic;
-    printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", MainConfig.Kafka.Topic.c_str());
+    MainConfig.mKafka.Topic = KafkaTopic;
+    printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", MainConfig.mKafka.Topic.c_str());
   }
 
   std::shared_ptr<WorkerThread> MainWorker = std::make_shared<WorkerThread>(MainConfig);
@@ -115,19 +115,19 @@ int main(int argc, char *argv[]) {
 
     if (CLI.isSet(kafkaBrokerOption)) {
       std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
-      Config.Kafka.Broker = KafkaBroker;
-      printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.Kafka.Broker.c_str());
+      Config.mKafka.Broker = KafkaBroker;
+      printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.mKafka.Broker.c_str());
     }
 
     if (CLI.isSet(kafkaTopicOption)) {
       std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
-      Config.Kafka.Topic = KafkaTopic;
-      printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.Kafka.Topic.c_str());
+      Config.mKafka.Topic = KafkaTopic;
+      printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.mKafka.Topic.c_str());
     }
 
     MainWorker.get();
     MainWindow* w = new MainWindow(Config, MainWorker.get());
-    w->setWindowTitle(QString::fromStdString(Config.Plot.WindowTitle + " " + std::to_string(count)));
+    w->setWindowTitle(QString::fromStdString(Config.mPlot.WindowTitle + " " + std::to_string(count)));
     w->setParent(&mainWidget, Qt::Window);
     w->show();
 

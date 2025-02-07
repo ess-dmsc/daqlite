@@ -19,8 +19,8 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
     : AbstractPlot(PlotType::TOF2D, Consumer)
     , mConfig(Config) 
 {
-  if ((not(mConfig.Geometry.YDim <= TOF2DY) or
-       (not(mConfig.TOF.BinSize <= TOF2DX)))) {
+  if ((not(mConfig.mGeometry.YDim <= TOF2DY) or
+       (not(mConfig.mTOF.BinSize <= TOF2DX)))) {
     throw(std::runtime_error("2D TOF histogram size mismatch"));
   }
 
@@ -30,7 +30,7 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
           SLOT(showPointToolTip(QMouseEvent *)));
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
-  auto &geom = mConfig.Geometry;
+  auto &geom = mConfig.mGeometry;
 
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
   // HistogramData.resize(LogicalGeometry->max_pixel() + 1);
@@ -51,9 +51,9 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
   // we want the color map to have nx * ny data points
   xAxis->setLabel("TOF");
   yAxis->setLabel("Y");
-  mColorMap->data()->setSize(mConfig.TOF.BinSize, geom.YDim);
-  mColorMap->data()->setRange(QCPRange(0, mConfig.TOF.MaxValue),
-                              QCPRange(0, mConfig.Geometry.YDim)); //
+  mColorMap->data()->setSize(mConfig.mTOF.BinSize, geom.YDim);
+  mColorMap->data()->setRange(QCPRange(0, mConfig.mTOF.MaxValue),
+                              QCPRange(0, mConfig.mGeometry.YDim)); //
 
   // add a color scale:
   mColorScale = new QCPColorScale(this);
@@ -67,7 +67,7 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
 
   // associate the color map with the color scale
   mColorMap->setColorScale(mColorScale);
-  mColorMap->setInterpolate(mConfig.Plot.Interpolate);
+  mColorMap->setInterpolate(mConfig.mPlot.Interpolate);
   mColorMap->setTightBoundary(false);
   mColorScale->axis()->setLabel("Counts");
 
@@ -87,15 +87,15 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
 
 void CustomAMOR2DTOFPlot::setCustomParameters() {
   // set the color gradient of the color map to one of the presets:
-  QCPColorGradient Gradient(getColorGradient(mConfig.Plot.ColorGradient));
+  QCPColorGradient Gradient(getColorGradient(mConfig.mPlot.ColorGradient));
 
-  if (mConfig.Plot.InvertGradient) {
+  if (mConfig.mPlot.InvertGradient) {
     Gradient = Gradient.inverted();
   }
 
   mColorMap->setGradient(Gradient);
 
-  if (mConfig.Plot.LogScale) {
+  if (mConfig.mPlot.LogScale) {
     mColorMap->setDataScaleType(QCPAxis::stLogarithmic);
   } else {
     mColorMap->setDataScaleType(QCPAxis::stLinear);
@@ -149,8 +149,8 @@ void CustomAMOR2DTOFPlot::clearDetectorImage() {
 void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
 
-  for (int y = 0; y < mConfig.Geometry.YDim; y++) {
-    for (unsigned int x = 0; x < mConfig.TOF.BinSize; x++) {
+  for (int y = 0; y < mConfig.mGeometry.YDim; y++) {
+    for (unsigned int x = 0; x < mConfig.mTOF.BinSize; x++) {
       if ((HistogramData2D[x][y] == 0) and (not Force)) {
         continue;
       }
@@ -181,7 +181,7 @@ void CustomAMOR2DTOFPlot::updateData() {
       continue;
     }
     int tof = TOFs[i];
-    int yvals = (PixelIDs[i] - 1) / mConfig.Geometry.XDim;
+    int yvals = (PixelIDs[i] - 1) / mConfig.mGeometry.XDim;
     HistogramData2D[tof][yvals]++;
   }
   plotDetectorImage(false);
