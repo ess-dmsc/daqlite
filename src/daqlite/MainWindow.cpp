@@ -28,19 +28,15 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
   ui->lblDescriptionText->setText(mConfig.mPlot.PlotTitle.c_str());
   ui->lblEventRateText->setText("0");
 
-  connect(ui->pushButtonQuit, SIGNAL(clicked()), this,
-          SLOT(handleExitButton()));
-  connect(ui->pushButtonClear, SIGNAL(clicked()), this,
-          SLOT(handleClearButton()));
-  connect(ui->pushButtonLog, SIGNAL(clicked()), this, SLOT(handleLogButton()));
-  connect(ui->pushButtonGradient, SIGNAL(clicked()), this,
-          SLOT(handleGradientButton()));
-  connect(ui->pushButtonInvert, SIGNAL(clicked()), this,
-          SLOT(handleInvertButton()));
-  connect(ui->pushButtonAutoScaleX, SIGNAL(clicked()), this,
-          SLOT(handleAutoScaleXButton()));
-  connect(ui->pushButtonAutoScaleY, SIGNAL(clicked()), this,
-          SLOT(handleAutoScaleYButton()));
+  // Connect all windows buttons
+  auto signal = &QPushButton::clicked;
+  connect(ui->pushButtonQuit,       signal, this, &MainWindow::handleExitButton);
+  connect(ui->pushButtonClear,      signal, this, &MainWindow::handleClearButton);
+  connect(ui->pushButtonLog,        signal, this, &MainWindow::handleLogButton);
+  connect(ui->pushButtonGradient,   signal, this, &MainWindow::handleGradientButton);
+  connect(ui->pushButtonInvert,     signal, this, &MainWindow::handleInvertButton);
+  connect(ui->pushButtonAutoScaleX, signal, this, &MainWindow::handleAutoScaleXButton);
+  connect(ui->pushButtonAutoScaleY, signal, this, &MainWindow::handleAutoScaleYButton);
 
   updateGradientLabel();
   updateAutoScaleLabels();
@@ -95,14 +91,7 @@ void MainWindow::setupPlots() {
     Plots.push_back(std::make_unique<Custom2DPlot>(
         mConfig, mWorker->getConsumer(),
         Custom2DPlot::ProjectionXY));
-//    mWorker->getConsumer().addSubscriber(Plots.back().get()->getPlotType());
     ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
-
-    // Plots.push_back(std::make_unique<Custom2DPlot>(
-    //     mConfig, KafkaConsumerThread->getConsumer(),
-    //     Custom2DPlot::ProjectionXY));
-
-    // ui->gridLayout->addWidget(Plots.back().get(), 0, 1, 1, 1);
 
     // If detector is 3D, also create XZ and YZ
     if (mConfig.mGeometry.ZDim > 1) {
