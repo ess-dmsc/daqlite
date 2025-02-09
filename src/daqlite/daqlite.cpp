@@ -22,20 +22,16 @@
 #include <stdio.h>
 
 
-void prettyJson(nlohmann::json &obj, const std::string &header, int indent=4) {
-  fmt::print("{}:\n", header);
-  std::cout << obj.dump(indent) << "\n\n" << std::endl;
-}
-
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
 
+  // Handle all commandline args
   QCommandLineParser CLI;
   CLI.setApplicationDescription("Daquiri light - when you're driving home");
   CLI.addHelpOption();
 
-  QCommandLineOption fileOption("f", "Configuration file", "unusedDefault");
-  CLI.addOption(fileOption);
+  QCommandLineOption configurationOption("f", "Configuration file", "unusedDefault");
+  CLI.addOption(configurationOption);
 
   QCommandLineOption kafkaBrokerOption("b", "Kafka broker", "unusedDefault");
   CLI.addOption(kafkaBrokerOption);
@@ -48,33 +44,15 @@ int main(int argc, char *argv[]) {
 
   CLI.process(app);
 
-
-
   // Parent button used to quit all plot widgets
-  QWidget mainWidget;
-  QPushButton button("&Quit");
-  QVBoxLayout layout;
-  mainWidget.setLayout(&layout);
-  layout.addWidget(&button);
-
-  button.connect(&button, &QPushButton::clicked, app.quit);
-  mainWidget.show();
+  QPushButton main("&Quit");
+  main.connect(&main, &QPushButton::clicked, app.quit);
 
   // ---------------------------------------------------------------------------
-  // Parse main config file
-  const std::string FileName = CLI.value(fileOption).toStdString();
-  std::ifstream ifs(FileName, std::ofstream::in);
-  if (!ifs.good()) {
-    throw(std::runtime_error("Unable to create ifstream (bad filename?), exiting ..."));
-  }
-
-  nlohmann::json MainJsonObj;
-  ifs >> MainJsonObj;
-  std::cout << MainJsonObj << "\n\n";
-
-  // Generate mother config
-  Configuration MainConfig;
-  MainConfig.fromJsonObj(MainJsonObj);
+  // Get top configuration
+  const std::string FileName = CLI.value(configurationOption).toStdString();
+  std::vector<Configuration> confs = Configuration::getConfigurations(FileName);
+  Configuration MainConfig = confs.front();
 
   if (CLI.isSet(kafkaBrokerOption)) {
     std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
@@ -88,30 +66,14 @@ int main(int argc, char *argv[]) {
     printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", MainConfig.mKafka.Topic.c_str());
   }
 
-  std::shared_ptr<WorkerThread> MainWorker = std::make_shared<WorkerThread>(MainConfig);
-//  WorkerThread MainWorker(MainConfig);
+  // Setup worker thread
+  std::shared_ptr<WorkerThread> Worker = std::make_shared<WorkerThread>(MainConfig);
 
 
-  // Loop over all plots
-  nlohmann::json plots = MainJsonObj["plots"];
-  prettyJson(plots, "All Plots");
-
-  // Generate json for each plot and set up a CustomPlot
+  // Setup a window for each plot 
   int count = 0;
-  for (const auto& plot : plots.items()) {
-    nlohmann::json PlotObj = MainJsonObj;
-
-    const auto iter = PlotObj.find("plots");
-    if (iter != PlotObj.cend()) {
-      PlotObj.erase(iter);
-    }
-    PlotObj["plot"] = plot.value();
-
-    prettyJson(PlotObj, "Plot " + std::to_string(count));
-
-  
-    Configuration Config;
-    Config.fromJsonObj(PlotObj);
+  for (size_t i=1; i < confs.size(); ++i) {
+    Configuration Config = confs[i];
 
     if (CLI.isSet(kafkaBrokerOption)) {
       std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
@@ -125,17 +87,16 @@ int main(int argc, char *argv[]) {
       printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.mKafka.Topic.c_str());
     }
 
-    MainWorker.get();
-    MainWindow* w = new MainWindow(Config, MainWorker.get());
-    w->setWindowTitle(QString::fromStdString(Config.mPlot.WindowTitle + " " + std::to_string(count)));
-    w->setParent(&mainWidget, Qt::Window);
+    MainWindow* w = new MainWindow(Config, Worker.get());
+    w->setWindowTitle(QString::fromStdString(Config.mPlot.WindowTitle));
+    w->setParent(&main, Qt::Window);
     w->show();
-
-    count += 1;
   }
 
-  MainWorker->start();
-  mainWidget.raise();
+  // Start the worker and let the Qt event handler take over  
+  Worker->start();
+  // main.show();
+  // main.raise();
 
   return app.exec();
 }

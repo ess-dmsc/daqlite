@@ -25,7 +25,12 @@ public:
   void fromJsonObj(const nlohmann::json &obj);
 
   /// \brief loads configuration from json file
-  void fromJsonFile(const std::string &fname);
+  void fromJsonFile(const std::string &path);
+
+  /// \brief loads configuration from json file
+  static std::vector<Configuration> getConfigurations(const std::string &path);
+
+  static void prettyJSON(nlohmann::json &obj, const std::string &header="", int indent=4);
 
   // get the Kafka related config options
   void getKafkaConfig();

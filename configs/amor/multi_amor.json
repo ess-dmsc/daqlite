@@ -25,7 +25,7 @@
 
   "plot": {
     "plot_type" : "tof2d",
-    "window_title" : "AMOR TOF 2D",
+    "window_title" : "Top AMOR TOF 2D",
     "plot_title" : "Pixels",
     "clear_periodic" : false,
     "clear_interval_seconds" : 5,
@@ -38,7 +38,7 @@
   "plots": {
     "tof_2d": {
       "plot_type" : "tof2d",
-      "window_title" : "AMOR TOF 2D",
+      "window_title" : "Sub AMOR TOF 2D",
       "plot_title" : "Pixels",
       "clear_periodic" : false,
       "clear_interval_seconds" : 5,

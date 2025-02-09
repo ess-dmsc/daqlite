@@ -7,6 +7,68 @@
 
 #include <Configuration.h>
 #include <fmt/format.h>
+#include <iostream>
+
+void Configuration::prettyJSON(nlohmann::json &obj, const std::string &header, int indent) {
+  fmt::print("{}:\n", header);
+  std::cout << obj.dump(indent) << "\n\n" << std::endl;
+}
+
+std::vector<Configuration> Configuration::getConfigurations(const std::string &Path) {
+  std::vector<Configuration> Configurations;
+
+  // Open JSON file for reading
+  std::ifstream ifs(Path, std::ofstream::in);
+  if (!ifs.good()) {
+    throw(std::runtime_error("Unable to create ifstream (bad filename?), exiting ..."));
+  }
+
+  // Load JSON file
+  nlohmann::json MainJSON;
+  ifs >> MainJSON;
+  Configuration::prettyJSON(MainJSON, "Main");
+
+  // ---------------------------------------------------------------------------
+  // Common options
+  //
+  // Read Kafka, Geometry and TOF options - but no plots
+  nlohmann::json Common;
+  for (const auto& key: {"kafka", "geometry", "tof"}) {
+    if (MainJSON.contains(key)) {
+      Common[key] = MainJSON[key];
+    }
+  }
+
+  Configuration conf;
+  conf.fromJsonObj(Common);
+  Configurations.push_back(conf);
+
+  // ---------------------------------------------------------------------------
+  // Single plot
+  if (MainJSON.contains("plot")) {
+    Common["plot"] = MainJSON["plot"];
+  }
+
+  Configuration::prettyJSON(Common, "Top plot");
+  conf.fromJsonObj(Common);
+  Configurations.push_back(conf);
+  
+  // ---------------------------------------------------------------------------
+  // Multiple plots
+  if (MainJSON.contains("plots")) {
+    for (const auto& [key, plot] : MainJSON["plots"].items()) {
+      Common["plot"] = plot;
+
+      Configuration::prettyJSON(Common, key);
+      conf.fromJsonObj(Common);
+      Configurations.push_back(conf);
+    }
+  }
+
+
+  return Configurations;
+}
+
 
 void Configuration::fromJsonObj(const nlohmann::json &obj) {
   mJsonObj = obj;
