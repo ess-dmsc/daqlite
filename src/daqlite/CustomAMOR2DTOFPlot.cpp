@@ -33,12 +33,10 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
 
   memset(HistogramData2D, 0, sizeof(HistogramData2D));
 
-  connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
-          SLOT(showPointToolTip(QMouseEvent *)));
+  connect(this, &QCustomPlot::mouseMove, this, &CustomAMOR2DTOFPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;
-
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
   // HistogramData.resize(LogicalGeometry->max_pixel() + 1);
 

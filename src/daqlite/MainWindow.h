@@ -21,13 +21,8 @@ class AbstractPlot;
 class QObject;
 class QWidget;
 class WorkerThread;
-namespace Ui { class MainWindow; }  // lines 21-21
 
-// QT_BEGIN_NAMESPACE
-// namespace Ui {
-// class MainWindow;
-// }
-// QT_END_NAMESPACE
+namespace Ui { class MainWindow; }
 
 class MainWindow : public QMainWindow {
   Q_OBJECT

@@ -31,8 +31,7 @@ HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
     , mConfig(Config)
 {
   // Register callback functions for events
-  connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
-          SLOT(showPointToolTip(QMouseEvent *)));
+  connect(this, &QCustomPlot::mouseMove, this, &HistogramPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;

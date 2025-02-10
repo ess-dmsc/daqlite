@@ -27,12 +27,10 @@ CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
     , mConfig(Config)
 {
   // Register callback functions for events
-  connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
-          SLOT(showPointToolTip(QMouseEvent *)));
+  connect(this, &QCustomPlot::mouseMove, this, &CustomTofPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;
-
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
 
   HistogramTofData.resize(mConfig.mTOF.BinSize);

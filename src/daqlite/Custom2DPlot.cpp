@@ -25,12 +25,10 @@ Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
     , mProjection(Proj)
 {
   // Register callback functions for events
-  connect(this, SIGNAL(mouseMove(QMouseEvent *)), this,
-          SLOT(showPointToolTip(QMouseEvent *)));
+  connect(this, &QCustomPlot::mouseMove, this, &Custom2DPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;
-
   LogicalGeometry = new ESSGeometry(geom.XDim, geom.YDim, geom.ZDim, 1);
   HistogramData.resize(LogicalGeometry->max_pixel() + 1);
 
