@@ -23,15 +23,15 @@ public:
   /// \brief constructor using default values
   /// Default are likely to be unsuitable and this should probably
   /// always be followed by a call to fromJsonFile()
-  Configuration(){};
+  Configuration(){}
 
-  /// \brief loads configuration from json file
+  /// \brief loads configuration from JSON file
   void fromJsonObj(const nlohmann::json &obj);
 
-  /// \brief loads configuration from json file
+  /// \brief loads configuration from JSON file
   void fromJsonFile(const std::string &path);
 
-  /// \brief loads configuration from json file
+  /// \brief loads configuration from JSON file
   static std::vector<Configuration> getConfigurations(const std::string &path);
 
   static void prettyJSON(nlohmann::json &obj, const std::string &header="", int indent=4);

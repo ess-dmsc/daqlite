@@ -10,8 +10,8 @@
 
 #include "Configuration.h"
 
-// #include <qglobal.h>
-#include <qmainwindow.h>
+#include <QMainWindow>
+
 #include <stddef.h>
 #include <memory>
 #include <vector>
@@ -58,12 +58,12 @@ private:
 
   std::vector<std::unique_ptr<AbstractPlot>> Plots;
 
-  // Q3DScatter scatter;
-
-  /// \brief configuration obtained from main()
+  /// \brief Configuration obtained from ctor
   Configuration mConfig;
+
+  // Pointer to worker thread
   WorkerThread *mWorker;
 
-  /// \brief
+  /// \brief Number of updates data deliveries so far
   size_t mCount;
 };
