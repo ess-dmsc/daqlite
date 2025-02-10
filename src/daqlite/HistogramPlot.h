@@ -11,7 +11,6 @@
 
 #include "AbstractPlot.h"
 
-#include <bits/chrono.h>
 #include <stdint.h>
 #include <vector>
 

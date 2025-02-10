@@ -9,7 +9,6 @@
 #include "WorkerThread.h"
 #include "ESSConsumer.h"
 
-#include <bits/chrono.h>
 #include <ratio>
 
 void WorkerThread::run() {

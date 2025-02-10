@@ -12,7 +12,6 @@
 
 #include <QPlot/qcustomplot/qcustomplot.h>
 
-#include <bits/chrono.h>
 #include <stdint.h>
 #include <map>
 #include <string>
