@@ -8,19 +8,20 @@
 /// Handles command line option(s), instantiates GUI
 //===----------------------------------------------------------------------===//
 
-#include <Configuration.h>
-#include <Custom2DPlot.h>
-#include <MainWindow.h>
-#include <WorkerThread.h>
+#include "Configuration.h"
+#include "MainWindow.h"        
+#include "WorkerThread.h"
 
-#include <QApplication>
-#include <QCommandLineParser>
-#include <QPlot/QPlot.h>
+#include <QApplication>          
+#include <QCommandLineOption>    
+#include <QCommandLineParser>    
+#include <QPushButton>           
+#include <QString>               
 
-#include <memory>
-#include <fmt/format.h>
-#include <stdio.h>
-
+#include <stdio.h>               
+#include <memory>                
+#include <string>                
+#include <vector>                
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
@@ -71,7 +72,6 @@ int main(int argc, char *argv[]) {
 
 
   // Setup a window for each plot 
-  int count = 0;
   for (size_t i=1; i < confs.size(); ++i) {
     Configuration Config = confs[i];
 

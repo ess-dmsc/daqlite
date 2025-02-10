@@ -6,8 +6,11 @@
 /// \brief main consumer loop implementation for Daquiri Light (daqlite)
 //===----------------------------------------------------------------------===//
 
-#include <WorkerThread.h>
-#include <chrono>
+#include "WorkerThread.h"
+#include "ESSConsumer.h"
+
+#include <bits/chrono.h>
+#include <ratio>
 
 void WorkerThread::run() {
   auto t2 = std::chrono::high_resolution_clock::now();
@@ -27,7 +30,7 @@ void WorkerThread::run() {
 
       int ElapsedCountMS = elapsed.count()/1000000;
       emit resultReady(ElapsedCountMS);
-   
+
       t1 = std::chrono::high_resolution_clock::now();
     }
   }

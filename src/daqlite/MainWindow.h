@@ -8,19 +8,26 @@
 
 #pragma once
 
-#include "Common.h"
+#include "Configuration.h"
 
-#include <AbstractPlot.h>
-#include <Configuration.h>
-#include <QMainWindow>
-#include <WorkerThread.h>
+// #include <qglobal.h>
+#include <qmainwindow.h>
+#include <stddef.h>
 #include <memory>
+#include <vector>
 
-QT_BEGIN_NAMESPACE
-namespace Ui {
-class MainWindow;
-}
-QT_END_NAMESPACE
+// Forward declarations
+class AbstractPlot;
+class QObject;
+class QWidget;
+class WorkerThread;
+namespace Ui { class MainWindow; }  // lines 21-21
+
+// QT_BEGIN_NAMESPACE
+// namespace Ui {
+// class MainWindow;
+// }
+// QT_END_NAMESPACE
 
 class MainWindow : public QMainWindow {
   Q_OBJECT

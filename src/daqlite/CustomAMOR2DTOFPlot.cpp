@@ -5,19 +5,26 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include <CustomAMOR2DTOFPlot.h>
+#include "CustomAMOR2DTOFPlot.h"
+#include "AbstractPlot.h"
 #include "Common.h"
+#include "Configuration.h"
+#include "ESSConsumer.h"
 
-#include <WorkerThread.h>
-#include <algorithm>
-#include <assert.h>
-#include <fmt/format.h>
+#include <logical_geometry/ESSGeometry.h>
+
+#include <QEvent>
+
+#include <fmt/core.h>
+#include <string.h>
+#include <stdexcept>
 #include <string>
+#include <vector>
 
 CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
                                          ESSConsumer &Consumer)
     : AbstractPlot(PlotType::TOF2D, Consumer)
-    , mConfig(Config) 
+    , mConfig(Config)
 {
   if ((not(mConfig.mGeometry.YDim <= TOF2DY) or
        (not(mConfig.mTOF.BinSize <= TOF2DX)))) {

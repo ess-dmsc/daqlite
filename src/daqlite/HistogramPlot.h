@@ -9,17 +9,18 @@
 
 #pragma once
 
-#include "Common.h"
+#include "AbstractPlot.h"
 
-
-#include <AbstractPlot.h>
-#include <ESSConsumer.h>
-#include <Configuration.h>
-#include <QPlot/QPlot.h>
-#include <chrono>
-#include <logical_geometry/ESSGeometry.h>
-#include <qvector.h>
+#include <bits/chrono.h>
+#include <stdint.h>
 #include <vector>
+
+// Forward declarations
+class Configuration;
+class ESSConsumer;
+class ESSGeometry;
+class QCPGraph;
+class QMouseEvent;
 
 class HistogramPlot : public AbstractPlot {
   Q_OBJECT

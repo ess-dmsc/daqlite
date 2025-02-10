@@ -8,14 +8,21 @@
 
 #pragma once
 
-#include "Common.h"
 
-#include <AbstractPlot.h>
-#include <ESSConsumer.h>
-#include <Configuration.h>
-#include <QPlot/QPlot.h>
-#include <chrono>
-#include <logical_geometry/ESSGeometry.h>
+#include "AbstractPlot.h"
+
+#include <QPlot/qcustomplot/qcustomplot.h>
+
+#include <stdint.h>
+#include <map>
+#include <string>
+#include <utility>
+#include <vector>
+
+// Forward declarations
+class Configuration;
+class ESSConsumer;
+class ESSGeometry;
 
 class Custom2DPlot : public AbstractPlot {
   Q_OBJECT

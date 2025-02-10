@@ -10,21 +10,23 @@
 
 #pragma once
 
-#include <Common.h>
-#include <Configuration.h>
-#include <ThreadSafeVector.h>
+
+#include "ThreadSafeVector.h"
+
+#include <librdkafka/rdkafkacpp.h>
 
 #include <cstddef>
 #include <cstdint>
-#include <da00_dataarray_generated.h>
-#include <flatbuffers/flatbuffers.h>
-#include <librdkafka/rdkafkacpp.h>
-#include <mutex>
+#include <map>
+#include <memory>
 #include <string>
+#include <utility>
 #include <vector>
-#include <fmt/format.h>
 
-
+// Forward declarations
+class Configuration;
+enum class PlotType;
+struct da00_Variable;
 
 /// \class ESSConsumer
 /// \brief A class to handle Kafka consumer operations for ESS data.
@@ -93,16 +95,16 @@ public:
   /// \brief read out the TOF histogram data and reset it
   std::vector<uint32_t> readResetHistogramTof();
 
-  /// \brief read out the event pixel IDs and reset it 
+  /// \brief read out the event pixel IDs and reset it
   std::vector<uint32_t> readResetPixelIDs();
 
-  /// \brief read out the event TOFs and reset it 
+  /// \brief read out the event TOFs and reset it
   std::vector<uint32_t> readResetTOFs();
 
   /// \brief read out the event TOFs (no reset)
   std::vector<uint32_t> getTofs() const;
 
-  /// \brief Add a new plot subscribing for data 
+  /// \brief Add a new plot subscribing for data
   ///
   /// \param Type  The plot type
   void addSubscriber(PlotType Type);
@@ -168,31 +170,31 @@ private:
     PIXEL_ID,
   };
 
-  /// \brief Vector used for handy looping through all data types  
+  /// \brief Vector used for handy looping through all data types
   std::vector<DataType> mDataTypes = {
-    DataType::NONE, 
-    DataType::ANY, 
-    DataType::TOF, 
-    DataType::HISTOGRAM, 
-    DataType::HISTOGRAM_TOF, 
+    DataType::NONE,
+    DataType::ANY,
+    DataType::TOF,
+    DataType::HISTOGRAM,
+    DataType::HISTOGRAM_TOF,
     DataType::PIXEL_ID
   };
 
   /// \brief  Check if all deliveries have been made for a given data type
   /// \param  Type  Check for this data type
-  /// \return true if all deliveries are done  
+  /// \return true if all deliveries are done
   bool checkDelivery(DataType Type);
 
-  /// \brief Number of plots subscribing to ESSConsumer data (is incremented 
+  /// \brief Number of plots subscribing to ESSConsumer data (is incremented
   ///        when calling addSubscriber)
   size_t mSubscribers{0};
 
-  /// \brief  Count the current number of request for event stats 
+  /// \brief  Count the current number of request for event stats
   size_t mEventRequests{0};
-  
+
   /// \brief The number of subscribers for each data type
   std::map<DataType, size_t> mSubscriptionCount;
 
-  /// \brief The number of deliveries made so far for different data types  
+  /// \brief The number of deliveries made so far for different data types
   std::map<DataType, size_t> mDeliveryCount;
 };

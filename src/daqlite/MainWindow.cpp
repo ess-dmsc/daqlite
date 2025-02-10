@@ -5,21 +5,32 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "AbstractPlot.h"
-#include <HistogramPlot.h>
-#include <Custom2DPlot.h>
-#include <CustomAMOR2DTOFPlot.h>
-#include <CustomTofPlot.h>
+#include "MainWindow.h"
 #include <ui_MainWindow.h>
-#include <MainWindow.h>
-#include <memory>
+
+#include "Custom2DPlot.h"
+#include "CustomAMOR2DTOFPlot.h"
+#include "CustomTofPlot.h"
+#include "HistogramPlot.h"
+#include "WorkerThread.h"
+
+#include <QApplication>
+#include <QMetaType>
+#include <QPushButton>
+
+#include <stdint.h>
 #include <string.h>
+#include <memory>
+#include <stdexcept>
+#include <string>
+
+class QWidget;
 
 MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , mConfig(Config)
-  , mWorker(Worker) 
+  , mWorker(Worker)
   , mCount(0)
 {
   ui->setupUi(this);
@@ -54,8 +65,8 @@ void MainWindow::setupPlots() {
     // register plot on ui
     ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
-  } 
-  
+  }
+
   else if (strcmp(mConfig.mPlot.PlotType.c_str(), "tof") == 0) {
     Plots.push_back(std::make_unique<CustomTofPlot>(
         mConfig, mWorker->getConsumer()));
@@ -69,8 +80,8 @@ void MainWindow::setupPlots() {
     ui->lblGradientText->setVisible(false);
     ui->lblGradient->setVisible(false);
 
-  } 
-  
+  }
+
   else if (strcmp(mConfig.mPlot.PlotType.c_str(), "histogram") == 0) {
     Plots.push_back(std::make_unique<HistogramPlot>(
         mConfig, mWorker->getConsumer()));
@@ -83,8 +94,8 @@ void MainWindow::setupPlots() {
     ui->lblGradientText->setVisible(false);
     ui->lblGradient->setVisible(false);
 
-  } 
-  
+  }
+
   else if (strcmp(mConfig.mPlot.PlotType.c_str(), "pixels") == 0) {
 
     // Always create the XY plot
@@ -104,8 +115,8 @@ void MainWindow::setupPlots() {
           Custom2DPlot::ProjectionYZ));
       ui->gridLayout->addWidget(Plots.back().get(), 0, 2, 1, 1);
     }
-  } 
-  
+  }
+
   else {
     throw(std::runtime_error("No valid plot type specified"));
   }

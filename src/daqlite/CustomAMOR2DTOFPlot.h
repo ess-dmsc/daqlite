@@ -8,12 +8,20 @@
 
 #pragma once
 
-#include <AbstractPlot.h>
-#include <ESSConsumer.h>
-#include <Configuration.h>
-#include <QPlot/QPlot.h>
-#include <chrono>
-#include <logical_geometry/ESSGeometry.h>
+#include "AbstractPlot.h"
+
+#include <QPlot/qcustomplot/qcustomplot.h>
+
+#include <bits/chrono.h>
+#include <stdint.h>
+#include <map>
+#include <string>
+#include <utility>
+
+// Forward declarations
+class Configuration;
+class ESSConsumer;
+class ESSGeometry;
 
 class CustomAMOR2DTOFPlot : public AbstractPlot {
   Q_OBJECT
@@ -75,7 +83,7 @@ private:
       {"spectrum", QCPColorGradient::gpSpectrum},
       {"jet", QCPColorGradient::gpJet},
       {"hues", QCPColorGradient::gpHues}};
-      
+
   /// \brief reference time for periodic clearing of histogram
   std::chrono::time_point<std::chrono::high_resolution_clock> t1;
 };

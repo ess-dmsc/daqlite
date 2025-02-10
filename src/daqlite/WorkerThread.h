@@ -12,19 +12,21 @@
 
 #pragma once
 
-#include <ESSConsumer.h>
-#include <KafkaConfig.h>
-#include <QMutex>
+#include "Configuration.h"
+#include "ESSConsumer.h"
+#include "KafkaConfig.h"
+
 #include <QThread>
-#include <iostream>
+
 #include <memory>
+#include <stdexcept>
 
 class WorkerThread : public QThread {
   Q_OBJECT
 
 public:
-  WorkerThread(Configuration &Config) 
-  : mConfig(Config) 
+  WorkerThread(Configuration &Config)
+  : mConfig(Config)
   {
     KafkaConfig KafkaCfg(Config.mKafkaConfigFile);
     Consumer = std::make_unique<ESSConsumer>(Config, KafkaCfg.CfgParms);

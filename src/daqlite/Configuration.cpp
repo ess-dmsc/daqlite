@@ -5,9 +5,19 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include <Configuration.h>
-#include <fmt/format.h>
+
+#include "Configuration.h"
+
+#include <nlohmann/detail/iterators/iter_impl.hpp>
+#include <nlohmann/detail/iterators/iteration_proxy.hpp>
+#include <nlohmann/json.hpp>
+
+#include <fmt/core.h>
+#include <fstream>
+#include <initializer_list>
 #include <iostream>
+#include <stdexcept>
+
 
 void Configuration::prettyJSON(nlohmann::json &obj, const std::string &header, int indent) {
   fmt::print("{}:\n", header);
@@ -52,7 +62,7 @@ std::vector<Configuration> Configuration::getConfigurations(const std::string &P
   Configuration::prettyJSON(Common, "Top plot");
   conf.fromJsonObj(Common);
   Configurations.push_back(conf);
-  
+
   // ---------------------------------------------------------------------------
   // Multiple plots
   if (MainJSON.contains("plots")) {
@@ -64,7 +74,6 @@ std::vector<Configuration> Configuration::getConfigurations(const std::string &P
       Configurations.push_back(conf);
     }
   }
-
 
   return Configurations;
 }

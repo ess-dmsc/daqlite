@@ -5,11 +5,17 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include <Custom2DPlot.h>
-#include <WorkerThread.h>
+#include "Custom2DPlot.h"
+#include "AbstractPlot.h"
+#include "Common.h"
+#include "Configuration.h"
+#include "ESSConsumer.h"
+
+#include <logical_geometry/ESSGeometry.h>
+
+#include <fmt/core.h>
 #include <algorithm>
-#include <assert.h>
-#include <fmt/format.h>
+#include <ratio>
 #include <string>
 
 Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,

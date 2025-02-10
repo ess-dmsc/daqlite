@@ -5,17 +5,25 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include <ESSConsumer.h>
-#include <algorithm>
-#include <cstddef>
-#include <cstdint>
+#include "ESSConsumer.h"
+
+#include "Common.h"
+#include "Configuration.h"
+#include "ThreadSafeVector.h"
+
+#include <flatbuffers/flatbuffers.h>
 #include <da00_dataarray_generated.h>
 #include <ev42_events_generated.h>
 #include <ev44_events_generated.h>
+
+#include <algorithm>
+#include <assert.h>
+#include <cstddef>
+#include <cstdint>
 #include <fmt/core.h>
-#include <fmt/format.h>
-#include <iostream>
 #include <memory>
+#include <stdlib.h>
+#include <sys/types.h>
 #include <unistd.h>
 #include <vector>
 
@@ -23,7 +31,7 @@ ESSConsumer::ESSConsumer(
     Configuration &Config,
     std::vector<std::pair<std::string, std::string>> &KafkaConfig)
     : mConfig(Config)
-    , mKafkaConfig(KafkaConfig) 
+    , mKafkaConfig(KafkaConfig)
 {
   auto &geom = mConfig.mGeometry;
   mNumPixels = geom.XDim * geom.YDim * geom.ZDim;
