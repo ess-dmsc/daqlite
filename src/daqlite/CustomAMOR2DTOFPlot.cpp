@@ -5,11 +5,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "CustomAMOR2DTOFPlot.h"
-#include "AbstractPlot.h"
-#include "Common.h"
-#include "Configuration.h"
-#include "ESSConsumer.h"
+#include <CustomAMOR2DTOFPlot.h>
+
+#include <AbstractPlot.h>
+#include <Common.h>
+#include <Configuration.h>
+#include <ESSConsumer.h>
 
 #include <logical_geometry/ESSGeometry.h>
 

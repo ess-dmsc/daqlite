@@ -6,14 +6,14 @@
 /// \brief using nlohmann json parser to read configurations from file
 //===----------------------------------------------------------------------===//
 
-#include "KafkaConfig.h"
-#include "JsonFile.h"
+#include <KafkaConfig.h>
+
+#include <JsonFile.h>
+
+#include <nlohmann/json.hpp>
 
 #include <cstdio>
 #include <map>
-#include <nlohmann/detail/iterators/iter_impl.hpp>
-#include <nlohmann/json_fwd.hpp>
-#include <nlohmann/json.hpp>
 #include <stdexcept>
 
 KafkaConfig::KafkaConfig(std::string KafkaConfigFile) {

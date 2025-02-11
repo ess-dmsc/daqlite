@@ -13,6 +13,7 @@
 #pragma GCC diagnostic ignored "-Wpedantic"
 #include <nlohmann/json.hpp>
 #pragma GCC diagnostic pop
+
 #include <fmt/format.h>
 #include <fstream>
 

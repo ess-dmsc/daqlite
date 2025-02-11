@@ -5,14 +5,14 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "MainWindow.h"
+#include <MainWindow.h>
 #include <ui_MainWindow.h>
 
-#include "Custom2DPlot.h"
-#include "CustomAMOR2DTOFPlot.h"
-#include "CustomTofPlot.h"
-#include "HistogramPlot.h"
-#include "WorkerThread.h"
+#include <Custom2DPlot.h>
+#include <CustomAMOR2DTOFPlot.h>
+#include <CustomTofPlot.h>
+#include <HistogramPlot.h>
+#include <WorkerThread.h>
 
 #include <QApplication>
 #include <QMetaType>

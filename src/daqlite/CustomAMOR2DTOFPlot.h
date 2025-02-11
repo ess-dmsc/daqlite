@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "AbstractPlot.h"
+#include <AbstractPlot.h>
 
 #include <QPlot/qcustomplot/qcustomplot.h>
 

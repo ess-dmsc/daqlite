@@ -5,11 +5,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "Custom2DPlot.h"
-#include "AbstractPlot.h"
-#include "Common.h"
-#include "Configuration.h"
-#include "ESSConsumer.h"
+#include <Custom2DPlot.h>
+
+#include <AbstractPlot.h>
+#include <Common.h>
+#include <Configuration.h>
+#include <ESSConsumer.h>
 
 #include <logical_geometry/ESSGeometry.h>
 
@@ -17,6 +18,8 @@
 #include <algorithm>
 #include <ratio>
 #include <string>
+
+using std::string;
 
 Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
@@ -114,7 +117,7 @@ void Custom2DPlot::setCustomParameters() {
 
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
-QCPColorGradient Custom2DPlot::getColorGradient(std::string GradientName) {
+QCPColorGradient Custom2DPlot::getColorGradient(string GradientName) {
   if (mGradients.find(GradientName) != mGradients.end()) {
     return mGradients.find(GradientName)->second;
   } else {
@@ -128,10 +131,10 @@ QCPColorGradient Custom2DPlot::getColorGradient(std::string GradientName) {
   }
 }
 
-std::string Custom2DPlot::getNextColorGradient(std::string GradientName) {
+string Custom2DPlot::getNextColorGradient(string GradientName) {
   bool SaveFirst{true};
   bool SaveNext{false};
-  std::string RetVal;
+  string RetVal;
 
   for (auto &Gradient : mGradients) {
     if (SaveFirst) {

@@ -6,8 +6,9 @@
 /// \brief main consumer loop implementation for Daquiri Light (daqlite)
 //===----------------------------------------------------------------------===//
 
-#include "WorkerThread.h"
-#include "ESSConsumer.h"
+#include <WorkerThread.h>
+
+#include <ESSConsumer.h>
 
 #include <ratio>
 

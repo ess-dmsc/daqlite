@@ -9,7 +9,7 @@
 
 #pragma once
 
-#include "AbstractPlot.h"
+#include <AbstractPlot.h>
 
 #include <stdint.h>
 #include <vector>

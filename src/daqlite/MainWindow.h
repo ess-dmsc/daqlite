@@ -8,7 +8,7 @@
 
 #pragma once
 
-#include "Configuration.h"
+#include <Configuration.h>
 
 #include <QMainWindow>
 

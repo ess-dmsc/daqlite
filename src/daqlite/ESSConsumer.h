@@ -10,8 +10,7 @@
 
 #pragma once
 
-
-#include "ThreadSafeVector.h"
+#include <ThreadSafeVector.h>
 
 #include <librdkafka/rdkafkacpp.h>
 

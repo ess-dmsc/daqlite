@@ -5,11 +5,11 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "ESSConsumer.h"
+#include <ESSConsumer.h>
 
-#include "Common.h"
-#include "Configuration.h"
-#include "ThreadSafeVector.h"
+#include <Common.h>
+#include <Configuration.h>
+#include <ThreadSafeVector.h>
 
 #include <flatbuffers/flatbuffers.h>
 #include <da00_dataarray_generated.h>

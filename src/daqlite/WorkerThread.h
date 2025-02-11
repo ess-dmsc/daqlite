@@ -12,9 +12,9 @@
 
 #pragma once
 
-#include "Configuration.h"
-#include "ESSConsumer.h"
-#include "KafkaConfig.h"
+#include <Configuration.h>
+#include <ESSConsumer.h>
+#include <KafkaConfig.h>
 
 #include <QThread>
 

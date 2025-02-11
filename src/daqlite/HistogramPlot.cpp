@@ -5,12 +5,12 @@
 ///
 //===----------------------------------------------------------------------===//
 
-#include "HistogramPlot.h"
+#include <HistogramPlot.h>
 
-#include "AbstractPlot.h"
-#include "Common.h"
-#include "Configuration.h"
-#include "ESSConsumer.h"
+#include <AbstractPlot.h>
+#include <Common.h>
+#include <Configuration.h>
+#include <ESSConsumer.h>
 
 #include <logical_geometry/ESSGeometry.h>
 
