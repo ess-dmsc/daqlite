@@ -20,8 +20,7 @@ class AbstractPlot : public QCustomPlot {
 protected:
   AbstractPlot(PlotType Type, ESSConsumer &Consumer)
   : mPlotType(Type)
-  , mConsumer(Consumer) 
-{
+  , mConsumer(Consumer) {
   mConsumer.addSubscriber(mPlotType);
 };
 
