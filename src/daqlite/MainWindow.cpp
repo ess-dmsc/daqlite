@@ -31,8 +31,7 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
   , ui(new Ui::MainWindow)
   , mConfig(Config)
   , mWorker(Worker)
-  , mCount(0)
-{
+  , mCount(0) {
   ui->setupUi(this);
   setupPlots();
 

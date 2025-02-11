@@ -26,8 +26,7 @@ Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
     : AbstractPlot(PlotType::PIXEL, Consumer)
     , mConfig(Config)
-    , mProjection(Proj)
-{
+    , mProjection(Proj) {
   // Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &Custom2DPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);

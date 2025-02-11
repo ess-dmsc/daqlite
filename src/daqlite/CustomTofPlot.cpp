@@ -26,8 +26,7 @@ using std::vector;
 
 CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
     : AbstractPlot(PlotType::TOF, Consumer)
-    , mConfig(Config)
-{
+    , mConfig(Config) {
   // Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &CustomTofPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);

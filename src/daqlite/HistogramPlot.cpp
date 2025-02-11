@@ -30,8 +30,7 @@ using std::vector;
 
 HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
     : AbstractPlot(PlotType::HISTOGRAM, Consumer)
-    , mConfig(Config)
-{
+    , mConfig(Config) {
   // Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &HistogramPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);

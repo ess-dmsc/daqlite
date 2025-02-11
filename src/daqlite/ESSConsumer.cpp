@@ -34,8 +34,7 @@ ESSConsumer::ESSConsumer(
     Configuration &Config,
     vector<std::pair<string, string>> &KafkaConfig)
     : mConfig(Config)
-    , mKafkaConfig(KafkaConfig)
-{
+    , mKafkaConfig(KafkaConfig) {
   auto &geom = mConfig.mGeometry;
   mNumPixels = geom.XDim * geom.YDim * geom.ZDim;
   mMinPixel = geom.Offset + 1;
