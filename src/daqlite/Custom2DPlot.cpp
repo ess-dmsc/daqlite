@@ -20,6 +20,7 @@
 #include <string>
 
 using std::string;
+using std::vector;
 
 Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
@@ -117,7 +118,7 @@ void Custom2DPlot::setCustomParameters() {
 
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
-QCPColorGradient Custom2DPlot::getColorGradient(string GradientName) {
+QCPColorGradient Custom2DPlot::getColorGradient(const string &GradientName) {
   if (mGradients.find(GradientName) != mGradients.end()) {
     return mGradients.find(GradientName)->second;
   } else {
@@ -131,7 +132,7 @@ QCPColorGradient Custom2DPlot::getColorGradient(string GradientName) {
   }
 }
 
-string Custom2DPlot::getNextColorGradient(string GradientName) {
+string Custom2DPlot::getNextColorGradient(const string &GradientName) {
   bool SaveFirst{true};
   bool SaveNext{false};
   string RetVal;
@@ -200,7 +201,7 @@ void Custom2DPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // update histogram data from consumer of worker thread
-  std::vector<uint32_t> Histogram = mConsumer.readResetHistogram();
+  vector<uint32_t> Histogram = mConsumer.readResetHistogram();
 
   int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
   if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {

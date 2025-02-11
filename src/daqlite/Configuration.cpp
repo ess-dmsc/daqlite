@@ -5,7 +5,6 @@
 ///
 //===----------------------------------------------------------------------===//
 
-
 #include <Configuration.h>
 
 #include <nlohmann/json.hpp>
@@ -16,14 +15,16 @@
 #include <iostream>
 #include <stdexcept>
 
+using std::string;
+using std::vector;
 
 void Configuration::prettyJSON(nlohmann::json &obj, const std::string &header, int indent) {
   fmt::print("{}:\n", header);
   std::cout << obj.dump(indent) << "\n\n" << std::endl;
 }
 
-std::vector<Configuration> Configuration::getConfigurations(const std::string &Path) {
-  std::vector<Configuration> Configurations;
+vector<Configuration> Configuration::getConfigurations(const std::string &Path) {
+  vector<Configuration> Configurations;
 
   // Open JSON file for reading
   std::ifstream ifs(Path, std::ofstream::in);
@@ -190,7 +191,7 @@ void Configuration::print() {
 //\brief getVal() template is used to effectively achieve
 // getInt(), getString() and getBool() functionality through T
 template <typename T>
-T Configuration::getVal(std::string Group, std::string Option, T Default,
+T Configuration::getVal(const std::string &Group, const std::string &Option, T Default,
                         bool Throw) {
   T ConfigVal;
   try {

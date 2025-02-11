@@ -16,7 +16,6 @@
 #include <utility>
 #include <vector>
 
-
 class Configuration {
 public:
   /// \brief constructor using default values
@@ -53,7 +52,7 @@ public:
   /// \brief return value of type T from the json object, possibly default,
   // and optionally throws if value is not found
   template <typename T>
-  T getVal(std::string Group, std::string Option, T Default,
+  T getVal(const std::string &Group, const std::string &Option, T Default,
            bool Throw = false);
 
   // Configurable options

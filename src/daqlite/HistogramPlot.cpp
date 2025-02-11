@@ -26,6 +26,8 @@
 #include <string>
 #include <vector>
 
+using std::vector;
+
 HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
     : AbstractPlot(PlotType::HISTOGRAM, Consumer)
     , mConfig(Config)
@@ -124,7 +126,7 @@ void HistogramPlot::updateData() {
     return;
   }
 
-  std::vector<uint32_t> YAxisValues = mConsumer.readResetHistogram();
+  vector<uint32_t> YAxisValues = mConsumer.readResetHistogram();
   auto TofValues = mConsumer.getTofs();
 
   HistogramXAxisValues = TofValues;

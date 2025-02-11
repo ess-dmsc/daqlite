@@ -22,6 +22,8 @@
 #include <string>
 #include <vector>
 
+using std::vector;
+
 CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
                                          ESSConsumer &Consumer)
     : AbstractPlot(PlotType::TOF2D, Consumer)
@@ -111,7 +113,7 @@ void CustomAMOR2DTOFPlot::setCustomParameters() {
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
 QCPColorGradient
-CustomAMOR2DTOFPlot::getColorGradient(std::string GradientName) {
+CustomAMOR2DTOFPlot::getColorGradient(const std::string &GradientName) {
   if (mGradients.find(GradientName) != mGradients.end()) {
     return mGradients.find(GradientName)->second;
   } else {
@@ -126,7 +128,7 @@ CustomAMOR2DTOFPlot::getColorGradient(std::string GradientName) {
 }
 
 std::string
-CustomAMOR2DTOFPlot::getNextColorGradient(std::string GradientName) {
+CustomAMOR2DTOFPlot::getNextColorGradient(const std::string &GradientName) {
   bool SaveFirst{true};
   bool SaveNext{false};
   std::string RetVal;
@@ -174,8 +176,8 @@ void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
 
 void CustomAMOR2DTOFPlot::updateData() {
   // Get newest histogram data from Consumer
-  std::vector<uint32_t> PixelIDs = mConsumer.readResetPixelIDs();
-  std::vector<uint32_t> TOFs = mConsumer.readResetTOFs();
+  vector<uint32_t> PixelIDs = mConsumer.readResetPixelIDs();
+  vector<uint32_t> TOFs = mConsumer.readResetTOFs();
 
   // Accumulate counts, PixelId 0 does not exist
   if (PixelIDs.size() == 0) {

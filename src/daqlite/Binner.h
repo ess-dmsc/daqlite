@@ -7,7 +7,6 @@
 /// Main use is for TOF binning
 //===----------------------------------------------------------------------===//
 
-
 #pragma once
 
 class Binner {

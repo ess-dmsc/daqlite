@@ -33,13 +33,13 @@ public:
   void updateData() override;
 
   /// \brief Support for different gradients
-  QCPColorGradient getColorGradient(std::string GradientName);
+  QCPColorGradient getColorGradient(const std::string &GradientName);
 
   /// \brief update plot based on (possibly dynamic) config settings
   void setCustomParameters();
 
   /// \brief rotate through gradient names
-  std::string getNextColorGradient(std::string GradientName);
+  std::string getNextColorGradient(const std::string &GradientName);
 
   /// \brief clears histogram data (overridden from AbstractPlot)
   void clearDetectorImage() override;

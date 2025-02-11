@@ -22,6 +22,8 @@
 #include <ratio>
 #include <string>
 
+using std::vector;
+
 CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
     : AbstractPlot(PlotType::TOF, Consumer)
     , mConfig(Config)
@@ -107,7 +109,7 @@ void CustomTofPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get histogram data from Consumer and clear it
-  std::vector<uint32_t> HistogramTof = mConsumer.readResetHistogramTof();
+  vector<uint32_t> HistogramTof = mConsumer.readResetHistogramTof();
 
   // Periodically clear the histogram
   int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;

@@ -27,9 +27,12 @@
 #include <unistd.h>
 #include <vector>
 
+using std::string;
+using std::vector;
+
 ESSConsumer::ESSConsumer(
     Configuration &Config,
-    std::vector<std::pair<std::string, std::string>> &KafkaConfig)
+    vector<std::pair<string, string>> &KafkaConfig)
     : mConfig(Config)
     , mKafkaConfig(KafkaConfig)
 {
@@ -57,7 +60,7 @@ RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
     return nullptr;
   }
 
-  std::string ErrStr;
+  string ErrStr;
   /// \todo figure out good values for these
   /// \todo some may be obsolete
   mConf->set("metadata.broker.list", mConfig.mKafka.Broker, ErrStr);
@@ -66,7 +69,7 @@ RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
              ErrStr);
   mConf->set("replica.fetch.max.bytes", mConfig.mKafka.ReplicaFetchMaxBytes,
              ErrStr);
-  std::string GroupId = randomGroupString(16);
+  string GroupId = randomGroupString(16);
   mConf->set("group.id", GroupId, ErrStr);
   mConf->set("enable.auto.commit", mConfig.mKafka.EnableAutoCommit, ErrStr);
   mConf->set("enable.auto.offset.store", mConfig.mKafka.EnableAutoOffsetStore,
@@ -108,8 +111,8 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
   }
 
   // local temporary histograms to avoid locking during processing
-  std::vector<uint32_t> PixelVector(mNumPixels, 0);
-  std::vector<uint32_t> TofBinVector(mConfig.mTOF.BinSize, 0);
+  vector<uint32_t> PixelVector(mNumPixels, 0);
+  vector<uint32_t> TofBinVector(mConfig.mTOF.BinSize, 0);
 
   for (uint i = 0; i < PixelIds->size(); i++) {
     uint32_t Pixel = (*PixelIds)[i];
@@ -197,8 +200,8 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  std::vector<uint32_t> PixelVector(mNumPixels, 0);
-  std::vector<uint32_t> TofBinVector(mConfig.mTOF.BinSize, 0);
+  vector<uint32_t> PixelVector(mNumPixels, 0);
+  vector<uint32_t> TofBinVector(mConfig.mTOF.BinSize, 0);
 
   for (uint i = 0; i < PixelIds->size(); i++) {
     uint32_t Pixel = (*PixelIds)[i];
@@ -279,7 +282,7 @@ bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
 }
 
 // Copied from daquiri - added seed based on pid
-std::string ESSConsumer::randomGroupString(size_t length) {
+string ESSConsumer::randomGroupString(size_t length) {
   srand(getpid());
   auto randchar = []() -> char {
     const char charset[] = "0123456789"
@@ -288,14 +291,14 @@ std::string ESSConsumer::randomGroupString(size_t length) {
     const size_t max_index = (sizeof(charset) - 1);
     return charset[rand() % max_index];
   };
-  std::string str(length, 0);
+  string str(length, 0);
   std::generate_n(str.begin(), length, randchar);
   return str;
 }
 
-std::vector<int64_t>
+vector<int64_t>
 ESSConsumer::getDataVector(const da00_Variable &Variable) const {
-  std::vector<int64_t> Data;
+  vector<int64_t> Data;
 
   auto data = Variable.unit()->str();
   auto shape = Variable.shape()->Get(0);
@@ -347,8 +350,8 @@ std::unique_ptr<RdKafka::Message> ESSConsumer::consume() {
 
 
 /// \brief read out the histogram data and reset it
-std::vector<uint32_t> ESSConsumer::readResetHistogram() {
-  std::vector<uint32_t> ret = mHistogram;
+vector<uint32_t> ESSConsumer::readResetHistogram() {
+  vector<uint32_t> ret = mHistogram;
 
   if (checkDelivery(DataType::HISTOGRAM)) {
     mHistogram.clear();
@@ -358,8 +361,8 @@ std::vector<uint32_t> ESSConsumer::readResetHistogram() {
 }
 
 /// \brief read out the TOF histogram data and reset it
-std::vector<uint32_t> ESSConsumer::readResetHistogramTof() {
-  std::vector<uint32_t> ret = mHistogramTof;
+vector<uint32_t> ESSConsumer::readResetHistogramTof() {
+  vector<uint32_t> ret = mHistogramTof;
 
   if (checkDelivery(DataType::HISTOGRAM_TOF)) {
     mHistogramTof.clear();
@@ -369,8 +372,8 @@ std::vector<uint32_t> ESSConsumer::readResetHistogramTof() {
 }
 
 /// \brief read out the event pixel IDs and clear the vector
-std::vector<uint32_t> ESSConsumer::readResetPixelIDs() {
-  std::vector<uint32_t> ret = mPixelIDs;
+vector<uint32_t> ESSConsumer::readResetPixelIDs() {
+  vector<uint32_t> ret = mPixelIDs;
 
   if (checkDelivery(DataType::PIXEL_ID)) {
     mPixelIDs.clear();
@@ -381,8 +384,8 @@ std::vector<uint32_t> ESSConsumer::readResetPixelIDs() {
 }
 
 /// \brief read out the event TOFs and clear the vector
-std::vector<uint32_t> ESSConsumer::readResetTOFs() {
-  std::vector<uint32_t> ret = mTOFs;
+vector<uint32_t> ESSConsumer::readResetTOFs() {
+  vector<uint32_t> ret = mTOFs;
 
   if (checkDelivery(DataType::TOF)) {
     mTOFs.clear();
@@ -391,8 +394,8 @@ std::vector<uint32_t> ESSConsumer::readResetTOFs() {
   return ret;
 }
 
-std::vector<uint32_t> ESSConsumer::getTofs() const {
-  std::vector<uint32_t> ret = mTOFs;
+vector<uint32_t> ESSConsumer::getTofs() const {
+  vector<uint32_t> ret = mTOFs;
 
   return ret;
 }
