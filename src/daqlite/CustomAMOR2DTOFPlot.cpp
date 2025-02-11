@@ -16,7 +16,7 @@
 
 #include <QEvent>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <string.h>
 #include <stdexcept>
 #include <string>

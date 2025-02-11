@@ -14,7 +14,7 @@
 
 #include <logical_geometry/ESSGeometry.h>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <algorithm>
 #include <ratio>
 #include <string>

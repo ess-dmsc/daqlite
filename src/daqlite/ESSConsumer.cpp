@@ -20,7 +20,7 @@
 #include <assert.h>
 #include <cstddef>
 #include <cstdint>
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <memory>
 #include <stdlib.h>
 #include <sys/types.h>

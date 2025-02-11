@@ -19,7 +19,7 @@
 #include <QColor>
 #include <QEvent>
 
-#include <fmt/core.h>
+#include <fmt/format.h>
 #include <algorithm>
 #include <cstdint>
 #include <ratio>
