@@ -8,7 +8,7 @@
 #include <CustomAMOR2DTOFPlot.h>
 
 #include <AbstractPlot.h>
-#include <Common.h>
+#include <CommonTypes.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
 

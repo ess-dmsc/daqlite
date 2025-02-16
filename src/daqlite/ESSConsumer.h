@@ -24,7 +24,7 @@
 
 // Forward declarations
 class Configuration;
-enum class PlotType;
+class PlotType;
 struct da00_Variable;
 
 /// \class ESSConsumer

@@ -8,7 +8,7 @@
 #include <Custom2DPlot.h>
 
 #include <AbstractPlot.h>
-#include <Common.h>
+#include <CommonTypes.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
 
@@ -24,7 +24,7 @@ using std::vector;
 
 Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
-    : AbstractPlot(PlotType::PIXEL, Consumer)
+    : AbstractPlot(PlotType::PIXELS, Consumer)
     , mConfig(Config)
     , mProjection(Proj) {
   // Register callback functions for events

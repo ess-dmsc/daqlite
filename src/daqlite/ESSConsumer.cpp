@@ -7,7 +7,7 @@
 
 #include <ESSConsumer.h>
 
-#include <Common.h>
+#include <CommonTypes.h>
 #include <Configuration.h>
 #include <ThreadSafeVector.h>
 
@@ -428,7 +428,7 @@ void ESSConsumer::addSubscriber(PlotType Type) {
       mSubscriptionCount[DataType::TOF] += 1;
       break;
 
-    case PlotType::PIXEL:
+    case PlotType::PIXELS:
       mSubscriptionCount[DataType::HISTOGRAM] += 1;
       break;
 

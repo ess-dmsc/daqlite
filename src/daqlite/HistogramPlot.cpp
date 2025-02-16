@@ -8,7 +8,7 @@
 #include <HistogramPlot.h>
 
 #include <AbstractPlot.h>
-#include <Common.h>
+#include <CommonTypes.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
 
@@ -82,7 +82,7 @@ void HistogramPlot::setCustomParameters() {
   }
 }
 
-void HistogramPlot::plotDetectorImage(bool Force) {
+void HistogramPlot::plotDetectorImage(bool) {
   setCustomParameters();
   mGraph->data()->clear();
 

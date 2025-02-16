@@ -136,7 +136,9 @@ void Configuration::getKafkaConfig() {
 
 void Configuration::getPlotConfig() {
   // Plot options - all are optional
-  mPlot.PlotType = getVal("plot", "plot_type", mPlot.PlotType);
+  std::string plot;
+  mPlot.Plot = getVal("plot", "plot_type", mPlot.Plot.asString());
+
   mPlot.ClearPeriodic = getVal("plot", "clear_periodic", mPlot.ClearPeriodic);
   mPlot.ClearEverySeconds =
       getVal("plot", "clear_interval_seconds", mPlot.ClearEverySeconds);
@@ -171,7 +173,7 @@ void Configuration::print() {
   fmt::print("  Pixel Offset {}\n", mGeometry.Offset);
   fmt::print("[Plot]\n");
   fmt::print("  WindowTitle {}\n", mPlot.WindowTitle);
-  fmt::print("  Plot type {}\n", mPlot.PlotType);
+  fmt::print("  Plot type {}\n", mPlot.Plot);
   fmt::print("  Clear periodically {}\n", mPlot.ClearPeriodic);
   fmt::print("  Clear interval (s) {}\n", mPlot.ClearEverySeconds);
   fmt::print("  Interpolate image {}\n", mPlot.Interpolate);

@@ -10,6 +10,8 @@
 
 #pragma once
 
+#include <CommonTypes.h>
+
 #include <nlohmann/json.hpp>
 
 #include <string>
@@ -83,7 +85,7 @@ public:
   };
 
   struct PlotOptions {
-    std::string PlotType{"pixels"}; // "tof" and "tof2d" are also possible
+    PlotType Plot{"pixels"}; // "tof" and "tof2d" are also possible
     bool ClearPeriodic{false};
     uint32_t ClearEverySeconds{5};
     bool Interpolate{false};

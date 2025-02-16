@@ -57,7 +57,9 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
 MainWindow::~MainWindow() { delete ui; }
 
 void MainWindow::setupPlots() {
-  if (strcmp(mConfig.mPlot.PlotType.c_str(), "tof2d") == 0) {
+  PlotType Type(mConfig.mPlot.Plot);
+
+  if (Type == PlotType::TOF2D) {
     Plots.push_back(std::make_unique<CustomAMOR2DTOFPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -66,7 +68,7 @@ void MainWindow::setupPlots() {
 
   }
 
-  else if (strcmp(mConfig.mPlot.PlotType.c_str(), "tof") == 0) {
+  else if (Type == PlotType::TOF) {
     Plots.push_back(std::make_unique<CustomTofPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -81,7 +83,7 @@ void MainWindow::setupPlots() {
 
   }
 
-  else if (strcmp(mConfig.mPlot.PlotType.c_str(), "histogram") == 0) {
+  else if (Type == PlotType::HISTOGRAM) {
     Plots.push_back(std::make_unique<HistogramPlot>(
         mConfig, mWorker->getConsumer()));
 
@@ -95,7 +97,7 @@ void MainWindow::setupPlots() {
 
   }
 
-  else if (strcmp(mConfig.mPlot.PlotType.c_str(), "pixels") == 0) {
+  else if (Type == PlotType::PIXELS) {
 
     // Always create the XY plot
     Plots.push_back(std::make_unique<Custom2DPlot>(
@@ -177,7 +179,7 @@ void MainWindow::handleClearButton() {
 void MainWindow::updateGradientLabel() {
 
   for (auto &Plot : Plots) {
-    if (Plot->getPlotType() == PlotType::PIXEL) {
+    if (Plot->getPlotType() == PlotType::PIXELS) {
       if (mConfig.mPlot.InvertGradient) {
         ui->lblGradientText->setText(
             QString::fromStdString(mConfig.mPlot.ColorGradient + " (I)"));
@@ -213,7 +215,7 @@ void MainWindow::handleLogButton() {
 
 // toggle the invert gradient flag (irrelevant for TOF)
 void MainWindow::handleInvertButton() {
-  if (Plots[0]->getPlotType() ==  PlotType::PIXEL || Plots[0]->getPlotType() ==  PlotType::TOF2D) {
+  if (Plots[0]->getPlotType() ==  PlotType::PIXELS || Plots[0]->getPlotType() ==  PlotType::TOF2D) {
     mConfig.mPlot.InvertGradient = not mConfig.mPlot.InvertGradient;
     updateGradientLabel();
   }
@@ -238,7 +240,7 @@ void MainWindow::handleAutoScaleYButton() {
 void MainWindow::handleGradientButton() {
 
   for (auto &Plot : Plots) {
-    if (Plot->getPlotType() ==  PlotType::PIXEL) {
+    if (Plot->getPlotType() ==  PlotType::PIXELS) {
 
       Custom2DPlot *Plot2D = dynamic_cast<Custom2DPlot *>(Plot.get());
 
