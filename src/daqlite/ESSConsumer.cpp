@@ -7,7 +7,7 @@
 
 #include <ESSConsumer.h>
 
-#include <CommonTypes.h>
+#include <types/PlotType.h>
 #include <Configuration.h>
 #include <ThreadSafeVector.h>
 
@@ -440,7 +440,8 @@ void ESSConsumer::addSubscriber(PlotType Type) {
       break;
   }
 
-  // for (const auto& dt: mDataTypes) {
+  // Uncomment to print the subscription state
+  // for (const auto& dt: DataType::types()) {
   //   fmt::print("ESSConsumer::addSubscriber {} {}\n", Type, mSubscriptionCount[dt]);
   // }
 }

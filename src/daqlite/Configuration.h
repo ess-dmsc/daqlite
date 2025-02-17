@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include <CommonTypes.h>
+#include <types/PlotType.h>
 
 #include <nlohmann/json.hpp>
 

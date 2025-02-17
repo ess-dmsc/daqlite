@@ -11,6 +11,7 @@
 #pragma once
 
 #include <ThreadSafeVector.h>
+#include <types/DataType.h>
 
 #include <librdkafka/rdkafkacpp.h>
 
@@ -158,26 +159,6 @@ private:
   uint32_t mNumPixels{0}; ///< Number of pixels
   uint32_t mMinPixel{0};  ///< Offset
   uint32_t mMaxPixel{0};  ///< Number of pixels + offset
-
-  /// \brief Data types produced by the ESSConsumer
-  enum class DataType {
-    NONE,
-    ANY,
-    TOF,
-    HISTOGRAM,
-    HISTOGRAM_TOF,
-    PIXEL_ID,
-  };
-
-  /// \brief Vector used for handy looping through all data types
-  std::vector<DataType> mDataTypes = {
-    DataType::NONE,
-    DataType::ANY,
-    DataType::TOF,
-    DataType::HISTOGRAM,
-    DataType::HISTOGRAM_TOF,
-    DataType::PIXEL_ID
-  };
 
   /// \brief  Check if all deliveries have been made for a given data type
   /// \param  Type  Check for this data type

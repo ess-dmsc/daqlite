@@ -8,9 +8,9 @@
 #include <Custom2DPlot.h>
 
 #include <AbstractPlot.h>
-#include <CommonTypes.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
+#include <types/PlotType.h>
 
 #include <logical_geometry/ESSGeometry.h>
 

@@ -1,36 +1,40 @@
 // Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file CommonTypes.h
+/// \file PlotType.h
 ///
-/// Types used to specify plots and data
+/// Used for characterizing different daqlite plots
 //===----------------------------------------------------------------------===//
 
 #pragma once
 
 #include <algorithm>
+#include <cctype>
 #include <cstdint>
 #include <stdexcept>
 #include <string>
-#include <cctype>
+#include <vector> 
 
 class PlotType {
-
 public:
+
+  // Enum definition
   enum Types {
-    NONE      = 0x01,
-    ANY       = 0x02,
-    TOF2D     = 0x03,
-    TOF       = 0x04,
-    PIXELS    = 0x05,
+    NONE = 0x01,
+    ANY = 0x02,
+    TOF2D = 0x03,
+    TOF = 0x04,
+    PIXELS = 0x05,
     HISTOGRAM = 0x06
   };
 
+  // Max and min enum values
   static constexpr int MIN = Types::NONE;
-
   static constexpr int MAX = Types::HISTOGRAM;
 
+  // Construct from string
   PlotType(const std::string &type) {
+
     // Convert to lower case, so both "value" and "VALUE" will work
     std::string lower = type;
     std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c){ return std::tolower(c); });
@@ -64,6 +68,7 @@ public:
     }
   }
 
+  // Construct from integer
   PlotType(const int type) {
     if (type >= MIN && type <= MAX) {
       mPlotType = static_cast<Types>(type);
@@ -76,9 +81,13 @@ public:
   }
 
   std::string asString() const {
-    std::string result = "None";
+    std::string result = "";
 
     switch (mPlotType) {
+      case Types::NONE:
+        result = "NONE";
+        break;
+
       case Types::ANY:
         result = "ANY";
         break;
@@ -104,6 +113,17 @@ public:
     }
 
     return result;
+  }
+
+  static std::vector<int> types() {
+    return std::vector<int>{
+      Types::NONE,
+      Types::ANY,
+      Types::TOF2D,
+      Types::TOF,
+      Types::PIXELS,
+      Types::HISTOGRAM
+    };
   }
 
   operator int() const { return static_cast<int>(mPlotType); }

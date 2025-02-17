@@ -8,7 +8,7 @@
 #include <CustomTofPlot.h>
 
 #include <AbstractPlot.h>
-#include <CommonTypes.h>
+#include <types/PlotType.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
 

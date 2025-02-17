@@ -17,7 +17,6 @@ set(daqlite_src
 
 set(daqlite_inc
   AbstractPlot.h
-  CommonTypes.h
   Configuration.h
   Custom2DPlot.h
   CustomAMOR2DTOFPlot.h
@@ -28,6 +27,10 @@ set(daqlite_inc
   MainWindow.h
   ThreadSafeVector.h
   WorkerThread.h
+
+  # Types
+  types/PlotType.h
+  types/CommonTypes.h
   )
 
 set(daqlite_ui

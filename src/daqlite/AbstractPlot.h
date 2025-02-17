@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include "CommonTypes.h"
-#include "ESSConsumer.h"
+#include <ESSConsumer.h>
+#include <types/PlotType.h>
 
 #include <QPlot/QPlot.h>
 
