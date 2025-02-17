@@ -85,7 +85,7 @@ public:
   };
 
   struct PlotOptions {
-    PlotType Plot{"pixels"}; // "tof" and "tof2d" are also possible
+    PlotType Plot{PlotType::PIXELS}; // "tof" and "tof2d" are also possible
     bool ClearPeriodic{false};
     uint32_t ClearEverySeconds{5};
     bool Interpolate{false};
