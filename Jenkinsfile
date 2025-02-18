@@ -19,8 +19,8 @@ properties([[
 ]]);
 
 container_build_nodes = [
-  'centos': ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11'),
-  'ubuntu2204': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2204')
+  'centos'    : ContainerBuildNode.getDefaultContainerBuildNode('centos7-gcc11-qt6'),
+  'ubuntu2204': ContainerBuildNode.getDefaultContainerBuildNode('ubuntu2204-qt6')
 ]
 
 pipeline_builder = new PipelineBuilder(this, container_build_nodes)
@@ -108,7 +108,7 @@ builders = pipeline_builder.createBuilders { container ->
             make everything -j4
         """
     }  // stage
-    
+
     if (container.key == archive_what) {
         pipeline_builder.stage("${container.key}: archive") {
             container.sh """
