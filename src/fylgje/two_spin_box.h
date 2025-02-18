@@ -7,13 +7,18 @@ class TwoSpinBox: public QSpinBox
 public:
     TwoSpinBox(int minimum, int maximum): QSpinBox()
     {
-        for (int i=minimum; i<=maximum; i<<=1) acceptedValues << i;
+        for (int i=minimum; i<=maximum; i<<=1) {
+            acceptedValues << i;
+        }
         setRange(acceptedValues.first(), acceptedValues.last());
         setValue(maximum);
     }
+
     void stepBy(int steps) override
     {
-        int const index = std::max(0, (acceptedValues.indexOf(value()) + steps) % acceptedValues.length()); // Bounds the index between 0 and length
+         // Bounds the index between 0 and length
+        const int length = static_cast<int>((acceptedValues.indexOf(value()) + steps) % acceptedValues.length());
+        const int index = std::max(0, length);
         setValue(acceptedValues.value(index));
     }
 private:

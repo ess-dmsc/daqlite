@@ -27,7 +27,8 @@ target_link_libraries(
   PRIVATE RdKafka::rdkafka
   PRIVATE QPlot
   PRIVATE QtColorWidgets
-  PRIVATE Qt5::Widgets
+  PRIVATE Qt6::Widgets
+  PRIVATE Qt6::Core5Compat
 )
 
 target_link_libraries(sniffer

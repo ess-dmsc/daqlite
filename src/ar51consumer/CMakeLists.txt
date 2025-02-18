@@ -41,7 +41,7 @@ target_link_libraries(
   PRIVATE RdKafka::rdkafka
   PRIVATE QPlot
   PRIVATE QtColorWidgets
-  PRIVATE Qt5::Widgets
+  PRIVATE Qt6::Widgets
 )
 
 target_link_libraries(ar51consumer
