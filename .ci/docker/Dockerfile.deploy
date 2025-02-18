@@ -1,28 +1,29 @@
 # docker build --build-arg VNC_PASSWORD=<secret> --build-arg VNC_RESOLUTION=1440×900 -f Dockerfile.deploy -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:<x.x> .
-
 FROM ubuntu:22.04
 
 # Install necessary packages
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
+        apt-utils \
+        binutils \
+        dbus-x11 \
+        gedit \
+        qt6-base-dev \
+        libqt6core5compat6-dev \
         tightvncserver \
-        xfce4 \
-        xfce4-goodies \
-        qtcreator \
         vim-tiny \
         x11-xserver-utils \
-        gedit \
-        xfonts-base \
+        xfce4 \
+        xfce4-goodies \
         xfonts-75dpi \
-        dbus-x11 && \
+        xfonts-base && \
     apt-get clean && \
+    apt-get autoclean && \
+    apt-get autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Qt6
-RUN apt -y install binutils &&               \
-    apt -y install qt6-base-dev &&           \
-    apt -y install libqt6core5compat6-dev && \
-    strip -v --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt6Core.so.6
+# Install Qt6 with Cento
+RUN strip -v --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt6Core.so.6
 
 # Copy application files
 COPY build/bin /ess/ecdc/daqlite/bin
