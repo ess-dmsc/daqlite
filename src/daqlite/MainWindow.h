@@ -1,4 +1,4 @@
-// Copyright \(C\) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file MainWindow.h
@@ -9,7 +9,6 @@
 #pragma once
 
 #include <Configuration.h>
-
 #include <QMainWindow>
 
 #include <stddef.h>
