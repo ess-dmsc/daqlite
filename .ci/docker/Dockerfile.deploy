@@ -9,8 +9,6 @@ RUN apt-get update && \
         xfce4 \
         xfce4-goodies \
         qtcreator \
-        qtbase5-dev \
-        qt5-qmake \
         vim-tiny \
         x11-xserver-utils \
         gedit \
@@ -19,6 +17,12 @@ RUN apt-get update && \
         dbus-x11 && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
+
+# Install Qt6
+RUN apt -y install binutils &&               \
+    apt -y install qt6-base-dev &&           \
+    apt -y install libqt6core5compat6-dev && \
+    strip -v --remove-section=.note.ABI-tag /usr/lib/x86_64-linux-gnu/libQt6Core.so.6
 
 # Copy application files
 COPY build/bin /ess/ecdc/daqlite/bin
@@ -49,7 +53,7 @@ ENV PATH="/ess/ecdc/daqlite/scripts:${PATH}"
 RUN mkdir -p /ess/ecdc/daqlite /ess/ecdc/daqlite/configs
 
 # Set up Kafka configuration
-RUN echo "{}" > /ess/ecdc/daqlite/configs/kafka-config-daqlite.json
+RUN echo "{}" > /ess/ecdc/daqlite/configs/kafka-config-daqlite.jsonqt5
 
 # Copy startup script
 COPY .ci/docker/Dockerfile_entrypoint.sh /ess/ecdc/daqlite/entrypoint.sh
