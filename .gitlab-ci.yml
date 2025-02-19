@@ -4,7 +4,8 @@ workflow:
       when: always
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
       when: always
-    - when: never
+    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
+      when: always
 
 default:
   tags:
@@ -16,7 +17,7 @@ stages:
 
 build_job:
   stage: build
-  image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204:1.0
+  image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204-qt6:1.1
   script:
       - mkdir -p build
       - cd build
