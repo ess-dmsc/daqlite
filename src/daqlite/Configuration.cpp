@@ -196,9 +196,14 @@ template <typename T>
 T Configuration::getVal(const std::string &Group, const std::string &Option, T Default,
                         bool Throw) {
   T ConfigVal;
-  try {
+
+  // Check if the option is present
+  if (mJsonObj.contains(Group) && mJsonObj[Group].contains(Option)) {
     ConfigVal = mJsonObj[Group][Option];
-  } catch (nlohmann::json::exception &e) {
+  }
+
+  // ... inform, if it is missing
+  else {
     fmt::print("Missing [{}][{}] configuration\n", Group, Option);
     if (Throw) {
       throw std::runtime_error("Daqlite config error");
@@ -207,5 +212,6 @@ T Configuration::getVal(const std::string &Group, const std::string &Option, T D
       return Default;
     }
   }
+
   return ConfigVal;
 }

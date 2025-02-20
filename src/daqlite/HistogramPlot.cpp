@@ -176,7 +176,8 @@ void HistogramPlot::showPointToolTip(QMouseEvent *event) {
   int xCoordTofValue = int((x + xCoordStep / 2) / xCoordStep) * xCoordStep;
 
   // Get the count value from the data store
-  double count = mGraph->data()->at(xCoordDataIndex)->mainValue();
+  const bool empty = mGraph->data()->isEmpty();
+  double count = (empty) ? 0 : mGraph->data()->at(xCoordDataIndex)->mainValue();
 
   setToolTip(QString("Tof: %1 Value: %2").arg(xCoordTofValue).arg(count));
 }
