@@ -9,19 +9,21 @@
 //===----------------------------------------------------------------------===//
 
 #include "Configuration.h"
-#include "MainWindow.h"        
+#include "MainWindow.h"
 #include "WorkerThread.h"
 
-#include <QApplication>          
-#include <QCommandLineOption>    
-#include <QCommandLineParser>    
-#include <QPushButton>           
-#include <QString>               
+#include <QApplication>
+#include <QCommandLineOption>
+#include <QCommandLineParser>
+#include <QPushButton>
+#include <QString>
 
-#include <stdio.h>               
-#include <memory>                
-#include <string>                
-#include <vector>                
+#include <fmt/format.h>
+
+#include <stdio.h>
+#include <memory>
+#include <string>
+#include <vector>
 
 int main(int argc, char *argv[]) {
   QApplication app(argc, argv);
@@ -56,35 +58,39 @@ int main(int argc, char *argv[]) {
   Configuration MainConfig = confs.front();
 
   if (CLI.isSet(kafkaBrokerOption)) {
-    std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
-    MainConfig.mKafka.Broker = KafkaBroker;
-    printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", MainConfig.mKafka.Broker.c_str());
+    MainConfig.mKafka.Broker = CLI.value(kafkaBrokerOption).toStdString();
+    fmt::print("<<<< \n WARNING Overriding kafka broker to {} \n>>>>\n", MainConfig.mKafka.Broker);
   }
 
   if (CLI.isSet(kafkaTopicOption)) {
-    std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
-    MainConfig.mKafka.Topic = KafkaTopic;
-    printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", MainConfig.mKafka.Topic.c_str());
+    MainConfig.mKafka.Topic = CLI.value(kafkaTopicOption).toStdString();
+    fmt::print("<<<< \n WARNING Overriding kafka topic to {} \n>>>>\n", MainConfig.mKafka.Topic);
+  }
+
+  if (CLI.isSet(kafkaConfigOption)) {
+    MainConfig.mKafkaConfigFile = CLI.value(kafkaConfigOption).toStdString();
   }
 
   // Setup worker thread
   std::shared_ptr<WorkerThread> Worker = std::make_shared<WorkerThread>(MainConfig);
 
 
-  // Setup a window for each plot 
+  // Setup a window for each plot
   for (size_t i=1; i < confs.size(); ++i) {
     Configuration Config = confs[i];
 
     if (CLI.isSet(kafkaBrokerOption)) {
-      std::string KafkaBroker = CLI.value(kafkaBrokerOption).toStdString();
-      Config.mKafka.Broker = KafkaBroker;
-      printf("<<<< \n WARNING Override kafka broker to %s \n>>>>\n", Config.mKafka.Broker.c_str());
+      Config.mKafka.Broker = CLI.value(kafkaBrokerOption).toStdString();
+      fmt::print("<<<< \n WARNING Overriding kafka broker to {} \n>>>>\n", MainConfig.mKafka.Broker);
     }
 
     if (CLI.isSet(kafkaTopicOption)) {
-      std::string KafkaTopic = CLI.value(kafkaTopicOption).toStdString();
-      Config.mKafka.Topic = KafkaTopic;
-      printf("<<<< \n WARNING Override kafka topic to %s \n>>>>\n", Config.mKafka.Topic.c_str());
+      Config.mKafka.Topic = CLI.value(kafkaTopicOption).toStdString();
+      fmt::print("<<<< \n WARNING Overriding kafka topic to {} \n>>>>\n", MainConfig.mKafka.Topic);
+    }
+
+    if (CLI.isSet(kafkaConfigOption)) {
+      Config.mKafkaConfigFile = CLI.value(kafkaConfigOption).toStdString();
     }
 
     MainWindow* w = new MainWindow(Config, Worker.get());
@@ -93,7 +99,7 @@ int main(int argc, char *argv[]) {
     w->show();
   }
 
-  // Start the worker and let the Qt event handler take over  
+  // Start the worker and let the Qt event handler take over
   Worker->start();
   // main.show();
   // main.raise();
