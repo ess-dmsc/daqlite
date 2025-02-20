@@ -1,11 +1,8 @@
 workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
     - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: always
 
 default:
   tags:
@@ -15,7 +12,7 @@ stages:
   - build
   - publish
 
-build_job:
+gitlab-ci-daqlite-build:
   stage: build
   image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204-qt6:1.1
   script:
@@ -32,52 +29,20 @@ build_job:
       - build/licenses
     expire_in: 1 week
 
-publish_docker_job:
+gitlab-ci-daqlite-publish:
   stage: publish
-  image: "docker:20.10"
+  image: alpine/curl:latest
   dependencies:
-    - build_job
-  services:
-    - docker:dind
+    - gitlab-ci-daqlite-build
   before_script:
-    - |
-      docker login \
-        -u "$CI_REGISTRY_USER" \
-        -p "$CI_REGISTRY_PASSWORD" \
-        "$CI_REGISTRY"
+    - curl -fL https://install-cli.jfrog.io | sh
+    - jf config add $ESS_ARTIFACTORY_ID --url=$ESS_ARTIFACTORY_URL --user=$ESS_ARTIFACTORY_ECDC_CONAN_USER --password=$ESS_ARTIFACTORY_ECDC_CONAN_TOKEN
+    - jf config show
   script:
-    # Determine the Docker tag based on the branch or tag
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
-        DOCKER_TAG="latest"
-      elif [[ -n "$CI_COMMIT_TAG" ]]; then
-        DOCKER_TAG="$CI_COMMIT_TAG"
-      else
-        echo "Not on master or tag, skipping Docker publish."
-        exit 1
-      fi
-    - |
-      docker build \
-          --build-arg https_proxy="http://172.20.72.11:8888" \
-          --build-arg http_proxy="http://172.20.72.11:8888" \
-          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG \
-          -f .ci/docker/Dockerfile.deploy .
-    - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG
-
-publish_tar_job:
-  stage: publish
-  image: alpine:latest
-  dependencies:
-    - build_job
-  artifacts:
-    paths:
-      - daqlite-ubuntu2204.tar.gz
-  script:
-    - apk update
-    - apk add --no-cache bash tar
     - mkdir -p archive/daqlite-ubuntu2204
     - cp -r build/bin archive/daqlite-ubuntu2204
     - cp -r build/lib archive/daqlite-ubuntu2204
     - cp -r scripts archive/daqlite-ubuntu2204
     - cp -r configs archive/daqlite-ubuntu2204
-    - tar czvf daqlite-ubuntu2204.tar.gz archive/daqlite-ubuntu2204
+    - tar czvf daqlite-ubuntu2204.tar.gz -C archive daqlite-ubuntu2204
+    - jf rt u --build-name="daqlite-ubuntu2204" --build-number="${CI_JOB_ID}" daqlite-ubuntu2204.tar.gz ecdc-generic-local
