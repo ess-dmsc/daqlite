@@ -1,11 +1,8 @@
 workflow:
   rules:
-    - if: '$CI_COMMIT_BRANCH == "main"'
-      when: always
-    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
-      when: always
-    - if: $CI_PIPELINE_SOURCE == 'merge_request_event'
-      when: always
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_COMMIT_TAG
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
 
 default:
   tags:
@@ -15,7 +12,7 @@ stages:
   - build
   - publish
 
-build_job:
+gitlab-ci-daqlite-build:
   stage: build
   image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204-qt6:1.1
   script:
@@ -32,52 +29,55 @@ build_job:
       - build/licenses
     expire_in: 1 week
 
-publish_docker_job:
+gitlab-ci-daqlite-publish-docker-image:
   stage: publish
-  image: "docker:20.10"
-  dependencies:
-    - build_job
-  services:
-    - docker:dind
-  before_script:
+  image: docker:28-cli
+  script:
     - |
       docker login \
         -u "$CI_REGISTRY_USER" \
         -p "$CI_REGISTRY_PASSWORD" \
         "$CI_REGISTRY"
-  script:
-    # Determine the Docker tag based on the branch or tag
-    - |
-      if [[ "$CI_COMMIT_BRANCH" == "main" ]]; then
-        DOCKER_TAG="latest"
-      elif [[ -n "$CI_COMMIT_TAG" ]]; then
-        DOCKER_TAG="$CI_COMMIT_TAG"
-      else
-        echo "Not on master or tag, skipping Docker publish."
-        exit 1
-      fi
     - |
       docker build \
           --build-arg https_proxy="http://172.20.72.11:8888" \
           --build-arg http_proxy="http://172.20.72.11:8888" \
-          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG \
+          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_IMAGE_TAG \
           -f .ci/docker/Dockerfile.deploy .
-    - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG
+    - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_IMAGE_TAG
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        DOCKER_IMAGE_TAG: "latest"
+    - if: $CI_COMMIT_TAG
+      variables:
+        DOCKER_IMAGE_TAG: "${CI_COMMIT_TAG}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
 
-publish_tar_job:
+gitlab-ci-daqlite-publish-to-artifactory:
   stage: publish
-  image: alpine:latest
+  image: alpine/curl:latest
   dependencies:
-    - build_job
-  artifacts:
-    paths:
-      - daqlite-ubuntu2204.tar.gz
+    - gitlab-ci-daqlite-build
+  before_script:
+    - curl -fL https://install-cli.jfrog.io | sh
+    - jf config add $ESS_ARTIFACTORY_ID --url=$ESS_ARTIFACTORY_URL --user=$ESS_ARTIFACTORY_ECDC_USER --password=$ESS_ARTIFACTORY_ECDC_GENERIC_TOKEN
+    - jf config show
   script:
-    - apk update
-    - apk add --no-cache bash tar
     - mkdir -p archive/daqlite-ubuntu2204
     - cp -r build/bin archive/daqlite-ubuntu2204
     - cp -r build/lib archive/daqlite-ubuntu2204
     - cp -r scripts archive/daqlite-ubuntu2204
     - cp -r configs archive/daqlite-ubuntu2204
-    - tar czvf daqlite-ubuntu2204.tar.gz archive/daqlite-ubuntu2204
+    - tar czvf daqlite-ubuntu2204.tar.gz -C archive daqlite-ubuntu2204
+    - jf rt u --build-name="daqlite-ubuntu2204" --build-number=${CI_JOB_ID} daqlite-ubuntu2204.tar.gz ecdc-generic-release/${ARTIFACTORY_UPLOAD_PATH}
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_DEFAULT_BRANCH}/${CI_PIPELINE_IID}/"
+    - if: $CI_COMMIT_TAG
+      variables:
+        ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/tags/${CI_COMMIT_TAG}/"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: never
