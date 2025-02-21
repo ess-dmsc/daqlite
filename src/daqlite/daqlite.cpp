@@ -44,7 +44,7 @@ namespace {
 
       else if (option == "k") {
         Config.mKafkaConfigFile = CLI.value(option).toStdString();
-        fmt::print("<<<< \n WARNING Overriding kafka config file to {} \n>>>>\n", Config.mKafkaConfigFile);
+        fmt::print("<<<< \n WARNING Overriding path to kafka config file to {} \n>>>>\n", Config.mKafkaConfigFile);
       }
     }
   }
