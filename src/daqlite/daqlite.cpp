@@ -32,8 +32,6 @@ namespace {
   /// \param Config  Plot configuration
   void setKafkaOptions(const QCommandLineParser &CLI, Configuration &Config) {
     for (const QString &option: CLI.optionNames()) {
-      fmt::print("Option = {}\n", option.toStdString());
-
       if (option == "b") {
         Config.mKafka.Broker = CLI.value(option).toStdString();
         fmt::print("<<<< \n WARNING Overriding kafka broker to {} \n>>>>\n", Config.mKafka.Broker);
