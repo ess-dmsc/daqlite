@@ -17,15 +17,37 @@
     "offset" : 71680
   },
 
+  "tof" : {
+    "scale" : 1000,
+    "max_value" : 72000,
+    "bin_size" : 512
+  },
+
   "plot": {
     "plot_type" : "pixels",
-    "window_title" : "DREAM BE EndCap image",
+    "window_title" : "DREAM BE EndCap Image",
     "plot_title" : "Pixels",
     "clear_periodic" : false,
     "clear_interval_seconds" : 5,
     "interpolate_pixels" : false,
     "color_gradient" : "hot",
     "invert_gradient" : false,
-    "log_scale" : true
+    "log_scale" : true,
+    "window_height" : 600,
+    "window_width" : 400
+   },
+
+
+  "plots": {
+    "plot1": {
+      "plot_type"              : "tof",
+      "window_title"           : "DREAM BE EndCap ToF",
+      "plot_title"             : "ToF",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "invert_gradient"        : false,
+      "log_scale"              : false
+    }
   }
 }

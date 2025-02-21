@@ -17,6 +17,12 @@
     "offset" : 0
   },
 
+  "tof" : {
+    "scale" : 1000,
+    "max_value" : 100000,
+    "bin_size" : 512
+  },
+
   "plot": {
     "plot_type" : "pixels",
     "window_title" : "ODIN Next Image",
@@ -27,5 +33,18 @@
     "color_gradient" : "grayscale",
     "invert_gradient" : false,
     "log_scale" : true
+  },
+
+  "plots": {
+    "plot-tof": {
+      "plot_type"              : "tof",
+      "window_title"           : "ODIN Next ToF",
+      "plot_title"             : "ToF",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "invert_gradient"        : false,
+      "log_scale"              : false
+    }
   }
 }
