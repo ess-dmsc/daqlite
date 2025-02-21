@@ -35,7 +35,9 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
   // Load JSON file
   nlohmann::json MainJSON;
   ifs >> MainJSON;
-  Configuration::prettyJSON(MainJSON, "Main");
+
+  // Uncomment to print JSON object
+  // Configuration::prettyJSON(MainJSON, "Main");
 
   // ---------------------------------------------------------------------------
   // Common options
@@ -58,7 +60,8 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
     Common["plot"] = MainJSON["plot"];
   }
 
-  Configuration::prettyJSON(Common, "Top plot");
+  // Uncomment to print JSON object
+  // Configuration::prettyJSON(Common, "Top plot");
   conf.fromJsonObj(Common);
   Configurations.push_back(conf);
 
@@ -68,7 +71,8 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
     for (const auto& [key, plot] : MainJSON["plots"].items()) {
       Common["plot"] = plot;
 
-      Configuration::prettyJSON(Common, key);
+      // Uncomment to print JSON object
+      // Configuration::prettyJSON(Common, key);
       conf.fromJsonObj(Common);
       Configurations.push_back(conf);
     }
