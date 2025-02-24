@@ -42,7 +42,7 @@ gitlab-ci-daqlite-publish-docker-image:
       docker build \
           --build-arg https_proxy="http://172.20.72.11:8888" \
           --build-arg http_proxy="http://172.20.72.11:8888" \
-          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_TAG \
+          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_IMAGE_TAG \
           -f .ci/docker/Dockerfile.deploy .
     - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_IMAGE_TAG
   rules:
