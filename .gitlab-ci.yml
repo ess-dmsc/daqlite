@@ -45,4 +45,4 @@ gitlab-ci-daqlite-publish:
     - cp -r scripts archive/daqlite-ubuntu2204
     - cp -r configs archive/daqlite-ubuntu2204
     - tar czvf daqlite-ubuntu2204.tar.gz -C archive daqlite-ubuntu2204
-    - jf rt u --build-name="daqlite-ubuntu2204" --build-number="${CI_JOB_ID}" daqlite-ubuntu2204.tar.gz ecdc-generic-local
+    - jf rt u --build-name="daqlite-ubuntu2204" --build-number="${CI_JOB_ID}" daqlite-ubuntu2204.tar.gz ecdc-generic-release/${CI_PROJECT_NAME}/${CI_PIPELINE_IID}
