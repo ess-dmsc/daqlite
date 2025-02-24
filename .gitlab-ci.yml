@@ -1,3 +1,8 @@
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+
 default:
   tags:
     - docker
@@ -47,4 +52,3 @@ gitlab-ci-daqlite-publish:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
         ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}/${CI_PIPELINE_IID}/"
-
