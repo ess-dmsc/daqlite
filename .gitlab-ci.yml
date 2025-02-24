@@ -1,8 +1,7 @@
 workflow:
   rules:
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-    - if: '$CI_COMMIT_TAG =~ /^v\d+\.\d+\.\d+$/'
+    
 
 default:
   tags:
@@ -17,11 +16,11 @@ gitlab-ci-daqlite-build:
   image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204-qt6:1.1
   script:
       - mkdir -p build
-      - cd build
-      - conan remote add --insert 0 --force ecdc-conan-external https://artifactory.esss.lu.se/artifactory/api/conan/ecdc-conan-external
-      - conan install ..
-      - cmake ..
-      - make
+      # - cd build
+      # - conan remote add --insert 0 --force ecdc-conan-external https://artifactory.esss.lu.se/artifactory/api/conan/ecdc-conan-external
+      # - conan install ..
+      # - cmake ..
+      # - make
   artifacts:
     paths:
       - build/bin
@@ -45,4 +44,12 @@ gitlab-ci-daqlite-publish:
     - cp -r scripts archive/daqlite-ubuntu2204
     - cp -r configs archive/daqlite-ubuntu2204
     - tar czvf daqlite-ubuntu2204.tar.gz -C archive daqlite-ubuntu2204
-    - jf rt u --build-name="daqlite-ubuntu2204" --build-number="${CI_JOB_ID}" daqlite-ubuntu2204.tar.gz ecdc-generic-release/${CI_PROJECT_NAME}/${CI_PIPELINE_IID}/
+    - jf rt u --build-name="daqlite-ubuntu2204" --build-number="${CI_JOB_ID}" daqlite-ubuntu2204.tar.gz ecdc-generic-release/"${ARTIFACTORY_UPLOAD_PATH}"
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+      variables:
+        ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_DEFAULT_BRANCH}/${CI_PIPELINE_IID}"
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      variables:
+        ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}/${CI_PIPELINE_IID}/"
+
