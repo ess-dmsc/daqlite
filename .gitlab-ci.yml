@@ -16,11 +16,11 @@ gitlab-ci-daqlite-build:
   image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204-qt6:1.1
   script:
       - mkdir -p build
-      # - cd build
-      # - conan remote add --insert 0 --force ecdc-conan-external https://artifactory.esss.lu.se/artifactory/api/conan/ecdc-conan-external
-      # - conan install ..
-      # - cmake ..
-      # - make
+      - cd build
+      - conan remote add --insert 0 --force ecdc-conan-external https://artifactory.esss.lu.se/artifactory/api/conan/ecdc-conan-external
+      - conan install ..
+      - cmake ..
+      - make
   artifacts:
     paths:
       - build/bin
@@ -48,7 +48,7 @@ gitlab-ci-daqlite-publish:
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
       variables:
-        ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_DEFAULT_BRANCH}/${CI_PIPELINE_IID}"
+        ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_DEFAULT_BRANCH}/${CI_PIPELINE_IID}/"
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       variables:
         ARTIFACTORY_UPLOAD_PATH: "${CI_PROJECT_NAME}/${CI_MERGE_REQUEST_SOURCE_BRANCH_NAME}/${CI_PIPELINE_IID}/"
