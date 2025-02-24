@@ -36,7 +36,7 @@ gitlab-ci-daqlite-publish:
     - gitlab-ci-daqlite-build
   before_script:
     - curl -fL https://install-cli.jfrog.io | sh
-    - jf config add $ESS_ARTIFACTORY_ID --url=$ESS_ARTIFACTORY_URL --user=$ESS_ARTIFACTORY_ECDC_CONAN_USER --password=$ESS_ARTIFACTORY_ECDC_CONAN_TOKEN
+    - jf config add $ESS_ARTIFACTORY_ID --url=$ESS_ARTIFACTORY_URL --user=$ESS_ARTIFACTORY_ECDC_USER --password=$ESS_ARTIFACTORY_ECDC_GENERIC_TOKEN
     - jf config show
   script:
     - mkdir -p archive/daqlite-ubuntu2204
