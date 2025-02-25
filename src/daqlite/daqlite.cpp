@@ -86,7 +86,7 @@ int main(int argc, char *argv[]) {
   std::shared_ptr<WorkerThread> Worker = std::make_shared<WorkerThread>(MainConfig);
 
   // Setup a window for each plot
-  for (size_t i=1; i < confs.size(); ++i) {
+  for (size_t i=0; i < confs.size(); ++i) {
     Configuration Config = confs[i];
     setKafkaOptions(CLI, MainConfig);
 

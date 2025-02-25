@@ -50,7 +50,10 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
 
   updateGradientLabel();
   updateAutoScaleLabels();
+
+  resize(mConfig.mPlot.Width, mConfig.mPlot.Height);
   show();
+
   startKafkaConsumerThread();
 }
 

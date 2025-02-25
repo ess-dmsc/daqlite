@@ -3,7 +3,7 @@
 ///
 /// \file HistogramPlot.h
 ///
-/// \brief Creates a hiostogram plot based on QCustomPlot and
+/// \brief Creates a histogram plot based on QCustomPlot and
 ///  on the configuration parameters
 //===----------------------------------------------------------------------===//
 

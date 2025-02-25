@@ -23,18 +23,6 @@
     "bin_size" : 512
   },
 
-  "plot": {
-    "plot_type" : "tof2d",
-    "window_title" : "Top AMOR TOF 2D",
-    "plot_title" : "Pixels",
-    "clear_periodic" : false,
-    "clear_interval_seconds" : 5,
-    "interpolate_pixels" : false,
-    "color_gradient" : "hot",
-    "invert_gradient" : false,
-    "log_scale" : false
-  },
-
   "plots": {
     "tof_2d": {
       "plot_type" : "tof2d",
@@ -57,7 +45,9 @@
       "interpolate_pixels" : false,
       "color_gradient" : "hot",
       "invert_gradient" : false,
-      "log_scale" : false
+      "log_scale" : false,
+      "window_width"  : 1024,
+      "window_height" : 640
     },
 
     "tof2": {
@@ -66,6 +56,20 @@
       "plot_title" : "TOF",
       "clear_periodic" : false,
       "clear_interval_seconds" : 30,
+      "interpolate_pixels" : false,
+      "color_gradient" : "hot",
+      "invert_gradient" : false,
+      "log_scale" : false,
+      "window_width"  : 640,
+      "window_height" : 256
+    },
+
+    "plot": {
+      "plot_type" : "tof2d",
+      "window_title" : "Top AMOR TOF 2D",
+      "plot_title" : "Pixels",
+      "clear_periodic" : false,
+      "clear_interval_seconds" : 5,
       "interpolate_pixels" : false,
       "color_gradient" : "hot",
       "invert_gradient" : false,
