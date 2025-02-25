@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <string.h>
+#include <algorithm>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -51,7 +52,32 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
   updateGradientLabel();
   updateAutoScaleLabels();
 
-  resize(mConfig.mPlot.Width, mConfig.mPlot.Height);
+  // ---------------------------------------------------------------------------
+  // Resize and fit plot to the size of the current screen
+  //
+  // - Pixel and Tof2D plots are square
+  // - Other plots are long and narrow
+
+  // Adjust size and get minimum size to fit plot
+  adjustSize();
+  double alpha = std::max(minimumWidth(), minimumHeight());
+
+  // Get geometry of the screen
+  auto const geom = QApplication::primaryScreen()->geometry();
+  auto const width  = geom.width();
+  auto const height = geom.height();
+
+  // Resize square plots
+  if (mConfig.mPlot.Plot == PlotType::PIXELS || mConfig.mPlot.Plot == PlotType::TOF2D) {
+    alpha = std::max(alpha, 0.6 * height);
+    resize(1.1*alpha, alpha);
+  }
+
+  // ... and the rest
+  else {
+    alpha = std::max(alpha, 0.6 * width);
+    resize(alpha, 0.4 * alpha);
+  }
   show();
 
   startKafkaConsumerThread();
