@@ -154,7 +154,13 @@ void Configuration::getPlotConfig() {
   mPlot.WindowTitle = getVal("plot", "window_title", mPlot.WindowTitle);
   mPlot.PlotTitle = getVal("plot", "plot_title", mPlot.PlotTitle);
   mPlot.XAxis = getVal("plot", "xaxis", mPlot.XAxis);
-  mPlot.Width = getVal("plot", "window_width", mPlot.Width);
+
+  // Check if a plot width or height is specified
+  if (mJsonObj.contains("plot")) {
+    mPlot.defaultGeometry  = !mJsonObj["plot"].contains("window_width");
+    mPlot.defaultGeometry &= !mJsonObj["plot"].contains("window_height");
+  }
+  mPlot.Width  = getVal("plot", "window_width", mPlot.Width);
   mPlot.Height = getVal("plot", "window_height", mPlot.Height);
 }
 

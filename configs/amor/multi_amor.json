@@ -45,9 +45,7 @@
       "interpolate_pixels" : false,
       "color_gradient" : "hot",
       "invert_gradient" : false,
-      "log_scale" : false,
-      "window_width"  : 1024,
-      "window_height" : 640
+      "log_scale" : false
     },
 
     "tof2": {

@@ -95,8 +95,10 @@ public:
     std::string WindowTitle{"Daquiri Lite - Daqlite"};
     std::string PlotTitle{""};
     std::string XAxis{""};
-    int Width{600};  // default window width
-    int Height{400}; // default window height
+
+    int Width{600};             // Default window width
+    int Height{400};            // Default window height
+    bool defaultGeometry{true}; // True if window geometries are default
   };
 
   struct TOFOptions mTOF;
