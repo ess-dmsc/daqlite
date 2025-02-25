@@ -60,8 +60,8 @@ RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
 /// \brief Example parser for VMM3a data
 void ESSConsumer::parseVMM3aData(uint8_t * Readout, int Size) {
   int BytesLeft = Size;
-  while (BytesLeft >= sizeof(vmm3a_readout)) {
-    vmm3a_readout * vmd = (vmm3a_readout *)Readout;
+  while (BytesLeft >= static_cast<int>(sizeof(vmm3a_readout))) {
+    vmm3a_readout * vmd = (vmm3a_readout *) Readout;
     int Ring = vmd->Fiber/2;
     int FEN = vmd->FEN;
     int Hybrid = vmd->VMM >> 1;
@@ -76,14 +76,14 @@ void ESSConsumer::parseVMM3aData(uint8_t * Readout, int Size) {
 }
 
 /// \brief Example parser for CAEN Data
-void ESSConsumer::parseCAENData(uint8_t * Readout, int Size) {
+void ESSConsumer::parseCAENData(uint8_t *, int) {
   printf("Nothing to see here, please move on\n");
 }
 
 /// \brief Example parser for CDT data
 void ESSConsumer::parseCDTData(uint8_t * Readout, int Size) {
   int BytesLeft = Size;
-  while (BytesLeft >= sizeof(vmm3a_readout)) {
+  while (BytesLeft >= static_cast<int>(sizeof(vmm3a_readout))) {
     cdt_readout * cd = (cdt_readout *)Readout;
     int Ring = cd->Fiber/2;
     int FEN = cd->FEN;

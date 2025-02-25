@@ -11,7 +11,7 @@
 #include <fmt/format.h>
 
 
-bool CAENGraph::ignoreEntry(int Ring, int FEN) {
+bool CAENGraph::ignoreEntry(int, int) {
   return false;
 }
 
