@@ -24,6 +24,9 @@ public:
   /// \brief loads configuration from json file
   void fromJsonFile(std::string fname);
 
+  // get the Instrument information from the config JSON
+  void getInstrumentConfig();
+
   // get the Kafka related config options
   void getKafkaConfig();
 
@@ -46,11 +49,18 @@ public:
            bool Throw = false);
 
   // Configurable options
+  struct Instrument {
+    std::string Name{"bifrost"};
+    int groups{45};
+    int units_per_group{3};
+    int pixels_per_unit{100};
+  };
+
   struct Kafka {
     std::string Topic{"bifrost_detector_samples"};
     std::string Broker{"172.17.5.38:9092"};
     std::string MessageMaxBytes{"10000000"};
-    std::string FetchMessagMaxBytes{"10000000"};
+    std::string FetchMessageMaxBytes{"10000000"};
     std::string ReplicaFetchMaxBytes{"10000000"};
     std::string EnableAutoCommit{"false"};
     std::string EnableAutoOffsetStore{"false"};
@@ -67,6 +77,7 @@ public:
     int Height{900};
   };
 
+  struct Instrument Instrument;
   struct Kafka Kafka;
   struct Plot Plot;
 

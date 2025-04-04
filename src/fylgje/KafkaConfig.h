@@ -1,4 +1,4 @@
-// Copyright (C) 2022 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2022-2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file
@@ -16,7 +16,7 @@ class KafkaConfig {
 public:
   ///\brief Load Kafka configuration from file
   ///\param KafkaConfigFile
-  KafkaConfig(std::string KafkaConfigFile);
+  KafkaConfig(const std::string & KafkaConfigFile);
 
 public:
   // Parameters obtained from JSON config file

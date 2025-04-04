@@ -3,6 +3,7 @@
 ///
 /// \file Configuration.cpp
 ///
+/// \brief GUI and Kafka configuration
 //===----------------------------------------------------------------------===//
 
 #include "Configuration.h"
@@ -20,9 +21,18 @@ void Configuration::fromJsonFile(std::string fname) {
     throw(std::runtime_error("File is not valid JSON"));
   }
 
+  getInstrumentConfig();
   getKafkaConfig();
   getPlotConfig();
   print();
+}
+
+void Configuration::getInstrumentConfig() {
+  using std::operator""s;
+  Instrument.Name = getVal("instrument", "name", "n/a"s, true);
+  Instrument.groups = getVal("instrument", "groups", Instrument.groups);
+  Instrument.units_per_group = getVal("instrument", "units_per_group", Instrument.units_per_group);
+  Instrument.pixels_per_unit = getVal("instrument", "pixels_per_unit", Instrument.pixels_per_unit);
 }
 
 void Configuration::getKafkaConfig() {
@@ -33,8 +43,8 @@ void Configuration::getKafkaConfig() {
   /// The rest are optional, using default values
   Kafka.MessageMaxBytes =
       getVal("kafka", "message.max.bytes", Kafka.MessageMaxBytes);
-  Kafka.FetchMessagMaxBytes =
-      getVal("kafka", "fetch.message.max.bytes", Kafka.FetchMessagMaxBytes);
+  Kafka.FetchMessageMaxBytes =
+      getVal("kafka", "fetch.message.max.bytes", Kafka.FetchMessageMaxBytes);
   Kafka.ReplicaFetchMaxBytes =
       getVal("kafka", "replica.fetch.max.bytes", Kafka.ReplicaFetchMaxBytes);
   Kafka.EnableAutoCommit =
@@ -64,7 +74,7 @@ void Configuration::print() {
   fmt::print("  broker {}\n", Kafka.Broker);
   fmt::print("  topic {}\n", Kafka.Topic);
   fmt::print("  message.max.bytes {}\n", Kafka.MessageMaxBytes);
-  fmt::print("  fetch.message.max.bytes {}\n", Kafka.FetchMessagMaxBytes);
+  fmt::print("  fetch.message.max.bytes {}\n", Kafka.FetchMessageMaxBytes);
   fmt::print("  replica.fetch.max.bytes {}\n", Kafka.ReplicaFetchMaxBytes);
   fmt::print("  enable.auto.commit {}\n", Kafka.EnableAutoCommit);
   fmt::print("  enable.auto.offset.store {}\n", Kafka.EnableAutoOffsetStore);

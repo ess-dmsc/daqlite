@@ -1,4 +1,9 @@
 {
+  "instrument": {
+    "name": "bifrost",
+    "pixels_per_tube": 100
+  },
+
   "kafka" : {
     "broker" : "172.30.242.20:9092",
     "topic" : "bifrost_detector_samples",

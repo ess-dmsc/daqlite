@@ -1,4 +1,4 @@
-// Copyright (C) 2023 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2023-2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file WorkerThread.h
@@ -18,7 +18,8 @@ class WorkerThread : public QThread {
   Q_OBJECT
 
 public:
-  WorkerThread(ESSConsumer::data_t * data, Configuration & Config):
+  using data_t = ESSConsumer::data_t;
+  WorkerThread(data_t * data, Configuration & Config):
   configuration(Config) {
     KafkaConfig kcfg(Config.KafkaConfigFile);
     Consumer = new ESSConsumer(data, configuration, kcfg.CfgParms);
@@ -29,6 +30,9 @@ public:
 
   /// \brief Kafka consumer
   ESSConsumer *Consumer;
+
+  void consume_from(int64_t ms_since_utc_epoch);
+  void consume_until(int64_t ms_since_utc_epoch);
 
 private:
   Configuration &configuration;
