@@ -6,6 +6,8 @@ logical-geometry/705ea61@ess-dmsc/stable
 nlohmann_json/3.10.5
 qplot/4029c0397121d8bd@ess-dmsc/stable
 streaming-data-types/13dd32d@ess-dmsc/stable
+h5cpp/0.4.1@ess-dmsc/stable
+zlib/1.3
 
 [generators]
 cmake
@@ -20,6 +22,8 @@ librdkafka:ssl=True
 librdkafka:sasl=True
 flatbuffers:shared=True
 date:use_system_tz_db=True
+hdf5:shared=True
+h5cpp:with_boost=False
 
 [imports]
 ., *.dylib* -> ./lib @ keep_path=False

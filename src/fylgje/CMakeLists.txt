@@ -1,33 +1,41 @@
 include(QtLibraryConfig)
 find_package(RdKafka REQUIRED)
 find_package(qplot REQUIRED)
+find_package(h5cpp REQUIRED)
 
 set(fylgje_src
-  fylgje_main.cpp
-  fylgje_window.cpp
-  WorkerThread.cpp
-  KafkaConfig.cpp
-  ESSConsumer.cpp
-  data_manager.cpp
+  AppMain.cpp
+  AppWindow.cpp
+  AppOverview.cpp
+  AppCalibration.cpp
+  AppData.cpp
+  Calibration.cpp
   Configuration.cpp
-  )
+  DataManager.cpp
+  ESSConsumer.cpp
+  KafkaConfig.cpp
+  PlotManager.cpp
+  TableItemTypes.cpp
+  WorkerThread.cpp
+)
 
 set(fylgje_inc
+  AppWindow.h
+  Calibration.h
   Configuration.h
+  Cycles.h
+  DataManager.h
   ESSConsumer.h
-  KafkaConfig.h
-  fylgje_window.h
-  plot_manager.h
-  two_spin_box.h
-  data_manager.h
-  WorkerThread.h
   JsonFile.h
-  cycles.h
-  )
+  KafkaConfig.h
+  PlotManager.h
+  TwoSpinBox.h
+  WorkerThread.h
+)
 
 set(fylgje_ui
-  fylgje_window.ui
-  )
+  AppWindow.ui
+)
 
 set(CMAKE_AUTOUIC ON)
 
@@ -45,6 +53,7 @@ target_link_libraries(
   PRIVATE RdKafka::rdkafka
   PRIVATE QPlot
   PRIVATE Qt6::Widgets
+  PRIVATE h5cpp::h5cpp
 )
 
 target_link_libraries(fylgje

@@ -13,7 +13,7 @@
 #include "Configuration.h"
 #include "ar51_readout_data_generated.h"
 #include <librdkafka/rdkafkacpp.h>
-#include "data_manager.h"
+#include "DataManager.h"
 
 class ESSConsumer {
 public:
@@ -36,7 +36,7 @@ public:
     uint32_t SeqNum;
   } __attribute__((packed));
 
-  struct caen_readout {
+  struct CAENReadout {
     uint8_t Fiber;
     uint8_t FEN;
     uint16_t Length;
@@ -53,7 +53,8 @@ public:
 
 
   /// \brief Constructor needs the configured Broker and Topic
-  ESSConsumer(data_t * data, Configuration & configuration, std::vector<std::pair<std::string, std::string>> &KafkaConfig);
+  ESSConsumer(data_t * data, Configuration & configuration,
+              std::vector<std::pair<std::string, std::string>> &KafkaConfig);
 
   /// \brief wrapper function for librdkafka consumer
   RdKafka::Message *consume();
@@ -73,15 +74,23 @@ public:
 
   static std::string randomGroupString(size_t length);
 
+  [[maybe_unused]] void consumeAll();
+  void consumeForever();
+  void consumeFrom(int64_t ms_since_utc_epoch);
+  void consumeUntil(int64_t ms_since_utc_epoch);
+
 private:
   Configuration & configuration;
 
   RdKafka::KafkaConsumer *mConsumer;
+  int32_t my_partition{0};
+  int64_t earliest_timestamp{-1}, latest_timestamp{-1};
 
   data_t * histograms;
 
   /// \brief loadable Kafka-specific configuration
   std::vector<std::pair<std::string, std::string>> &mKafkaConfig;
 
-  void set_consumer_offset(Start start, int64_t ms_since_utc_epoch);
+  void setConsumerOffset(Start start, int64_t ms_since_utc_epoch);
+  void setTopicPartitionOffset(std::vector<RdKafka::TopicPartition*>& tps, Start start, int64_t ms_since_utc_epoch);
 };

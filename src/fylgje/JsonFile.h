@@ -1,4 +1,4 @@
-// Copyright (C) 2019-2020 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2019-2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file
@@ -16,19 +16,19 @@
 #include <fmt/format.h>
 #include <fstream>
 
-inline nlohmann::json from_json_file(const std::string &fname) {
-  nlohmann::json j;
-  std::ifstream ifs(fname, std::ofstream::in);
+inline nlohmann::json from_json_file(const std::string &file_name) {
+  nlohmann::json json_out;
+  std::ifstream ifs(file_name, std::ofstream::in);
   if (ifs.fail()) {
     throw std::runtime_error(
-        fmt::format("file permission error or missing json file {}", fname));
+        fmt::format("file permission error or missing json file {}", file_name));
   }
   if (ifs.good())
-    ifs >> j;
+    ifs >> json_out;
 
-  return j;
+  return json_out;
 }
 
-inline void to_json_file(const nlohmann::json &j, const std::string &fname) {
-  std::ofstream(fname, std::ofstream::trunc) << j.dump(1);
+inline void to_json_file(const nlohmann::json &json_in, const std::string &file_name) {
+  std::ofstream(file_name, std::ofstream::trunc) << json_in.dump(1);
 }

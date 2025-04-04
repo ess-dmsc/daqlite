@@ -1,3 +1,10 @@
+// Copyright (C) 2025 European Spallation Source, ERIC. See LICENSE file
+//===----------------------------------------------------------------------===//
+//
+/// \file
+//
+/// \brief GUI main window header for the Fylgje application
+//===----------------------------------------------------------------------===//
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
@@ -7,11 +14,13 @@
 #include <optional>
 
 #include "WorkerThread.h"
-#include "plot_manager.h"
-#include "data_manager.h"
-#include "two_spin_box.h"
-#include "cycles.h"
+#include "PlotManager.h"
+#include "DataManager.h"
+#include "TwoSpinBox.h"
+#include "TableItemTypes.h"
+#include "Cycles.h"
 #include "Configuration.h"
+#include "Calibration.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -24,12 +33,11 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
     using int_t = ::bifrost::data::Type;
-//    using key_t = std::tuple<int, int, int_t>;
-    using key_t = ::bifrost::data::key_t;
     using intensity_map_t = ::bifrost::data::map_t<int>;
     enum class Time {Fixed, Historical, Live};
+    enum class PlotType {Unknown, Types, Triplets, Singular};
 public:
-    MainWindow(Configuration & Config, QWidget *parent = nullptr);
+    MainWindow(const Configuration & Config, const Calibration & calibration, QWidget *parent = nullptr);
     ~MainWindow();
 
     void set_arc_1(){set_arc(0);}
@@ -72,6 +80,12 @@ public:
     void set_time_live();
     void set_time_historical();
     void set_time_fixed();
+    void set_time_early(const QDateTime &);
+    void set_time_late(const QDateTime &);
+
+    void set_filter_all(){plot_filter = ::bifrost::data::Filter::none; plot();}
+    void set_filter_included(){plot_filter = ::bifrost::data::Filter::positive; plot();}
+    void set_filter_excluded(){plot_filter = ::bifrost::data::Filter::negative; plot();}
 
     // gateway, uses private flags to determine which plot type is called
     void plot();
@@ -83,6 +97,7 @@ private:
   void set_triplet(int n, bool plot_now=true);
   void set_int(int_t t, bool plot_now=true);
 
+  PlotType selected_plot_type();
   // ensure there is only 1 full-size canvas, draw the fully specified plot
   void plot_single(int arc, int triplet, int_t int_type);
   // plot all triplets for the specified intensity plot type
@@ -97,6 +112,11 @@ private:
   void setup_intensity_limits();
   void setup_gradient_list();
   void setup_consumer();
+  void setup_calibration();
+  void setup_calibration_table();
+  void setup_calibration_table_items();
+  void setup_calibration_info();
+  void update_calibration_info();
 
   void set_intensity_limits();
   void get_intensity_limits();
@@ -132,13 +152,21 @@ private:
   void pause_toggled(bool checked);
   bool is_paused();
 
+
+  void save_calibration();
+  void load_calibration();
+
+  void setup_data();
+  void save_data();
+
+
 private:
     Ui::MainWindow *ui;
     bool _triplet_fixed{false};
     bool _type_fixed{false};
     int _fixed_arc{0};
     int _fixed_triplet{0};
-    int_t _fixed_type{int_t::ab}; // should match the default in fylgje_window.ui
+    int_t _fixed_type{int_t::ab}; // should match the default in AppWindow.ui
 
     std::map<std::pair<int_t, int>, TwoSpinBox *> bin_boxes{};
     intensity_map_t max;
@@ -149,11 +177,15 @@ private:
     std::string topic;
 
     ::bifrost::data::Manager * data;
+    ::bifrost::data::Filter plot_filter{::bifrost::data::Filter::none};
     PlotManager * plots;
     WorkerThread * consumer{};
 
     /// \brief configuration obtained from main()
     Configuration configuration;
+
+    /// \brief calibration obtained from main()
+    Calibration calibration;
 
     Time time_status{Time::Live};
 
@@ -171,5 +203,9 @@ private:
       }
       return static_cast<int>(i);
     }
+
+    QTableWidget * calibration_table{nullptr};
+    std::vector<QTableWidgetItem *> calibration_table_items;
+    std::vector<std::pair<std::string, std::function<QTableWidgetItem*(int,int,int,CalibrationUnit *)>>> calibration_table_columns;
 };
 #endif // MAINWINDOW_H

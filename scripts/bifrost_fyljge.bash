@@ -3,6 +3,7 @@
 BROKER=${DAQLITE_BROKER:-}
 
 KAFKA_CONFIG=""
+CALIBRATION=""
 
 # Check if we are in production environment and set KAFKA_CONFIG accordingly
 # or set dev environment variables
@@ -13,4 +14,4 @@ else
     DAQLITE_CONFIG="../configs"
 fi
 
-$DAQLITE_HOME/bin/fylgje $BROKER -f $DAQLITE_CONFIG/bifrost/fylgje.json $KAFKA_CONFIG
+$DAQLITE_HOME/bin/fylgje $BROKER -f $DAQLITE_CONFIG/bifrost/fylgje.json -c $DAQLITE_CONFIG/bifrost/calibration.json $KAFKA_CONFIG
