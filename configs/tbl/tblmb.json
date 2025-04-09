@@ -1,0 +1,50 @@
+{
+  "kafka": {
+    "broker"                   : "172.30.242.20:9092",
+    "topic"                    : "tbl_detector_mb",
+
+    "message.max.bytes"        : "10000000",
+    "fetch.message.max.bytes"  : "10000000",
+    "replica.fetch.max.bytes"  : "10000000",
+    "enable.auto.commit"       : "false",
+    "enable.auto.offset.store" : "false"
+  },
+
+  "geometry": {
+    "xdim"   : 64,
+    "ydim"   : 448,
+    "zdim"   : 1,
+    "offset" : 0
+  },
+
+  "tof": {
+    "scale"     : 1000,
+    "max_value" : 72000,
+    "bin_size"  : 512
+  },
+
+  "plots": {
+    "pixels": {
+      "plot_type"              : "pixels",
+      "window_title"           : "TBLMB - full instrument Image",
+      "plot_title"             : "pixels",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "color_gradient"         : "hot",
+      "invert_gradient"        : false,
+      "log_scale"              : true
+    },
+
+    "tof": {
+      "plot_type"              : "tof",
+      "window_title"           : "TBLMB - full instrument ToF",
+      "plot_title"             : "ToF",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "invert_gradient"        : false,
+      "log_scale"              : false
+    }
+  }
+}
