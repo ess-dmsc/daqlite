@@ -13,4 +13,4 @@ else
     DAQLITE_CONFIG="../configs"
 fi
 
-$DAQLITE_HOME/bin/daqlite $BROKER -f $DAQLITE_CONFIG/tbl/tbl3he.json $KAFKA_CONFIG
+$DAQLITE_HOME/bin/daqlite $BROKER -f $DAQLITE_CONFIG/tbl/tblmb.json $KAFKA_CONFIG
