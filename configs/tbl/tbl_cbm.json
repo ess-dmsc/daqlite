@@ -2,7 +2,7 @@
   "kafka": {
     "broker"                   : "10.70.6.62:9092",
     "topic"                    : "tbl_beam_monitor",
-    "source"                   : "bunker_1",
+    "source"                   : "cbm1",
     
     "message.max.bytes"        : "10000000",
     "fetch.message.max.bytes"  : "10000000",
