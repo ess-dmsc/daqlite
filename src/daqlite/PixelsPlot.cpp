@@ -1,17 +1,18 @@
 // Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file Custom2DPlot.cpp
+/// \file PixelsPlot.cpp
 ///
 //===----------------------------------------------------------------------===//
 
-#include <Custom2DPlot.h>
+#include <PixelsPlot.h>
 
 #include <AbstractPlot.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
-#include <types/PlotType.h>
 
+#include <types/PlotType.h>
+#include <types/Gradients.h>
 #include <logical_geometry/ESSGeometry.h>
 
 #include <fmt/format.h>
@@ -22,13 +23,13 @@
 using std::string;
 using std::vector;
 
-Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
+PixelsPlot::PixelsPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
     : AbstractPlot(PlotType::PIXELS, Consumer)
     , mConfig(Config)
     , mProjection(Proj) {
   // Register callback functions for events
-  connect(this, &QCustomPlot::mouseMove, this, &Custom2DPlot::showPointToolTip);
+  connect(this, &QCustomPlot::mouseMove, this, &PixelsPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;
@@ -99,7 +100,7 @@ Custom2DPlot::Custom2DPlot(Configuration &Config, ESSConsumer &Consumer,
   t1 = std::chrono::high_resolution_clock::now();
 }
 
-void Custom2DPlot::setCustomParameters() {
+void PixelsPlot::setCustomParameters() {
   // set the color gradient of the color map to one of the presets:
   QCPColorGradient Gradient(getColorGradient(mConfig.mPlot.ColorGradient));
 
@@ -117,48 +118,28 @@ void Custom2DPlot::setCustomParameters() {
 
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
-QCPColorGradient Custom2DPlot::getColorGradient(const string &GradientName) {
-  if (mGradients.find(GradientName) != mGradients.end()) {
-    return mGradients.find(GradientName)->second;
+QCPColorGradient
+PixelsPlot::getColorGradient(const std::string &GradientName) {
+  if (const auto search = GRADIENTS.find(GradientName); search != GRADIENTS.end()) {
+    return search->second;
   } else {
     fmt::print("Gradient {} not found, using 'hot' instead.\n", GradientName);
     fmt::print("Supported gradients are: ");
-    for (auto &Gradient : mGradients) {
+    for (auto &Gradient : GRADIENTS) {
       fmt::print("{} ", Gradient.first);
     }
     fmt::print("\n");
-    return mGradients.find("hot")->second;
+
+    return GRADIENTS["hot"];
   }
 }
 
-string Custom2DPlot::getNextColorGradient(const string &GradientName) {
-  bool SaveFirst{true};
-  bool SaveNext{false};
-  string RetVal;
-
-  for (auto &Gradient : mGradients) {
-    if (SaveFirst) {
-      RetVal = Gradient.first;
-      SaveFirst = false;
-    }
-    if (SaveNext) {
-      RetVal = Gradient.first;
-      SaveNext = false;
-    }
-    if (Gradient.first == GradientName) {
-      SaveNext = true;
-    }
-  }
-  return RetVal;
-}
-
-void Custom2DPlot::clearDetectorImage() {
+void PixelsPlot::clearDetectorImage() {
   std::fill(HistogramData.begin(), HistogramData.end(), 0);
   plotDetectorImage(true);
 }
 
-void Custom2DPlot::plotDetectorImage(bool Force) {
-
+void PixelsPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
 
   // if scales match the dimensions (xdim 400, range 0, 399) then cell indexes
@@ -195,7 +176,7 @@ void Custom2DPlot::plotDetectorImage(bool Force) {
   replot();
 }
 
-void Custom2DPlot::updateData() {
+void PixelsPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
@@ -206,8 +187,9 @@ void Custom2DPlot::updateData() {
   if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
     t1 = std::chrono::high_resolution_clock::now();
     std::fill(HistogramData.begin(), HistogramData.end(), 0);
-    plotDetectorImage(true); // Periodically clear the histogram
-    //
+
+    // Periodically clear the histogram
+    plotDetectorImage(true);
   }
 
   // Accumulate counts, PixelId 0 does not exist
@@ -215,11 +197,12 @@ void Custom2DPlot::updateData() {
     HistogramData[i] += Histogram[i];
   }
   plotDetectorImage(false);
+
   return;
 }
 
 // MouseOver, display coordinate and data in tooltip
-void Custom2DPlot::showPointToolTip(QMouseEvent *event) {
+void PixelsPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
   int y = this->yAxis->pixelToCoord(event->pos().y());
 

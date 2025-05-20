@@ -3,30 +3,32 @@ find_package(RdKafka REQUIRED)
 find_package(qplot REQUIRED)
 
 set(daqlite_src
-  daqlite.cpp
   AbstractPlot.cpp
+  AMOR2DTofPlot.cpp
   Configuration.cpp
-  Custom2DPlot.cpp
-  CustomAMOR2DTOFPlot.cpp
-  CustomTofPlot.cpp
+  daqlite.cpp
   ESSConsumer.cpp
+  HelpWindow.cpp
   HistogramPlot.cpp
   KafkaConfig.cpp
   MainWindow.cpp
+  PixelsPlot.cpp
+  TofPlot.cpp
   WorkerThread.cpp
   )
 
 set(daqlite_inc
   AbstractPlot.h
+  AMOR2DTofPlot.h
   Configuration.h
-  Custom2DPlot.h
-  CustomAMOR2DTOFPlot.h
-  CustomTofPlot.h
   ESSConsumer.h
+  HelpWindow.h
   HistogramPlot.h
   KafkaConfig.h
   MainWindow.h
+  PixelsPlot.h
   ThreadSafeVector.h
+  TofPlot.h
   WorkerThread.h
 
   # Types

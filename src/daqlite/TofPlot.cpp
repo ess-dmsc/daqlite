@@ -1,11 +1,11 @@
 // Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file CustomTofPlot.cpp
+/// \file TofPlot.cpp
 ///
 //===----------------------------------------------------------------------===//
 
-#include <CustomTofPlot.h>
+#include <TofPlot.h>
 
 #include <AbstractPlot.h>
 #include <types/PlotType.h>
@@ -24,11 +24,11 @@
 
 using std::vector;
 
-CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
+TofPlot::TofPlot(Configuration &Config, ESSConsumer &Consumer)
     : AbstractPlot(PlotType::TOF, Consumer)
     , mConfig(Config) {
   // Register callback functions for events
-  connect(this, &QCustomPlot::mouseMove, this, &CustomTofPlot::showPointToolTip);
+  connect(this, &QCustomPlot::mouseMove, this, &TofPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;
@@ -56,7 +56,7 @@ CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
   // we want the color map to have nx * ny data points
 
   if (mConfig.mPlot.XAxis.empty()) {
-    xAxis->setLabel("TOF (us)");
+    xAxis->setLabel("TOF (μs)");
   } else {
     xAxis->setLabel(mConfig.mPlot.XAxis.c_str());
   }
@@ -69,7 +69,7 @@ CustomTofPlot::CustomTofPlot(Configuration &Config, ESSConsumer &Consumer)
   t1 = std::chrono::high_resolution_clock::now();
 }
 
-void CustomTofPlot::setCustomParameters() {
+void TofPlot::setCustomParameters() {
   if (mConfig.mPlot.LogScale) {
     yAxis->setScaleType(QCPAxis::stLogarithmic);
   } else {
@@ -77,7 +77,7 @@ void CustomTofPlot::setCustomParameters() {
   }
 }
 
-void CustomTofPlot::plotDetectorImage(bool Force) {
+void TofPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
   mGraph->data()->clear();
   uint32_t MaxY{0};
@@ -102,7 +102,7 @@ void CustomTofPlot::plotDetectorImage(bool Force) {
   replot();
 }
 
-void CustomTofPlot::updateData() {
+void TofPlot::updateData() {
   // printf("addData (TOF) Histogram size %lu\n", Histogram.size());
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
@@ -125,13 +125,13 @@ void CustomTofPlot::updateData() {
   return;
 }
 
-void CustomTofPlot::clearDetectorImage() {
+void TofPlot::clearDetectorImage() {
   std::fill(HistogramTofData.begin(), HistogramTofData.end(), 0);
   plotDetectorImage(true);
 }
 
 // MouseOver, display coordinate and data in tooltip
-void CustomTofPlot::showPointToolTip(QMouseEvent *event) {
+void TofPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
 
   // Calculate x coord width of the graphical representation of the column

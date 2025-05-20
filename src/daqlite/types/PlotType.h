@@ -13,7 +13,7 @@
 #include <cstdint>
 #include <stdexcept>
 #include <string>
-#include <vector> 
+#include <vector>
 
 class PlotType {
 public:

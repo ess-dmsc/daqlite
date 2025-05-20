@@ -75,8 +75,7 @@ public:
   /// \return true if message contains data, false otherwise
   bool handleMessage(RdKafka::Message *message);
 
-  /// \brief return a random group id so that simultaneous consume from  fmt::print("ESSConsumer::readResetTOFs: Clearing = {} {} {}\n\n", mSubscriptionCount[DataType::TOF], mDeliveryCount[DataType::TOF]);
-
+  /// \brief return a random group id so that simultaneous consumption from
   /// multiple applications is possible.
   static std::string randomGroupString(size_t length);
 
@@ -107,9 +106,13 @@ public:
   /// \brief Add a new plot subscribing for data
   ///
   /// \param Type  The plot type
-  void addSubscriber(PlotType Type);
+  void addSubscriber(PlotType Type, bool add=true);
 
-  /// Call this after pulling events data. Cleared all subscriptions have been delivered
+  /// \return The current number of data subscriptions
+  size_t subscriptionCount() const;
+
+  /// \brief Call this after pulling events data in order to clear all subscriptions
+  /// that have been delivered
   void gotEventRequest();
 
 private:

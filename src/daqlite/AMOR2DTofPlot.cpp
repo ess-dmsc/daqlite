@@ -1,16 +1,18 @@
 // Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
-/// \file Custom2DPlot.cpp
+/// \file PixelsPlot.cpp
 ///
 //===----------------------------------------------------------------------===//
 
-#include <CustomAMOR2DTOFPlot.h>
+#include <AMOR2DTofPlot.h>
 
 #include <AbstractPlot.h>
-#include <types/PlotType.h>
 #include <Configuration.h>
 #include <ESSConsumer.h>
+
+#include <types/PlotType.h>
+#include <types/Gradients.h>
 
 #include <logical_geometry/ESSGeometry.h>
 
@@ -24,18 +26,17 @@
 
 using std::vector;
 
-CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
-                                         ESSConsumer &Consumer)
+AMOR2DTofPlot::AMOR2DTofPlot(Configuration &Config,
+                             ESSConsumer &Consumer)
     : AbstractPlot(PlotType::TOF2D, Consumer)
     , mConfig(Config) {
   if ((not(mConfig.mGeometry.YDim <= TOF2DY) or
        (not(mConfig.mTOF.BinSize <= TOF2DX)))) {
     throw(std::runtime_error("2D TOF histogram size mismatch"));
   }
-
   memset(HistogramData2D, 0, sizeof(HistogramData2D));
 
-  connect(this, &QCustomPlot::mouseMove, this, &CustomAMOR2DTOFPlot::showPointToolTip);
+  connect(this, &QCustomPlot::mouseMove, this, &AMOR2DTofPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
   auto &geom = mConfig.mGeometry;
@@ -92,10 +93,9 @@ CustomAMOR2DTOFPlot::CustomAMOR2DTOFPlot(Configuration &Config,
   t1 = std::chrono::high_resolution_clock::now();
 }
 
-void CustomAMOR2DTOFPlot::setCustomParameters() {
+void AMOR2DTofPlot::setCustomParameters() {
   // set the color gradient of the color map to one of the presets:
   QCPColorGradient Gradient(getColorGradient(mConfig.mPlot.ColorGradient));
-
   if (mConfig.mPlot.InvertGradient) {
     Gradient = Gradient.inverted();
   }
@@ -112,48 +112,27 @@ void CustomAMOR2DTOFPlot::setCustomParameters() {
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
 QCPColorGradient
-CustomAMOR2DTOFPlot::getColorGradient(const std::string &GradientName) {
-  if (mGradients.find(GradientName) != mGradients.end()) {
-    return mGradients.find(GradientName)->second;
+AMOR2DTofPlot::getColorGradient(const std::string &GradientName) {
+  if (const auto search = GRADIENTS.find(GradientName); search != GRADIENTS.end()) {
+    return search->second;
   } else {
     fmt::print("Gradient {} not found, using 'hot' instead.\n", GradientName);
     fmt::print("Supported gradients are: ");
-    for (auto &Gradient : mGradients) {
+    for (auto &Gradient : GRADIENTS) {
       fmt::print("{} ", Gradient.first);
     }
     fmt::print("\n");
-    return mGradients.find("hot")->second;
+
+    return GRADIENTS["hot"];
   }
 }
 
-std::string
-CustomAMOR2DTOFPlot::getNextColorGradient(const std::string &GradientName) {
-  bool SaveFirst{true};
-  bool SaveNext{false};
-  std::string RetVal;
-
-  for (auto &Gradient : mGradients) {
-    if (SaveFirst) {
-      RetVal = Gradient.first;
-      SaveFirst = false;
-    }
-    if (SaveNext) {
-      RetVal = Gradient.first;
-      SaveNext = false;
-    }
-    if (Gradient.first == GradientName) {
-      SaveNext = true;
-    }
-  }
-  return RetVal;
-}
-
-void CustomAMOR2DTOFPlot::clearDetectorImage() {
+void AMOR2DTofPlot::clearDetectorImage() {
   memset(HistogramData2D, 0, sizeof(HistogramData2D));
   plotDetectorImage(true);
 }
 
-void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
+void AMOR2DTofPlot::plotDetectorImage(bool Force) {
   setCustomParameters();
 
   for (int y = 0; y < mConfig.mGeometry.YDim; y++) {
@@ -173,7 +152,7 @@ void CustomAMOR2DTOFPlot::plotDetectorImage(bool Force) {
   replot();
 }
 
-void CustomAMOR2DTOFPlot::updateData() {
+void AMOR2DTofPlot::updateData() {
   // Get newest histogram data from Consumer
   vector<uint32_t> PixelIDs = mConsumer.readResetPixelIDs();
   vector<uint32_t> TOFs = mConsumer.readResetTOFs();
@@ -197,7 +176,7 @@ void CustomAMOR2DTOFPlot::updateData() {
 }
 
 // MouseOver
-void CustomAMOR2DTOFPlot::showPointToolTip(QMouseEvent *event) {
+void AMOR2DTofPlot::showPointToolTip(QMouseEvent *event) {
   int x = this->xAxis->pixelToCoord(event->pos().x());
   int y = this->yAxis->pixelToCoord(event->pos().y());
 

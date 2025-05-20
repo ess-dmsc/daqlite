@@ -157,11 +157,11 @@ void AbstractPlot::mouseReleaseEvent(QMouseEvent *event) {
   }
 
   // Convert zoom pixels to physical space
-  double x0 = xAxis->pixelToCoord(mPoint0->x());
-  double x1 = xAxis->pixelToCoord(mPoint1->x());
+  const double x0 = xAxis->pixelToCoord(mPoint0->x());
+  const double x1 = xAxis->pixelToCoord(mPoint1->x());
 
-  double y0 = yAxis->pixelToCoord(mPoint0->y());
-  double y1 = yAxis->pixelToCoord(mPoint1->y());
+  const double y0 = yAxis->pixelToCoord(mPoint0->y());
+  const double y1 = yAxis->pixelToCoord(mPoint1->y());
 
   // Set new axis ranges
   xAxis->setRange(x0, x1);
@@ -174,4 +174,3 @@ void AbstractPlot::mouseReleaseEvent(QMouseEvent *event) {
 
   update();
 }
-
