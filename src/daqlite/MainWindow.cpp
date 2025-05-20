@@ -8,15 +8,24 @@
 #include <MainWindow.h>
 #include <ui_MainWindow.h>
 
-#include <Custom2DPlot.h>
-#include <CustomAMOR2DTOFPlot.h>
-#include <CustomTofPlot.h>
+#include <AMOR2DTofPlot.h>
+#include <HelpWindow.h>
 #include <HistogramPlot.h>
+#include <PixelsPlot.h>
+#include <TofPlot.h>
 #include <WorkerThread.h>
 
+#include <types/Gradients.h>
+
+#include <fmt/core.h>
+
 #include <QApplication>
+#include <QTextEdit>
 #include <QMetaType>
 #include <QPushButton>
+#include <QPixmap>
+#include <QImage>
+#include <QToolButton>
 
 #include <stdint.h>
 #include <string.h>
@@ -27,12 +36,16 @@
 
 class QWidget;
 
+// Initialize helper to nullptr
+HelpWindow *MainWindow::Helper = nullptr;
+
 MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidget *parent)
   : QMainWindow(parent)
   , ui(new Ui::MainWindow)
   , mConfig(Config)
   , mWorker(Worker)
-  , mCount(0) {
+  , mCount(0)
+  , mGradientIconSize(QSize(128, 24)) {
   ui->setupUi(this);
   setupPlots();
 
@@ -41,26 +54,31 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
 
   // Connect all windows buttons
   auto signal = &QPushButton::clicked;
-  connect(ui->pushButtonQuit,       signal, this, &MainWindow::handleExitButton);
-  connect(ui->pushButtonClear,      signal, this, &MainWindow::handleClearButton);
-  connect(ui->pushButtonLog,        signal, this, &MainWindow::handleLogButton);
-  connect(ui->pushButtonGradient,   signal, this, &MainWindow::handleGradientButton);
-  connect(ui->pushButtonInvert,     signal, this, &MainWindow::handleInvertButton);
-  connect(ui->pushButtonAutoScaleX, signal, this, &MainWindow::handleAutoScaleXButton);
-  connect(ui->pushButtonAutoScaleY, signal, this, &MainWindow::handleAutoScaleYButton);
+  connect(ui->pushButtonQuit,     signal, this, &MainWindow::handleExitButton);
+  connect(ui->pushButtonClear,    signal, this, &MainWindow::handleClearButton);
+  connect(ui->checkBoxLog,        signal, this, &MainWindow::handleLogButton);
+  connect(ui->checkBoxInvert,     signal, this, &MainWindow::handleInvertButton);
+  connect(ui->checkBoxAutoScaleX, signal, this, &MainWindow::handleAutoScaleXButton);
+  connect(ui->checkBoxAutoScaleY, signal, this, &MainWindow::handleAutoScaleYButton);
+  connect(ui->checkBoxAutoScaleY, signal, this, &MainWindow::handleAutoScaleYButton);
+  connect(ui->helpButton,         signal, this, &MainWindow::showHelp);
 
-  updateGradientLabel();
-  updateAutoScaleLabels();
+  ui->checkBoxLog->setCheckState(mConfig.mPlot.LogScale ? Qt::Checked : Qt::Unchecked);
+  ui->checkBoxInvert->setCheckState(mConfig.mPlot.InvertGradient ? Qt::Checked : Qt::Unchecked);
+  ui->checkBoxAutoScaleX->setCheckState(mConfig.mTOF.AutoScaleX ? Qt::Checked : Qt::Unchecked);
+  ui->checkBoxAutoScaleY->setCheckState(mConfig.mTOF.AutoScaleY ? Qt::Checked : Qt::Unchecked);
+
+  initGradientComboBox();
 
   // ---------------------------------------------------------------------------
-  // If window sizes have not been explicitly specified, we resize and fit plot 
+  // If window sizes have not been explicitly specified, we resize and fit plot
   // to the size of the current screen
   //
   // - Pixel and Tof2D plots are square
   // - Other plots are long and narrow
+  adjustSize();
   int &h = mConfig.mPlot.Height;
   int &w = mConfig.mPlot.Width;
-  adjustSize();
   if (mConfig.mPlot.defaultGeometry) {
     // Adjust size and get minimum required size
     double size = std::max(minimumWidth(), minimumHeight());
@@ -88,13 +106,15 @@ MainWindow::MainWindow(const Configuration &Config, WorkerThread *Worker, QWidge
   startKafkaConsumerThread();
 }
 
-MainWindow::~MainWindow() { delete ui; }
+MainWindow::~MainWindow() {
+  delete ui;
+}
 
 void MainWindow::setupPlots() {
   PlotType Type(mConfig.mPlot.Plot);
 
   if (Type == PlotType::TOF2D) {
-    Plots.push_back(std::make_unique<CustomAMOR2DTOFPlot>(
+    Plots.push_back(std::make_unique<AMOR2DTofPlot>(
         mConfig, mWorker->getConsumer()));
 
     // register plot on ui
@@ -103,18 +123,16 @@ void MainWindow::setupPlots() {
   }
 
   else if (Type == PlotType::TOF) {
-    Plots.push_back(std::make_unique<CustomTofPlot>(
+    Plots.push_back(std::make_unique<TofPlot>(
         mConfig, mWorker->getConsumer()));
 
     // register plot on ui
     ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
     // Hide irrelevant buttons for TOF
-    ui->pushButtonGradient->setVisible(false);
-    ui->pushButtonInvert->setVisible(false);
-    ui->lblGradientText->setVisible(false);
-    ui->lblGradient->setVisible(false);
-
+    ui->comboGradient->setVisible(false);
+    ui->checkBoxInvert->setVisible(false);
+    ui->gradientLine->setVisible(false);
   }
 
   else if (Type == PlotType::HISTOGRAM) {
@@ -124,30 +142,28 @@ void MainWindow::setupPlots() {
     ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
     // Hide irrelevant buttons for TOF
-    ui->pushButtonGradient->setVisible(false);
-    ui->pushButtonInvert->setVisible(false);
-    ui->lblGradientText->setVisible(false);
-    ui->lblGradient->setVisible(false);
-
+    ui->comboGradient->setVisible(false);
+    ui->checkBoxInvert->setVisible(false);
+    ui->gradientLine->setVisible(false);
   }
 
   else if (Type == PlotType::PIXELS) {
 
     // Always create the XY plot
-    Plots.push_back(std::make_unique<Custom2DPlot>(
+    Plots.push_back(std::make_unique<PixelsPlot>(
         mConfig, mWorker->getConsumer(),
-        Custom2DPlot::ProjectionXY));
+        PixelsPlot::ProjectionXY));
     ui->gridLayout->addWidget(Plots.back().get(), 0, 0, 1, 1);
 
     // If detector is 3D, also create XZ and YZ
     if (mConfig.mGeometry.ZDim > 1) {
-      Plots.push_back(std::make_unique<Custom2DPlot>(
+      Plots.push_back(std::make_unique<PixelsPlot>(
           mConfig, mWorker->getConsumer(),
-          Custom2DPlot::ProjectionXZ));
+          PixelsPlot::ProjectionXZ));
       ui->gridLayout->addWidget(Plots.back().get(), 0, 1, 1, 1);
-      Plots.push_back(std::make_unique<Custom2DPlot>(
+      Plots.push_back(std::make_unique<PixelsPlot>(
           mConfig, mWorker->getConsumer(),
-          Custom2DPlot::ProjectionYZ));
+          PixelsPlot::ProjectionYZ));
       ui->gridLayout->addWidget(Plots.back().get(), 0, 2, 1, 1);
     }
   }
@@ -157,19 +173,14 @@ void MainWindow::setupPlots() {
   }
 
   // Autoscale buttons are only relevant for TOF and HISTOGRAM
-  if (Plots[0]->getPlotType() == PlotType::TOF || Plots[0]->getPlotType() == PlotType::HISTOGRAM) {
-    ui->pushButtonAutoScaleX->setVisible(true);
-    ui->lblAutoScaleXText->setVisible(true);
-    ui->lblAutoScaleX->setVisible(true);
-    ui->pushButtonAutoScaleY->setVisible(true);
-    ui->lblAutoScaleYText->setVisible(true);
-    ui->lblAutoScaleY->setVisible(true);
-  }
+  const auto PlotType = Plots[0]->getPlotType();
+  const bool ScaleOn = PlotType == PlotType::TOF || PlotType == PlotType::HISTOGRAM;
+  ui->labelAutoScale->setVisible(ScaleOn);
+  ui->checkBoxAutoScaleX->setVisible(ScaleOn);
+  ui->checkBoxAutoScaleY->setVisible(ScaleOn);
 
-  if (Plots[0]->getPlotType() == PlotType::HISTOGRAM) {
-    ui->lblBinSizeText->setVisible(true);
-    ui->lblBinSize->setVisible(true);
-  }
+  ui->lblBinSizeText->setVisible(PlotType == PlotType::HISTOGRAM);
+  ui->lblBinSize->setVisible(PlotType == PlotType::HISTOGRAM);
 }
 
 void MainWindow::startKafkaConsumerThread() {
@@ -178,7 +189,6 @@ void MainWindow::startKafkaConsumerThread() {
           &MainWindow::handleKafkaData);
 }
 
-// SLOT
 void MainWindow::handleKafkaData(int ElapsedCountMS) {
   auto &Consumer = mWorker->getConsumer();
 
@@ -189,56 +199,59 @@ void MainWindow::handleKafkaData(int ElapsedCountMS) {
   ui->lblEventRateText->setText(QString::number(EventRate));
   ui->lblAcceptRateText->setText(QString::number(EventAccept));
   ui->lblDiscardedPixelsText->setText(QString::number(EventDiscardRate));
-  ui->lblBinSizeText->setText(QString::number(mConfig.mTOF.BinSize) + " " + QString::number(mCount));
+  ui->lblBinSizeText->setText(QString("%1 %2").arg(mConfig.mTOF.BinSize).arg(mCount));
 
   for (auto &Plot : Plots) {
     Plot->updateData();
   }
   Consumer.gotEventRequest();
 
-
   mCount += 1;
 }
 
-// SLOT
-void MainWindow::handleExitButton() { QApplication::quit(); }
+void MainWindow::handleExitButton() {
+  QApplication::quit();
+}
 
 void MainWindow::handleClearButton() {
-
   for (auto &Plot : Plots) {
     Plot->clearDetectorImage();
   }
 }
 
-void MainWindow::updateGradientLabel() {
+void MainWindow::initGradientComboBox() {
+  mGradients.clear();
+  ui->comboGradient->setIconSize(mGradientIconSize);
+  ui->comboGradient->clear();
 
-  for (auto &Plot : Plots) {
-    if (Plot->getPlotType() == PlotType::PIXELS) {
-      if (mConfig.mPlot.InvertGradient) {
-        ui->lblGradientText->setText(
-            QString::fromStdString(mConfig.mPlot.ColorGradient + " (I)"));
-      } else {
-        ui->lblGradientText->setText(
-            QString::fromStdString(mConfig.mPlot.ColorGradient));
-      }
+  // Initialize vars
+  int currentIndex = -1;
+
+  // Loop through all gradient and add them to the combo
+  for (auto &[name, gradient]: GRADIENTS) {
+    // Check and store gradient name
+    if (name == mConfig.mPlot.ColorGradient) {
+      currentIndex = mGradients.size();
     }
+    mGradients.push_back(name);
+
+    // Generate and add gradient icon for the combo box
+    const QIcon icon = makeIcon(name);
+    ui->comboGradient->addItem(icon, "");
   }
+
+  // Finalize
+  ui->pushButtonClear->adjustSize();
+  ui->comboGradient->setFixedHeight(ui->pushButtonClear->height());
+  ui->comboGradient->setCurrentIndex(currentIndex);
+  ui->comboGradient->setToolTip(QString::fromStdString(mGradients[currentIndex]));
+  connect(ui->comboGradient, &QComboBox::currentIndexChanged, this, &MainWindow::handleGradientComboBox);
 }
 
-/// \brief Autoscale is only relevant for TOF
-void MainWindow::updateAutoScaleLabels() {
-  if (Plots[0]->getPlotType() ==  PlotType::TOF || Plots[0]->getPlotType() ==  PlotType::HISTOGRAM) {
-    if (mConfig.mTOF.AutoScaleX) {
-      ui->lblAutoScaleXText->setText(QString::fromStdString("on"));
-    } else {
-      ui->lblAutoScaleXText->setText(QString::fromStdString("off"));
-    }
-
-    if (mConfig.mTOF.AutoScaleY) {
-      ui->lblAutoScaleYText->setText(QString::fromStdString("on"));
-    } else {
-      ui->lblAutoScaleYText->setText(QString::fromStdString("off"));
-    }
+void MainWindow::updateGradientComboBox() {
+  for (size_t index=0; index < mGradients.size(); ++index) {
+    const QIcon icon = makeIcon(mGradients[index]);
+    ui->comboGradient->setItemIcon(index, icon);
   }
 }
 
@@ -249,53 +262,81 @@ void MainWindow::handleLogButton() {
 
 // toggle the invert gradient flag (irrelevant for TOF)
 void MainWindow::handleInvertButton() {
-  if (Plots[0]->getPlotType() ==  PlotType::PIXELS || Plots[0]->getPlotType() ==  PlotType::TOF2D) {
+  const auto PlotType = Plots[0]->getPlotType();
+  if (PlotType == PlotType::PIXELS || PlotType == PlotType::TOF2D) {
     mConfig.mPlot.InvertGradient = not mConfig.mPlot.InvertGradient;
-    updateGradientLabel();
+    updateGradientComboBox();
   }
 }
 
 // toggle the auto scale x button
 void MainWindow::handleAutoScaleXButton() {
-  if (Plots[0]->getPlotType() ==  PlotType::TOF || Plots[0]->getPlotType() ==  PlotType::HISTOGRAM) {
+  const auto PlotType = Plots[0]->getPlotType();
+  if (PlotType == PlotType::TOF || PlotType == PlotType::HISTOGRAM) {
     mConfig.mTOF.AutoScaleX = not mConfig.mTOF.AutoScaleX;
-    updateAutoScaleLabels();
   }
 }
 
 // toggle the auto scale y button
 void MainWindow::handleAutoScaleYButton() {
-  if (Plots[0]->getPlotType() ==  PlotType::TOF || Plots[0]->getPlotType() ==  PlotType::HISTOGRAM) {
+  const auto PlotType = Plots[0]->getPlotType();
+  if (PlotType == PlotType::TOF || PlotType == PlotType::HISTOGRAM) {
     mConfig.mTOF.AutoScaleY = not mConfig.mTOF.AutoScaleY;
-    updateAutoScaleLabels();
   }
 }
 
-void MainWindow::handleGradientButton() {
-
+void MainWindow::handleGradientComboBox(int index) {
   for (auto &Plot : Plots) {
-    if (Plot->getPlotType() ==  PlotType::PIXELS) {
-
-      Custom2DPlot *Plot2D = dynamic_cast<Custom2DPlot *>(Plot.get());
-
-      /// \todo unnecessary code here could be part of the object since it has
-      /// the config at construction
-      mConfig.mPlot.ColorGradient =
-          Plot2D->getNextColorGradient(mConfig.mPlot.ColorGradient);
-
-    } else if (Plot->getPlotType() != PlotType::TOF2D) {
-
-      CustomAMOR2DTOFPlot *PlotTOF2D =
-          dynamic_cast<CustomAMOR2DTOFPlot *>(Plot.get());
-
-      mConfig.mPlot.ColorGradient =
-          PlotTOF2D->getNextColorGradient(mConfig.mPlot.ColorGradient);
-
+    const auto PlotType = Plot->getPlotType();
+    if (PlotType == PlotType::PIXELS || PlotType == PlotType::TOF2D) {
+      mConfig.mPlot.ColorGradient = mGradients[index];
     } else {
       return;
     }
+    ui->comboGradient->setToolTip(QString::fromStdString(mGradients[index]));
 
     Plot->plotDetectorImage(true);
   }
-  updateGradientLabel();
+}
+
+QIcon MainWindow::makeIcon(std::string key) {
+  const size_t width = mGradientIconSize.width();
+  const auto range = QCPRange(0, width - 1);
+  QImage image(width, 1, QImage::Format_RGB32);
+  for (size_t i=0; i<width; ++i) {
+    const QColor color(GRADIENTS[key].color(mConfig.mPlot.InvertGradient ? width - i : i, range));
+    image.setPixelColor(i, 0, color);
+  }
+  image = image.scaled(mGradientIconSize);
+
+  return QIcon(QPixmap::fromImage(image));
+}
+
+void MainWindow::closeEvent(QCloseEvent *) {
+  // If a windows is closed, we inform consumer to cancel the subscription
+  // for the plot
+  for (const auto &Plot: Plots) {
+    mWorker->getConsumer().addSubscriber(Plot->getPlotType(), false);
+  }
+
+  // Close daqlite, if no subscribers are left
+  if (mWorker->getConsumer().subscriptionCount() == 0) {
+    QApplication::quit();
+  }
+}
+
+void MainWindow::showHelp() {
+  if (Helper == nullptr) {
+    Helper = new HelpWindow(this);
+    Helper->setParent(this, Qt::Window);
+    Helper->setWindowFlags( Helper->windowFlags() | Qt::FramelessWindowHint);
+  }
+
+  if (Helper->isHidden()) {
+    Helper->show();
+  }
+
+  Helper->move(QCursor::pos());
+  Helper->placeHelp(QCursor::pos());
+  Helper->raise();
 }

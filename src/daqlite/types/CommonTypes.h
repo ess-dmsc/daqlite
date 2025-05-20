@@ -3,7 +3,7 @@
 ///
 /// \file CommonTypes.h
 ///
-/// Load enume type classes used to specify different plot and data types
+/// Load all enum type classes used to specify different plot and data types
 //===----------------------------------------------------------------------===//
 
 #pragma once

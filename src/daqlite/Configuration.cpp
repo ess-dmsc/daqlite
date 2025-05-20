@@ -56,7 +56,7 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
     nlohmann::json state = common;
     state["plot"] = plot;
 
-    // Initialize and return configuration 
+    // Initialize and return configuration
     Configuration conf;
     conf.fromJsonObj(state);
 
@@ -68,7 +68,7 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
   if (MainJSON.contains("plot")) {
     Configurations.push_back(adder(Common, MainJSON["plot"]));
   }
-  
+
   // ---------------------------------------------------------------------------
   // Multiple plots
   if (MainJSON.contains("plots")) {
@@ -127,8 +127,8 @@ void Configuration::getKafkaConfig() {
   /// The rest are optional, using default values
   mKafka.MessageMaxBytes =
       getVal("kafka", "message.max.bytes", mKafka.MessageMaxBytes);
-  mKafka.FetchMessagMaxBytes =
-      getVal("kafka", "fetch.message.max.bytes", mKafka.FetchMessagMaxBytes);
+  mKafka.FetchMessageMaxBytes =
+      getVal("kafka", "fetch.message.max.bytes", mKafka.FetchMessageMaxBytes);
   mKafka.ReplicaFetchMaxBytes =
       getVal("kafka", "replica.fetch.max.bytes", mKafka.ReplicaFetchMaxBytes);
   mKafka.EnableAutoCommit =

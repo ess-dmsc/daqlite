@@ -64,7 +64,7 @@ RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
   /// \todo some may be obsolete
   mConf->set("metadata.broker.list", mConfig.mKafka.Broker, ErrStr);
   mConf->set("message.max.bytes", mConfig.mKafka.MessageMaxBytes, ErrStr);
-  mConf->set("fetch.message.max.bytes", mConfig.mKafka.FetchMessagMaxBytes,
+  mConf->set("fetch.message.max.bytes", mConfig.mKafka.FetchMessageMaxBytes,
              ErrStr);
   mConf->set("replica.fetch.max.bytes", mConfig.mKafka.ReplicaFetchMaxBytes,
              ErrStr);
@@ -306,7 +306,7 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
   case da00_dtype::int32: {
     auto dataPtr = reinterpret_cast<const int32_t *>(Variable.data());
 
-    // skip the first element which is the legth of the data
+    // skip the first element which is the length of the data
     dataPtr++;
     Data.assign(dataPtr, dataPtr + shape);
     break;
@@ -314,7 +314,7 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
   case da00_dtype::int64: {
     auto dataPtr = reinterpret_cast<const int64_t *>(Variable.data());
 
-    // skip the first element which is the legth of the data
+    // skip the first element which is the length of the data
     dataPtr++;
     Data.assign(dataPtr, dataPtr + shape);
     break;
@@ -322,7 +322,7 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
   case da00_dtype::uint32: {
     auto dataPtr = reinterpret_cast<const uint32_t *>(Variable.data());
 
-    // skip the first element which is the legth of the data
+    // skip the first element which is the length of the data
     dataPtr++;
     Data.assign(dataPtr, dataPtr + shape);
     break;
@@ -330,7 +330,7 @@ ESSConsumer::getDataVector(const da00_Variable &Variable) const {
   case da00_dtype::uint64: {
     auto dataPtr = reinterpret_cast<const uint64_t *>(Variable.data());
 
-    // skip the first element which is the legth of the data
+    // skip the first element which is the length of the data
     dataPtr++;
     Data.assign(dataPtr, dataPtr + shape);
     break;
@@ -410,30 +410,32 @@ bool ESSConsumer::checkDelivery(DataType Type) {
   return false;
 }
 
-void ESSConsumer::addSubscriber(PlotType Type) {
-  mSubscribers += 1;
+void ESSConsumer::addSubscriber(PlotType Type, bool add) {
+  // Check if we register or deregister a plot
+  const int increment = add ? 1 : -1;
 
   // Increment the total number of plots
-  mSubscriptionCount[DataType::ANY] += 1;
+  mSubscribers += increment;
+  mSubscriptionCount[DataType::ANY] += increment;
 
-  // Register data types for the plot type
+  // Register or de-register data types for the plot type
   switch (Type)
   {
     case PlotType::TOF:
-      mSubscriptionCount[DataType::HISTOGRAM_TOF] += 1;
+      mSubscriptionCount[DataType::HISTOGRAM_TOF] += increment;
       break;
 
     case PlotType::TOF2D:
-      mSubscriptionCount[DataType::PIXEL_ID] += 1;
-      mSubscriptionCount[DataType::TOF] += 1;
+      mSubscriptionCount[DataType::PIXEL_ID] += increment;
+      mSubscriptionCount[DataType::TOF] += increment;
       break;
 
     case PlotType::PIXELS:
-      mSubscriptionCount[DataType::HISTOGRAM] += 1;
+      mSubscriptionCount[DataType::HISTOGRAM] += increment;
       break;
 
     case PlotType::HISTOGRAM:
-      mSubscriptionCount[DataType::HISTOGRAM] += 1;
+      mSubscriptionCount[DataType::HISTOGRAM] += increment;
       break;
 
     default:
@@ -446,18 +448,26 @@ void ESSConsumer::addSubscriber(PlotType Type) {
   // }
 }
 
-void ESSConsumer::gotEventRequest() {
-  mEventRequests += 1;
-
-  // Reset if all event requests have been delivered
-  if (mEventRequests == mSubscriptionCount[DataType::ANY]) {
-      mEventCount = 0;
-      mEventAccept = 0;
-      mEventDiscard = 0;
-
-      mEventRequests = 0;
+size_t ESSConsumer::subscriptionCount() const {
+  size_t count = 0;
+  for (const auto& [key, c]: mSubscriptionCount) {
+    count += c;
   }
+
+  return count;
 }
 
+void ESSConsumer::gotEventRequest()
+{
+    mEventRequests += 1;
 
+    // Reset if all event requests have been delivered
+    if (mEventRequests == mSubscriptionCount[DataType::ANY])
+    {
+        mEventCount = 0;
+        mEventAccept = 0;
+        mEventDiscard = 0;
 
+        mEventRequests = 0;
+    }
+}

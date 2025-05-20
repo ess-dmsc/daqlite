@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>600</width>
-    <height>400</height>
+    <width>681</width>
+    <height>635</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -48,7 +48,7 @@
     <item>
      <layout class="QHBoxLayout" name="StatusLineTop">
       <property name="sizeConstraint">
-       <enum>QLayout::SetMaximumSize</enum>
+       <enum>QLayout::SizeConstraint::SetMaximumSize</enum>
       </property>
       <item>
        <widget class="QLabel" name="lblDescription">
@@ -59,7 +59,7 @@
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Desc.:</string>
+         <string>Description:</string>
         </property>
        </widget>
       </item>
@@ -79,13 +79,13 @@
       <item>
        <widget class="QLabel" name="lblEventRate">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Evts/s:</string>
+         <string>Events/s:</string>
         </property>
        </widget>
       </item>
@@ -100,18 +100,21 @@
         <property name="text">
          <string/>
         </property>
+        <property name="alignment">
+         <set>Qt::AlignmentFlag::AlignLeading|Qt::AlignmentFlag::AlignLeft|Qt::AlignmentFlag::AlignVCenter</set>
+        </property>
        </widget>
       </item>
       <item>
        <widget class="QLabel" name="lblAcceptRate">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Accept/s:</string>
+         <string>Accepts/s:</string>
         </property>
        </widget>
       </item>
@@ -131,13 +134,13 @@
       <item>
        <widget class="QLabel" name="lblDiscardedPixels">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
         <property name="text">
-         <string>Discard/s:</string>
+         <string>Discards/s:</string>
         </property>
        </widget>
       </item>
@@ -155,87 +158,9 @@
        </widget>
       </item>
       <item>
-       <widget class="QLabel" name="lblGradient">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Gradient:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblGradientText">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblAutoScaleX">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Auto scale X:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblAutoScaleXText">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblAutoScaleY">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string>Auto scale Y:</string>
-        </property>
-       </widget>
-      </item>
-      <item>
-       <widget class="QLabel" name="lblAutoScaleYText">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="text">
-         <string/>
-        </property>
-       </widget>
-      </item>
-      <item>
        <widget class="QLabel" name="lblBinSize">
         <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
@@ -263,7 +188,7 @@
     <item>
      <layout class="QGridLayout" name="gridLayout">
       <property name="sizeConstraint">
-       <enum>QLayout::SetDefaultConstraint</enum>
+       <enum>QLayout::SizeConstraint::SetDefaultConstraint</enum>
       </property>
       <item row="0" column="0">
        <widget class="QPushButton" name="pushButtonUnused">
@@ -284,53 +209,63 @@
      </layout>
     </item>
     <item>
-     <layout class="QHBoxLayout" name="BottomButtonRow">
+     <layout class="QHBoxLayout" name="horizontalLayout">
       <item>
-       <widget class="QPushButton" name="pushButtonClear">
+       <widget class="QComboBox" name="comboGradient"/>
+      </item>
+      <item>
+       <widget class="QCheckBox" name="checkBoxInvert">
         <property name="text">
-         <string>Clear</string>
+         <string>&amp;Inverted</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonLog">
-        <property name="text">
-         <string>Log/lin</string>
+       <widget class="Line" name="gradientLine">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonGradient">
+       <widget class="QCheckBox" name="checkBoxLog">
         <property name="text">
-         <string>Grad.</string>
+         <string>&amp;Log</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonInvert">
+       <widget class="QLabel" name="labelAutoScale">
         <property name="text">
-         <string>Inv.</string>
+         <string>Autoscale:</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonAutoScaleX">
+       <widget class="QCheckBox" name="checkBoxAutoScaleX">
         <property name="text">
-         <string>Auto scale X</string>
+         <string>&amp;X</string>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QPushButton" name="pushButtonAutoScaleY">
+       <widget class="QCheckBox" name="checkBoxAutoScaleY">
         <property name="text">
-         <string>Auto scale Y</string>
+         <string>&amp;Y</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="Line" name="axisLine">
+        <property name="orientation">
+         <enum>Qt::Orientation::Vertical</enum>
         </property>
        </widget>
       </item>
       <item>
        <spacer name="horizontalSpacer">
         <property name="orientation">
-         <enum>Qt::Horizontal</enum>
+         <enum>Qt::Orientation::Horizontal</enum>
         </property>
         <property name="sizeHint" stdset="0">
          <size>
@@ -341,9 +276,23 @@
        </spacer>
       </item>
       <item>
+       <widget class="QPushButton" name="pushButtonClear">
+        <property name="text">
+         <string>&amp;Clear</string>
+        </property>
+       </widget>
+      </item>
+      <item>
+       <widget class="QPushButton" name="helpButton">
+        <property name="text">
+         <string>&amp;Help</string>
+        </property>
+       </widget>
+      </item>
+      <item>
        <widget class="QPushButton" name="pushButtonQuit">
         <property name="text">
-         <string>Quit</string>
+         <string>&amp;Quit</string>
         </property>
        </widget>
       </item>
@@ -352,6 +301,15 @@
    </layout>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>comboGradient</tabstop>
+  <tabstop>checkBoxInvert</tabstop>
+  <tabstop>checkBoxLog</tabstop>
+  <tabstop>checkBoxAutoScaleX</tabstop>
+  <tabstop>checkBoxAutoScaleY</tabstop>
+  <tabstop>pushButtonQuit</tabstop>
+  <tabstop>pushButtonUnused</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

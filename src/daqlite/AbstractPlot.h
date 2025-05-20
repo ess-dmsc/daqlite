@@ -48,7 +48,7 @@ protected:
   /// \param event Key event
   void keyPressEvent(QKeyEvent *event) override;
 
-  /// \brief Draw a zoom reactangle over the base plot
+  /// \brief Draw a zoom rectangle over the base plot
   /// \param event Paint event
   void paintEvent(QPaintEvent *event) override;
 
