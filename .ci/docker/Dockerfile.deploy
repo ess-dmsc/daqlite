@@ -54,7 +54,7 @@ ENV PATH="/ess/ecdc/daqlite/scripts:${PATH}"
 RUN mkdir -p /ess/ecdc/daqlite /ess/ecdc/daqlite/configs
 
 # Set up Kafka configuration
-RUN echo "{}" > /ess/ecdc/daqlite/configs/kafka-config-daqlite.jsonqt5
+RUN echo "{}" > /ess/ecdc/daqlite/configs/kafka-config-daqlite.json
 
 # Copy startup script
 COPY .ci/docker/Dockerfile_entrypoint.sh /ess/ecdc/daqlite/entrypoint.sh
