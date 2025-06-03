@@ -20,7 +20,7 @@
 
   "tof": {
     "scale"     : 1000,
-    "max_value" : 71428
+    "max_value" : 150000
   },
 
   "plot": {
