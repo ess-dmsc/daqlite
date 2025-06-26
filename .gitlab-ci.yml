@@ -21,7 +21,7 @@ gitlab-ci-daqlite-build:
       - conan remote add --insert 0 --force ecdc-conan-external https://artifactory.esss.lu.se/artifactory/api/conan/ecdc-conan-external
       - conan install ..
       - cmake ..
-      - make
+      - make -j$(nproc)
   artifacts:
     paths:
       - build/bin
