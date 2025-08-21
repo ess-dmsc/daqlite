@@ -1,0 +1,54 @@
+{
+  "kafka": {
+    "broker"                   : "10.70.6.62:9092",
+    "topic"                    : "bifrost_beam_monitor",
+
+    "message.max.bytes"        : "10000000",
+    "fetch.message.max.bytes"  : "10000000",
+    "replica.fetch.max.bytes"  : "10000000",
+    "enable.auto.commit"       : "false",
+    "enable.auto.offset.store" : "false"
+  },
+
+  "geometry": {
+    "xdim"   : 512,
+    "ydim"   : 512,
+    "zdim"   : 1,
+    "offset" : 0
+  },
+
+  "tof": {
+    "scale"     : 1000,
+    "max_value" : 71500,
+    "bin_size"  : 1024
+  },
+
+  "plots": {
+    "pixels": {
+      "plot_type"              : "pixels",
+      "window_title"           : "CBM - 2D",
+      "plot_title"             : "pixels",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "color_gradient"         : "hot",
+      "invert_gradient"        : false,
+      "log_scale"              : true
+    },
+
+    "tof": {
+      "plot_type"              : "tof",
+      "window_title"           : "CBM 2D ToF",
+      "plot_title"             : "ToF",
+      "clear_periodic"         : false,
+      "clear_interval_seconds" : 30,
+      "interpolate_pixels"     : false,
+      "color_gradient"         : "hot",
+      "invert_gradient"        : false,
+      "log_scale"              : false,
+      "window_height"          : 750,
+      "window_width"           : 750
+    }
+
+  }
+}
