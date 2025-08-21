@@ -1,7 +1,7 @@
 {
   "kafka": {
     "broker"                   : "172.30.242.20:9092",
-    "topic"                    : "nmx_detector",
+    "topic"                    : "nmx_detector_p1",
     
     "message.max.bytes"        : "10000000",
     "fetch.message.max.bytes"  : "10000000",
@@ -26,7 +26,7 @@
   "plots": {
     "pixels": {
       "plot_type"              : "pixels",
-      "window_title"           : "NMX - full instrument Image",
+      "window_title"           : "NMX - P1 instrument Image",
       "plot_title"             : "pixels",
       "clear_periodic"         : false,
       "clear_interval_seconds" : 30,
@@ -38,7 +38,7 @@
 
     "tof": {
       "plot_type"              : "tof",
-      "window_title"           : "NMX - full instrument ToF",
+      "window_title"           : "NMX - P1 instrument ToF",
       "plot_title"             : "ToF",
       "clear_periodic"         : false,
       "clear_interval_seconds" : 30,
