@@ -1,0 +1,40 @@
+{
+  "kafka": {
+    "broker"                   : "10.70.6.62:9092",
+    "topic"                    : "bifrost_beam_monitor",
+    "source"                   : "cbm1",
+    "message.max.bytes"        : "10000000",
+    "fetch.message.max.bytes"  : "10000000",
+    "replica.fetch.max.bytes"  : "10000000",
+    "enable.auto.commit"       : "false",
+    "enable.auto.offset.store" : "false"
+  },
+
+  "geometry": {
+    "xdim"   : 1000,
+    "ydim"   : 1000,
+    "zdim"   : 1,
+    "offset" : 0
+  },
+
+  "tof": {
+    "scale"     : 1000,
+    "max_value" : 71428,
+    "bin_size"  : 1024
+  },
+    
+
+  "plot": {
+    "plot_type"              : "tof",
+    "window_title"           : "BIFROST 0D CBM1",
+    "plot_title"             : "Events",
+    "clear_periodic"         : false,
+    "clear_interval_seconds" : 30,
+    "interpolate_pixels"     : false,
+    "color_gradient"         : "hot",
+    "invert_gradient"        : false,
+    "log_scale"              : false,
+    "window_height"          : 400,
+    "window_width"           : 1200
+  }
+}
