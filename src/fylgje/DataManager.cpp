@@ -169,7 +169,7 @@ bool bifrost::data::Manager::add_2D(int arc, int triplet, int full_a, int full_b
           std::stringstream ss;
           ss << y;
           fmt::print("arc={}, triplet={}, type={} at a={}, b={} time={} given out of bound index ({}, {})\n", arc,
-                     triplet, ss.str(), full_a, full_b, time, i, j);
+                     triplet, ss.str(), full_a, full_b, full_t, i, j);
         }
       }
     }
@@ -494,7 +494,7 @@ std::string bifrost::data::type_dataset_name(Type type){
   }
 }
 
-std::vector<unsigned long long> bifrost::data::Manager::type_dimensions(Type type) const{
+std::vector<uint64_t> bifrost::data::Manager::type_dimensions(Type type) const{
   switch (type){
     case Type::a: {return {BIN1D};}
     case Type::x: {return {BIN1D};}
@@ -534,7 +534,7 @@ void bifrost::data::Manager::save_to(hdf5::node::Group group) const {
   auto datatype = hdf5::datatype::create<int>();
   // and we know their final size already, so use contiguous layout
   hdf5::property::DatasetCreationList datasetCreationList;
-  datasetCreationList.layout(hdf5::property::DatasetLayout::CONTIGUOUS);
+  datasetCreationList.layout(hdf5::property::DatasetLayout::Contiguous);
 
   // bin center values for 1-D and 2-D axes:
   // TODO add units for each axis
@@ -605,7 +605,7 @@ void bifrost::data::Manager::save_to(std::filesystem::path file, std::optional<s
     if (!hdf5::file::is_hdf5_file(std::string(file))) {
       throw std::runtime_error(fmt::format("{} is not an HDF5 file", std::string(file)));
     }
-    hdf5_file = hdf5::file::open(std::string(file), hdf5::file::AccessFlags::READWRITE);
+    hdf5_file = hdf5::file::open(std::string(file), hdf5::file::AccessFlags::ReadWrite);
   } else if (status.type() == fs::file_type::not_found){
     hdf5_file = hdf5::file::create(std::string(file));
   } else {
