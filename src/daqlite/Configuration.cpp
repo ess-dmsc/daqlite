@@ -9,7 +9,7 @@
 
 #include <nlohmann/json.hpp>
 
-#include <fmt/format.h>
+#include <fmt/core.h>
 #include <fstream>
 #include <initializer_list>
 #include <iostream>
@@ -182,7 +182,7 @@ void Configuration::print() {
   fmt::print("  Pixel Offset {}\n", mGeometry.Offset);
   fmt::print("[Plot]\n");
   fmt::print("  WindowTitle {}\n", mPlot.WindowTitle);
-  fmt::print("  Plot type {}\n", mPlot.Plot);
+  fmt::print("  Plot type {}\n", mPlot.Plot.asString());
   fmt::print("  Clear periodically {}\n", mPlot.ClearPeriodic);
   fmt::print("  Clear interval (s) {}\n", mPlot.ClearEverySeconds);
   fmt::print("  Interpolate image {}\n", mPlot.Interpolate);

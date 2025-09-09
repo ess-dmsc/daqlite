@@ -323,7 +323,7 @@ namespace bifrost::data {
     }
 
   public:
-    std::vector<unsigned long long> type_dimensions(Type type) const;
+    std::vector<uint64_t> type_dimensions(Type type) const;
 
     void save_to(std::filesystem::path file, std::optional<std::string> group = std::nullopt) const;
     void save_to(hdf5::file::File file, std::optional<std::string> group = std::nullopt) const;
