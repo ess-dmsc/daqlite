@@ -11,15 +11,15 @@
   },
 
   "geometry": {
-    "xdim"   : 1024,
-    "ydim"   : 1024,
+    "xdim"   : 4096,
+    "ydim"   : 4096,
     "zdim"   : 1,
     "offset" : 0
   },
 
   "tof": {
     "scale"     : 1000,
-    "max_value" : 100000,
+    "max_value" : 71428,
     "bin_size"  : 512
   },
 
