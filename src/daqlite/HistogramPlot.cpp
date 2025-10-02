@@ -29,8 +29,7 @@
 using std::vector;
 
 HistogramPlot::HistogramPlot(Configuration &Config, ESSConsumer &Consumer)
-    : AbstractPlot(PlotType::HISTOGRAM, Consumer)
-    , mConfig(Config) {
+    : AbstractPlot(PlotType::HISTOGRAM, Consumer, Config) {
   // Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &HistogramPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -121,17 +120,17 @@ void HistogramPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // continue the the update only if we have data available from the consumer
-  if (mConsumer.getHistogramSize() == 0 or mConsumer.getTOFsSize() == 0) {
+  const std::string source = mConfig.mPlot.Source;
+  if (mConsumer.getDataSize(DataType::HISTOGRAM, source) == 0 or mConsumer.getDataSize(DataType::TOF, source) == 0) {
     return;
   }
 
-  vector<uint32_t> YAxisValues = mConsumer.readResetHistogram();
-  auto TofValues = mConsumer.getTofs();
+  vector<uint32_t> YAxisValues = mConsumer.readData(DataType::HISTOGRAM, source);
+  auto TofValues = mConsumer.readData(DataType::TOF, source, false);
 
   HistogramXAxisValues = TofValues;
-
   if (YAxisValues.size() != HistogramXAxisValues.size() - 1) {
-    fmt::print("HistogramPlot::updateData() - Y axis values in not fit for x "
+    fmt::print("HistogramPlot::updateData() - Y axis values does not match x "
                "axis values. Skip processing!\n");
     return;
   }
@@ -172,7 +171,7 @@ void HistogramPlot::showPointToolTip(QMouseEvent *event) {
   // Get the index in data store for the x coordinate
   int xCoordDataIndex = int((x - xCoordStep / 2) / xCoordStep);
 
-  // Get coulmn middle TOF value for the x coordinate
+  // Get column middle TOF value for the x coordinate
   int xCoordTofValue = int((x + xCoordStep / 2) / xCoordStep) * xCoordStep;
 
   // Get the count value from the data store

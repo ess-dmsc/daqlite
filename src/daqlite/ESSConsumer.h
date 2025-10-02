@@ -19,6 +19,7 @@
 #include <cstdint>
 #include <map>
 #include <memory>
+#include <set>
 #include <string>
 #include <utility>
 #include <vector>
@@ -61,6 +62,12 @@ struct da00_Variable;
 /// \see RdKafka::KafkaConsumer
 class ESSConsumer {
 public:
+  /// \brief  Threaded vector
+  using TSVector = ThreadSafeVector<uint32_t, int64_t>;
+
+  /// \brief  Type used for having one threaded vector per flat buffer source
+  using TSVectorMap = std::map<std::string, TSVector>;
+
   /// \brief Constructor needs the configured Broker and Topic
   ESSConsumer(Configuration &Config,
               std::vector<std::pair<std::string, std::string>> &KafkaConfig);
@@ -79,29 +86,9 @@ public:
   /// multiple applications is possible.
   static std::string randomGroupString(size_t length);
 
-  size_t getHistogramSize() const { return mHistogram.size(); }
-  size_t getHistogramTofSize() const { return mHistogramTof.size(); }
-  size_t getPixelIDsSize() const { return mPixelIDs.size(); }
-  size_t getTOFsSize() const { return mTOFs.size(); }
-
   uint64_t getEventCount() const { return mEventCount; };
   uint64_t getEventAccept() const { return mEventAccept; };
   uint64_t getEventDiscard() const { return mEventDiscard; };
-
-  /// \brief read out the histogram data and reset it
-  std::vector<uint32_t> readResetHistogram();
-
-  /// \brief read out the TOF histogram data and reset it
-  std::vector<uint32_t> readResetHistogramTof();
-
-  /// \brief read out the event pixel IDs and reset it
-  std::vector<uint32_t> readResetPixelIDs();
-
-  /// \brief read out the event TOFs and reset it
-  std::vector<uint32_t> readResetTOFs();
-
-  /// \brief read out the event TOFs (no reset)
-  std::vector<uint32_t> getTofs() const;
 
   /// \brief Add a new plot subscribing for data
   ///
@@ -111,11 +98,42 @@ public:
   /// \return The current number of data subscriptions
   size_t subscriptionCount() const;
 
-  /// \brief Call this after pulling events data in order to clear all subscriptions
-  /// that have been delivered
+  /// \brief Call this after pulling events data in order to clear all delivered subscriptions
   void gotEventRequest();
 
+  /// \brief For a given flat buffer source, read out data for a given data type
+  /// \param dataType  Type of the data
+  /// \param source    Flat buffer source
+  /// \param reset     If true, the internal container holding the data is cleared
+  /// \return          an integer vector containing the requested data
+  std::vector<uint32_t> readData(DataType dataType, const std::string &source="", bool reset=true);
+
+  /// \brief For a given flat buffer source, get the data container size for a given data type
+  /// \param dataType  Type of the data
+  /// \param source    Flat buffer source
+  /// \return          data container size
+  size_t getDataSize(DataType dataType, const std::string &source="") const;
+
+  /// \brief For a given flat buffer source, get the number of bins for the TOF data container
+  /// \param source    Flat buffer source
+  /// \return          data container size
+  size_t getBinSize(const std::string &source="") const;
+
+  /// \brief Register a flat buffer source for processing
+  /// \param source  The flat buffer source
+  void addSource(const std::string &source);
+
 private:
+  /// \brief For a given flat buffer source, get a pointer to data for a given data type
+  /// \param dataType  Type of the data
+  /// \param source    Flat buffer source
+  /// \return          an pointer to the requested data container
+  const TSVectorMap *getData(DataType dataType) const;
+
+  /// \brief Check if a flat buffer source has been registered for processing
+  /// \param source  The flat buffer source
+  bool hasSource(const std::string &source) const;
+
   RdKafka::Conf *mConf;
   RdKafka::Conf *mTConf;
   RdKafka::KafkaConsumer *mConsumer;
@@ -125,14 +143,18 @@ private:
   uint64_t mEventAccept{0};
   uint64_t mEventDiscard{0};
 
-  // Thread safe histogram data storage
-  ThreadSafeVector<uint32_t, int64_t> mHistogram;
-  ThreadSafeVector<uint32_t, int64_t> mHistogramTof;
-  ThreadSafeVector<uint32_t, int64_t> mPixelIDs;
-  ThreadSafeVector<uint32_t, int64_t> mTOFs;
+  // Thread safe data storage -  use a map to handle unique data for each flat
+  // buffer source
+  TSVectorMap mHistograms;
+  TSVectorMap mHistogramTOFs;
+  TSVectorMap mPixelIDs;
+  TSVectorMap mTOFs;
 
   /// \brief configuration obtained from main()
   Configuration &mConfig;
+
+  /// \brief all registered flat buffer sources
+  std::set<std::string> mSources;
 
   /// \brief loadable Kafka-specific configuration
   std::vector<std::pair<std::string, std::string>> &mKafkaConfig;

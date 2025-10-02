@@ -28,8 +28,7 @@ using std::vector;
 
 AMOR2DTofPlot::AMOR2DTofPlot(Configuration &Config,
                              ESSConsumer &Consumer)
-    : AbstractPlot(PlotType::TOF2D, Consumer)
-    , mConfig(Config) {
+    : AbstractPlot(PlotType::TOF2D, Consumer, Config) {
   if ((not(mConfig.mGeometry.YDim <= TOF2DY) or
        (not(mConfig.mTOF.BinSize <= TOF2DX)))) {
     throw(std::runtime_error("2D TOF histogram size mismatch"));
@@ -154,8 +153,8 @@ void AMOR2DTofPlot::plotDetectorImage(bool Force) {
 
 void AMOR2DTofPlot::updateData() {
   // Get newest histogram data from Consumer
-  vector<uint32_t> PixelIDs = mConsumer.readResetPixelIDs();
-  vector<uint32_t> TOFs = mConsumer.readResetTOFs();
+  vector<uint32_t> PixelIDs = mConsumer.readData(DataType::PIXEL_ID);
+  vector<uint32_t> TOFs = mConsumer.readData(DataType::TOF);
 
   // Accumulate counts, PixelId 0 does not exist
   if (PixelIDs.size() == 0) {

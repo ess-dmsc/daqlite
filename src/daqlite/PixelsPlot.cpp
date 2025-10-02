@@ -25,8 +25,7 @@ using std::vector;
 
 PixelsPlot::PixelsPlot(Configuration &Config, ESSConsumer &Consumer,
                            Projection Proj)
-    : AbstractPlot(PlotType::PIXELS, Consumer)
-    , mConfig(Config)
+    : AbstractPlot(PlotType::PIXELS, Consumer, Config)
     , mProjection(Proj) {
   // Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &PixelsPlot::showPointToolTip);
@@ -181,7 +180,7 @@ void PixelsPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // update histogram data from consumer of worker thread
-  vector<uint32_t> Histogram = mConsumer.readResetHistogram();
+  vector<uint32_t> Histogram = mConsumer.readData(DataType::HISTOGRAM);
 
   int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
   if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {

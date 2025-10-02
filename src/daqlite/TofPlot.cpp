@@ -25,8 +25,7 @@
 using std::vector;
 
 TofPlot::TofPlot(Configuration &Config, ESSConsumer &Consumer)
-    : AbstractPlot(PlotType::TOF, Consumer)
-    , mConfig(Config) {
+    : AbstractPlot(PlotType::TOF, Consumer, Config) {
   // Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &TofPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
@@ -108,7 +107,8 @@ void TofPlot::updateData() {
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
   // Get histogram data from Consumer and clear it
-  vector<uint32_t> HistogramTof = mConsumer.readResetHistogramTof();
+  const std::string source = mConfig.mPlot.Source;
+  vector<uint32_t> HistogramTof = mConsumer.readData(DataType::HISTOGRAM_TOF, source);
 
   // Periodically clear the histogram
   int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
@@ -122,6 +122,7 @@ void TofPlot::updateData() {
     HistogramTofData[i] += HistogramTof[i];
   }
   plotDetectorImage(false);
+
   return;
 }
 
@@ -140,7 +141,7 @@ void TofPlot::showPointToolTip(QMouseEvent *event) {
   // Get the index in data store for the x coordinate
   int xCoordDataIndex = int((x - xCoordStep / 2) / xCoordStep);
 
-  // Get coulmn middle TOF value for the x coordinate
+  // Get column middle TOF value for the x coordinate
   int xCoordTofValue = int((x + xCoordStep / 2) / xCoordStep) * xCoordStep;
 
   // Get the count value from the data store
