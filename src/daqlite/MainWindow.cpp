@@ -195,11 +195,12 @@ void MainWindow::handleKafkaData(int ElapsedCountMS) {
   uint64_t EventRate = Consumer.getEventCount() * 1000ULL / ElapsedCountMS;
   uint64_t EventAccept = Consumer.getEventAccept() * 1000ULL / ElapsedCountMS;
   uint64_t EventDiscardRate = Consumer.getEventDiscard() * 1000ULL / ElapsedCountMS;
+  uint32_t BinSize = Consumer.getBinSize(mConfig.mPlot.Source);
 
   ui->lblEventRateText->setText(QString::number(EventRate));
   ui->lblAcceptRateText->setText(QString::number(EventAccept));
   ui->lblDiscardedPixelsText->setText(QString::number(EventDiscardRate));
-  ui->lblBinSizeText->setText(QString("%1 %2").arg(mConfig.mTOF.BinSize).arg(mCount));
+  ui->lblBinSizeText->setText(QString("%1 %2").arg(BinSize).arg(mCount));
 
   for (auto &Plot : Plots) {
     Plot->updateData();

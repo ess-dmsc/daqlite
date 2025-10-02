@@ -6,12 +6,22 @@
 //===----------------------------------------------------------------------===//
 
 #include <AbstractPlot.h>
+#include <Configuration.h>
+#include <ESSConsumer.h>
 
 #include <fmt/format.h>
 
+AbstractPlot::AbstractPlot(PlotType Type, ESSConsumer &Consumer, Configuration &Config)
+    : mPlotType(Type)
+    , mConsumer(Consumer)
+    , mConfig(Config) {
+    mConsumer.addSubscriber(mPlotType);
+    mConsumer.addSource(mConfig.mPlot.Source);
+  };
+
 void AbstractPlot::paintEvent(QPaintEvent *event) {
   // ---------------------------------------------------------------------------
-  // If activated, draw a zoom reactangle on top of the base plot
+  // If activated, draw a zoom rectangle on top of the base plot
 
   // Draw the base plot
   QCustomPlot::paintEvent(event);

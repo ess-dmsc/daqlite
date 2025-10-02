@@ -5,7 +5,7 @@
 ///
 /// \brief Daquiri light configuration parameters
 ///
-/// Provides some defauls values and allow loading from json file
+/// Provides default values and allow loading from json file
 //===----------------------------------------------------------------------===//
 
 #pragma once
@@ -59,9 +59,9 @@ public:
 
   // Configurable options
   struct TOFOptions {
-    unsigned int Scale{1000};     // ns -> us
-    unsigned int MaxValue{25000}; // us
-    unsigned int BinSize{512};    // bins
+    unsigned int Scale{1000};      // ns -> us
+    unsigned int MaxValue{25000};  // us
+    unsigned int BinSize{512};     // initial bin size
     bool AutoScaleX{true};
     bool AutoScaleY{true};
   };
@@ -95,6 +95,7 @@ public:
     std::string WindowTitle{"Daquiri Lite - Daqlite"};
     std::string PlotTitle{""};
     std::string XAxis{""};
+    std::string Source{""};
 
     int Width{600};             // Default window width
     int Height{400};            // Default window height

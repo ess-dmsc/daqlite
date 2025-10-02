@@ -51,7 +51,7 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
   }
 
   // Handy utility for adding a plot to a configuration
-  auto adder = [](const nlohmann::json &common, const nlohmann::json &plot) {
+  auto addPlot = [](const nlohmann::json &common, const nlohmann::json &plot) {
     // Copy the common state and add a plot
     nlohmann::json state = common;
     state["plot"] = plot;
@@ -66,14 +66,14 @@ vector<Configuration> Configuration::getConfigurations(const std::string &Path) 
   // ---------------------------------------------------------------------------
   // Single plot
   if (MainJSON.contains("plot")) {
-    Configurations.push_back(adder(Common, MainJSON["plot"]));
+    Configurations.push_back(addPlot(Common, MainJSON["plot"]));
   }
 
   // ---------------------------------------------------------------------------
   // Multiple plots
   if (MainJSON.contains("plots")) {
     for (const auto& [key, plot] : MainJSON["plots"].items()) {
-      Configurations.push_back(adder(Common, plot));
+      Configurations.push_back(addPlot(Common, plot));
     }
   }
 
@@ -139,7 +139,6 @@ void Configuration::getKafkaConfig() {
 
 void Configuration::getPlotConfig() {
   // Plot options - all are optional
-  std::string plot;
   mPlot.Plot = getVal("plot", "plot_type", mPlot.Plot.asString());
 
   mPlot.ClearPeriodic = getVal("plot", "clear_periodic", mPlot.ClearPeriodic);
@@ -149,6 +148,7 @@ void Configuration::getPlotConfig() {
   mPlot.ColorGradient = getVal("plot", "color_gradient", mPlot.ColorGradient);
   mPlot.InvertGradient = getVal("plot", "invert_gradient", mPlot.InvertGradient);
   mPlot.LogScale = getVal("plot", "log_scale", mPlot.LogScale);
+  mPlot.Source = getVal("plot", "source", mPlot.Source);
 
   // Window options - all are optional
   mPlot.WindowTitle = getVal("plot", "window_title", mPlot.WindowTitle);

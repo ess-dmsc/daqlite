@@ -48,9 +48,6 @@ private:
   // QCustomPlot variables
   QCPGraph *mGraph{nullptr};
 
-  /// \brief configuration obtained from main()
-  Configuration &mConfig;
-
   std::vector<uint32_t> HistogramYAxisValues;
   std::vector<uint32_t> HistogramXAxisValues;
 

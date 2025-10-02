@@ -62,7 +62,7 @@ public:
 
   /// \brief Detect if the plot window is closed
   /// \param event Close event
-  void closeEvent(QCloseEvent*event) override;
+  void closeEvent(QCloseEvent *event) override;
 
 public slots:
   void handleExitButton();

@@ -53,9 +53,6 @@ private:
   QCPColorScale *mColorScale{nullptr};
   QCPColorMap *mColorMap{nullptr};
 
-  /// \brief configuration obtained from main()
-  Configuration &mConfig;
-
   /// \brief allocated according to config in constructor
   #define TOF2DX 512
   #define TOF2DY 512

@@ -8,12 +8,15 @@
 
 #pragma once
 
-#include <ESSConsumer.h>
 #include <types/PlotType.h>
 
 #include <QPlot/QPlot.h>
 
 #include <optional>
+
+// Forward declarations
+class Configuration;
+class ESSConsumer;
 
 class AbstractPlot : public QCustomPlot {
   Q_OBJECT
@@ -29,17 +32,16 @@ public:
 
 protected:
   // AbstractPlot is abstract and can ONLY be instantiated from a derived class
-  AbstractPlot(PlotType Type, ESSConsumer &Consumer)
-    : mPlotType(Type)
-    , mConsumer(Consumer) {
-    mConsumer.addSubscriber(mPlotType);
-  };
+  AbstractPlot(PlotType Type, ESSConsumer &Consumer, Configuration &Config);
 
   /// \brief Type plot type - Pixel, Histogram, etc.
   PlotType mPlotType;
 
   /// \brief Consumer thread used to deliver data to the plot
   ESSConsumer &mConsumer;
+
+  /// \brief Reference to main Configuration
+  Configuration &mConfig;
 
   /// \brief Store default axis ranges.
   void showEvent(QShowEvent *) override;

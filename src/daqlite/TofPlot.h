@@ -51,9 +51,6 @@ private:
   // QCustomPlot variables
   QCPGraph *mGraph{nullptr};
 
-  /// \brief configuration obtained from main()
-  Configuration &mConfig;
-
   std::vector<uint32_t> HistogramTofData;
 
   /// \brief for calculating x, y, z from pixelid
