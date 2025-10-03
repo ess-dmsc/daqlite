@@ -1,12 +1,12 @@
 [requires]
 fmt/10.1.1        #bump to 8.1.1 requires upgrade of spdlog as well
-gtest/1.10.0
+gtest/1.15.0
+h5cpp/0.7.1@ess-dmsc/stable
 librdkafka/2.0.2#47048b3f05407bab726e359b27740c46
-logical-geometry/705ea61@ess-dmsc/stable
+logical-geometry/1.1.0@ess-dmsc/stable
 nlohmann_json/3.10.5
 qplot/4029c0397121d8bd@ess-dmsc/stable
-streaming-data-types/13dd32d@ess-dmsc/stable
-h5cpp/0.7.1@ess-dmsc/stable
+streaming-data-types/3624504@ess-dmsc/stable
 zlib/1.3.1
 
 [generators]
@@ -16,14 +16,14 @@ virtualbuildenv
 virtualrunenv
 
 [options]
+date:use_system_tz_db=True
+flatbuffers:shared=True
 gtest:shared=False
+h5cpp:with_boost=False
+hdf5:shared=True
+librdkafka:sasl=True
 librdkafka:shared=False
 librdkafka:ssl=True
-librdkafka:sasl=True
-flatbuffers:shared=True
-date:use_system_tz_db=True
-hdf5:shared=True
-h5cpp:with_boost=False
 
 [imports]
 ., *.dylib* -> ./lib @ keep_path=False

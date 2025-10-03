@@ -126,8 +126,8 @@ public:
 private:
   /// \brief For a given flat buffer source, get a pointer to data for a given data type
   /// \param dataType  Type of the data
-  /// \param source    Flat buffer source
-  /// \return          an pointer to the requested data container
+  /// \return          a pointer to the requested data container or nullptr if
+  ///                  no data source could be found
   const TSVectorMap *getData(DataType dataType) const;
 
   /// \brief Check if a flat buffer source has been registered for processing

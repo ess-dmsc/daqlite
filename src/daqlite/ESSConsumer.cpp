@@ -284,7 +284,7 @@ bool ESSConsumer::handleMessage(RdKafka::Message *Message) {
 // Copied from daquiri - added seed based on pid
 string ESSConsumer::randomGroupString(size_t length) {
   srand(getpid());
-  auto randchar = []() -> char {
+  auto randomChar = []() -> char {
     const char charset[] = "0123456789"
                            "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                            "abcdefghijklmnopqrstuvwxyz";
@@ -292,7 +292,7 @@ string ESSConsumer::randomGroupString(size_t length) {
     return charset[rand() % max_index];
   };
   string str(length, 0);
-  std::generate_n(str.begin(), length, randchar);
+  std::generate_n(str.begin(), length, randomChar);
   return str;
 }
 
