@@ -12,9 +12,10 @@
 #include <fmt/format.h>
 
 AbstractPlot::AbstractPlot(PlotType Type, ESSConsumer &Consumer, Configuration &Config)
-    : mPlotType(Type)
-    , mConsumer(Consumer)
-    , mConfig(Config) {
+    : mConsumer(Consumer)
+    , mConfig(Config)
+    , mPlotType(Type)
+    , mZoomRectActive(false) {
     mConsumer.addSubscriber(mPlotType);
     mConsumer.addSource(mConfig.mPlot.Source);
   };

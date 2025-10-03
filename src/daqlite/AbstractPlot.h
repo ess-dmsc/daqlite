@@ -34,15 +34,13 @@ protected:
   // AbstractPlot is abstract and can ONLY be instantiated from a derived class
   AbstractPlot(PlotType Type, ESSConsumer &Consumer, Configuration &Config);
 
-  /// \brief Type plot type - Pixel, Histogram, etc.
-  PlotType mPlotType;
-
   /// \brief Consumer thread used to deliver data to the plot
   ESSConsumer &mConsumer;
 
   /// \brief Reference to main Configuration
   Configuration &mConfig;
 
+private:
   /// \brief Store default axis ranges.
   void showEvent(QShowEvent *) override;
 
@@ -66,8 +64,11 @@ protected:
   /// \param event Mouse event
   void mouseReleaseEvent(QMouseEvent *event) override;
 
+  /// \brief Type plot type - Pixel, Histogram, etc.
+  PlotType mPlotType;
+
   /// Zoom rectangle vars
-  bool mZoomRectActive{false};
+  bool mZoomRectActive;
 
   /// \brief First zoom rectangle corner
   std::optional<QPointF> mPoint0;
