@@ -1,7 +1,7 @@
 {
   "kafka": {
     "broker"                   : "10.70.6.62:9092",
-    "topic"                    : "bifrost_beam_monitor",
+    "topic"                    : "beam_monitor",
 
     "message.max.bytes"        : "10000000",
     "fetch.message.max.bytes"  : "10000000",
@@ -11,23 +11,23 @@
   },
 
   "geometry": {
-    "xdim"   : 10,
-    "ydim"   : 10,
+    "xdim"   : 1000,
+    "ydim"   : 1000,
     "zdim"   : 1,
-    "offset" : 1
+    "offset" : 0
   },
 
   "tof": {
     "scale"     : 1000,
-    "max_value" : 71430,
-    "bin_size"  : 1024
+    "max_value" : 71428,
+    "bin_size"  : 768
   },
 
-  "plot": {
+  "cbm2_plot": {
     "plot_type"              : "histogram",
     "plot_title"             : "Histogram",
-    "window_title"           : "BIFROST IBM CBM2",
-    "source"                 : "cbm2",
+    "window_title"           : "BIFROST IBM CBM1",
+    "source"                 : "cbm1",
 
     "clear_interval_seconds" : 30,
     "clear_periodic"         : false,
