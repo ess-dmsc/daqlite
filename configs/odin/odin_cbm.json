@@ -1,7 +1,7 @@
 {
   "kafka": {
     "broker"                   : "10.70.6.62:9092",
-    "topic"                    : "bifrost_beam_monitor",
+    "topic"                    : "odin_beam_monitor",
 
     "message.max.bytes"        : "10000000",
     "fetch.message.max.bytes"  : "10000000",
@@ -25,9 +25,9 @@
 
   "plots": {
     "cbm1_plot": {
-      "plot_type"              : "tof",
-      "plot_title"             : "Events",
-      "window_title"           : "BIFROST 0D CBM1",
+      "plot_type"              : "histogram",
+      "plot_title"             : "Histogram",
+      "window_title"           : "ODIN IBM CBM1",
       "source"                 : "cbm1",
 
       "clear_interval_seconds" : 30,
@@ -43,7 +43,7 @@
     "cbm2_plot": {
       "plot_type"              : "histogram",
       "plot_title"             : "Histogram",
-      "window_title"           : "BIFROST IBM CBM2",
+      "window_title"           : "ODIN IBM CBM2",
       "source"                 : "cbm2",
 
       "clear_interval_seconds" : 30,
@@ -59,7 +59,7 @@
     "cbm3_plot": {
       "plot_type"              : "histogram",
       "plot_title"             : "Histogram",
-      "window_title"           : "BIFROST IBM CBM3",
+      "window_title"           : "ODIN IBM CBM3",
       "source"                 : "cbm3",
 
       "clear_interval_seconds" : 30,
