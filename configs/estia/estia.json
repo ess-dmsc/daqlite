@@ -11,9 +11,9 @@
 
   "geometry": {
     "xdim"   : 1536,
-    "ydim"   : 128,
+    "ydim"   : 64,
     "zdim"   : 1,
-    "offset" : 0
+    "offset" : 98304
   },
 
   "tof": {
