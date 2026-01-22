@@ -13,4 +13,5 @@ else
     DAQLITE_CONFIG="../configs"
 fi
 
-$DAQLITE_HOME/bin/daqlite $BROKER -f $DAQLITE_CONFIG/estia/estia.json $KAFKA_CONFIG
+$DAQLITE_HOME/bin/daqlite $BROKER -f $DAQLITE_CONFIG/estia/estia.json $KAFKA_CONFIG &
+$DAQLITE_HOME/bin/daqlite $BROKER -f $DAQLITE_CONFIG/estia/estia_cbm.json $KAFKA_CONFIG
