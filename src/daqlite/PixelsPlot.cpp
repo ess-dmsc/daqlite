@@ -179,8 +179,9 @@ void PixelsPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
-  // update histogram data from consumer of worker thread
-  vector<uint32_t> Histogram = mConsumer.readData(DataType::HISTOGRAM);
+  // update histogram data from Consumer according to the source specified in the config
+  const std::string source = mConfig.mPlot.Source;
+  vector<uint32_t> Histogram = mConsumer.readData(DataType::HISTOGRAM, source);
 
   int64_t nsBetweenClear = 1000000000LL * mConfig.mPlot.ClearEverySeconds;
   if (mConfig.mPlot.ClearPeriodic and (elapsed.count() >= nsBetweenClear)) {
