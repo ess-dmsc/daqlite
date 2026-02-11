@@ -1,7 +1,7 @@
 {
   "kafka": {
     "broker"                   : "10.70.6.62:9092",
-    "topic"                    : "bifrost_beam_monitor",
+    "topic"                    : "loki_beam_monitor",
 
     "message.max.bytes"        : "10000000",
     "fetch.message.max.bytes"  : "10000000",
@@ -11,8 +11,8 @@
   },
 
   "geometry": {
-    "xdim"   : 32,
-    "ydim"   : 32,
+    "xdim"   : 3,
+    "ydim"   : 3,
     "zdim"   : 1,
     "offset" : 0
   },
@@ -24,10 +24,26 @@
   },
 
   "plots": {
+    "cbm0_plot": {
+      "plot_type"              : "tof",
+      "plot_title"             : "Events",
+      "window_title"           : "LOKI 0D CBM0",
+      "source"                 : "cbm0",
+
+      "clear_interval_seconds" : 30,
+      "clear_periodic"         : false,
+      "color_gradient"         : "hot",
+      "interpolate_pixels"     : false,
+      "invert_gradient"        : false,
+      "log_scale"              : false,
+      "window_height"          : 400,
+      "window_width"           : 1200
+    },
+
     "cbm1_plot": {
       "plot_type"              : "tof",
       "plot_title"             : "Events",
-      "window_title"           : "BIFROST 0D CBM1",
+      "window_title"           : "LOKI 0D CBM1",
       "source"                 : "cbm1",
 
       "clear_interval_seconds" : 30,
@@ -41,9 +57,9 @@
     },
 
     "cbm2_plot": {
-      "plot_type"              : "histogram",
-      "plot_title"             : "Histogram",
-      "window_title"           : "BIFROST IBM CBM2",
+      "plot_type"              : "tof",
+      "plot_title"             : "Events",
+      "window_title"           : "LOKI 0D CBM2",
       "source"                 : "cbm2",
 
       "clear_interval_seconds" : 30,
@@ -56,10 +72,26 @@
       "window_width"           : 1200
     },
 
+    "cbm4_plot": {
+      "plot_type"              : "tof",
+      "plot_title"             : "Events",
+      "window_title"           : "LOKI 0D CBM4",
+      "source"                 : "cbm4",
+
+      "clear_interval_seconds" : 30,
+      "clear_periodic"         : false,
+      "color_gradient"         : "hot",
+      "interpolate_pixels"     : false,
+      "invert_gradient"        : false,
+      "log_scale"              : false,
+      "window_height"          : 400,
+      "window_width"           : 1200
+    },
+
     "cbm3_plot": {
-      "plot_type"              : "histogram",
-      "plot_title"             : "Histogram",
-      "window_title"           : "BIFROST IBM CBM3",
+      "plot_type"              : "tof",
+      "plot_title"             : "Events",
+      "window_title"           : "LOKI 0D CBM3",
       "source"                 : "cbm3",
 
       "clear_interval_seconds" : 30,
@@ -71,49 +103,20 @@
       "window_height"          : 400,
       "window_width"           : 1200
     },
-    "cbm4_pixel": {
+
+    "pixel": {
       "plot_type"              : "pixels",
-      "window_title"           : "BIFROST CASCADE 2D",
+      "window_title"           : "LOKI PIXELS",
       "plot_title"             : "pixels",
-      "source"                 : "cbm4",
+      
       "clear_periodic"         : false,
       "clear_interval_seconds" : 30,
       "interpolate_pixels"     : false,
       "color_gradient"         : "hot",
       "invert_gradient"        : false,
       "log_scale"              : true,
-      "window_height"          : 712,
-      "window_width"           : 712
-    },
-
-    "cbm4-tof": {
-      "plot_type"              : "tof",
-      "window_title"           : "BIFROST CASCADE ToF",
-      "plot_title"             : "ToF",
-      "source"                 : "cbm4",
-      "clear_periodic"         : false,
-      "clear_interval_seconds" : 30,
-      "interpolate_pixels"     : false,
-      "color_gradient"         : "hot",
-      "invert_gradient"        : false,
-      "log_scale"              : false,
-      "window_height"          : 400,
-      "window_width"           : 1200
-    },
-    "cbm5_plot": {
-      "plot_type"              : "tof",
-      "plot_title"             : "Events",
-      "window_title"           : "BIFROST BRAGG PEAK",
-      "source"                 : "cbm5",
-
-      "clear_interval_seconds" : 30,
-      "clear_periodic"         : false,
-      "color_gradient"         : "hot",
-      "interpolate_pixels"     : false,
-      "invert_gradient"        : false,
-      "log_scale"              : false,
-      "window_height"          : 400,
-      "window_width"           : 1200
+      "window_height"          : 344,
+      "window_width"           : 344
     }
   }
 }

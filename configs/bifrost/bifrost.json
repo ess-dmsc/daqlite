@@ -19,8 +19,8 @@
 
   "tof": {
     "scale"     : 1000,
-    "max_value" : 2000,
-    "bin_size"  : 1024
+    "max_value" : 71438,
+    "bin_size"  : 744
   },
 
   "plots": {
@@ -46,8 +46,8 @@
       "color_gradient"         : "hot",
       "invert_gradient"        : false,
       "log_scale"              : false,
-      "window_height"          : 350,
-      "window_width"           : 750
+      "window_height"          : 712,
+      "window_width"           : 712
     }
   }
 }
