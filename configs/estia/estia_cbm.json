@@ -18,8 +18,8 @@
 
   "tof": {
     "scale"     : 1000,
-    "max_value" : 71428,
-    "bin_size"  : 768
+    "max_value" : 71438,
+    "bin_size"  : 744
   },
 
   "plots": {
