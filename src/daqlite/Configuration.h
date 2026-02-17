@@ -23,7 +23,9 @@ public:
   /// \brief constructor using default values
   /// Default are likely to be unsuitable and this should probably
   /// always be followed by a call to fromJsonFile()
-  Configuration(){}
+  Configuration() {}
+
+  static constexpr std::string_view EMPTY_SOURCE{"__EMPTY_SOURCE__"};
 
   /// \brief loads configuration from JSON file
   void fromJsonObj(const nlohmann::json &obj);
@@ -34,7 +36,8 @@ public:
   /// \brief loads configuration from JSON file
   static std::vector<Configuration> getConfigurations(const std::string &path);
 
-  static void prettyJSON(nlohmann::json &obj, const std::string &header="", int indent=4);
+  static void prettyJSON(nlohmann::json &obj, const std::string &header = "",
+                         int indent = 4);
 
   // get the Kafka related config options
   void getKafkaConfig();
@@ -59,9 +62,9 @@ public:
 
   // Configurable options
   struct TOFOptions {
-    unsigned int Scale{1000};      // ns -> us
-    unsigned int MaxValue{25000};  // us
-    unsigned int BinSize{512};     // initial bin size
+    unsigned int Scale{1000};     // ns -> us
+    unsigned int MaxValue{25000}; // us
+    unsigned int BinSize{512};    // initial bin size
     bool AutoScaleX{true};
     bool AutoScaleY{true};
   };
@@ -76,7 +79,7 @@ public:
   struct KafkaOptions {
     std::string Topic{"nmx_detector"};
     std::string Broker{"172.17.5.38:9092"};
-    std::string Source{""};
+    std::string Source{Configuration::EMPTY_SOURCE};
     std::string MessageMaxBytes{"10000000"};
     std::string FetchMessageMaxBytes{"10000000"};
     std::string ReplicaFetchMaxBytes{"10000000"};
@@ -95,7 +98,7 @@ public:
     std::string WindowTitle{"Daquiri Lite - Daqlite"};
     std::string PlotTitle{""};
     std::string XAxis{""};
-    std::string Source{""};
+    std::string Source{Configuration::EMPTY_SOURCE};
 
     int Width{600};             // Default window width
     int Height{400};            // Default window height

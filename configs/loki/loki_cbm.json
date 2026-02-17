@@ -27,22 +27,6 @@
     "cbm0_plot": {
       "plot_type"              : "tof",
       "plot_title"             : "Events",
-      "window_title"           : "LOKI 0D CBM0",
-      "source"                 : "cbm0",
-
-      "clear_interval_seconds" : 30,
-      "clear_periodic"         : false,
-      "color_gradient"         : "hot",
-      "interpolate_pixels"     : false,
-      "invert_gradient"        : false,
-      "log_scale"              : false,
-      "window_height"          : 400,
-      "window_width"           : 1200
-    },
-
-    "cbm1_plot": {
-      "plot_type"              : "tof",
-      "plot_title"             : "Events",
       "window_title"           : "LOKI 0D CBM1",
       "source"                 : "cbm1",
 
@@ -56,7 +40,7 @@
       "window_width"           : 1200
     },
 
-    "cbm2_plot": {
+    "cbm1_plot": {
       "plot_type"              : "tof",
       "plot_title"             : "Events",
       "window_title"           : "LOKI 0D CBM2",
@@ -72,11 +56,27 @@
       "window_width"           : 1200
     },
 
+    "cbm2_plot": {
+      "plot_type"              : "tof",
+      "plot_title"             : "Events",
+      "window_title"           : "LOKI 0D CBM3",
+      "source"                 : "cbm3",
+
+      "clear_interval_seconds" : 30,
+      "clear_periodic"         : false,
+      "color_gradient"         : "hot",
+      "interpolate_pixels"     : false,
+      "invert_gradient"        : false,
+      "log_scale"              : false,
+      "window_height"          : 400,
+      "window_width"           : 1200
+    },
+
     "cbm4_plot": {
       "plot_type"              : "tof",
       "plot_title"             : "Events",
-      "window_title"           : "LOKI 0D CBM4",
-      "source"                 : "cbm4",
+      "window_title"           : "LOKI 0D CBM5",
+      "source"                 : "cbm5",
 
       "clear_interval_seconds" : 30,
       "clear_periodic"         : false,
@@ -91,8 +91,8 @@
     "cbm3_plot": {
       "plot_type"              : "tof",
       "plot_title"             : "Events",
-      "window_title"           : "LOKI 0D CBM3",
-      "source"                 : "cbm3",
+      "window_title"           : "LOKI 0D CBM4",
+      "source"                 : "cbm4",
 
       "clear_interval_seconds" : 30,
       "clear_periodic"         : false,
