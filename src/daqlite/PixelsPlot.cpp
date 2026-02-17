@@ -1,4 +1,4 @@
-// Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2020 - 2026 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file PixelsPlot.cpp
@@ -11,23 +11,26 @@
 #include <Configuration.h>
 #include <ESSConsumer.h>
 
-#include <types/PlotType.h>
-#include <types/Gradients.h>
 #include <logical_geometry/ESSGeometry.h>
+#include <types/Gradients.h>
+#include <types/PlotType.h>
 
-#include <fmt/format.h>
 #include <algorithm>
+#include <fmt/format.h>
 #include <ratio>
 #include <string>
 
 using std::string;
 using std::vector;
 
+// clang-format off
 PixelsPlot::PixelsPlot(Configuration &Config, ESSConsumer &Consumer,
-                           Projection Proj)
+                       Projection Proj)
     : AbstractPlot(PlotType::PIXELS, Consumer, Config)
     , mProjection(Proj) {
-  // Register callback functions for events
+// clang-format on
+
+// Register callback functions for events
   connect(this, &QCustomPlot::mouseMove, this, &PixelsPlot::showPointToolTip);
   setAttribute(Qt::WA_AlwaysShowToolTips);
 
@@ -117,9 +120,9 @@ void PixelsPlot::setCustomParameters() {
 
 // Try the user supplied gradient name, then fall back to 'hot' and
 // provide a list of options
-QCPColorGradient
-PixelsPlot::getColorGradient(const std::string &GradientName) {
-  if (const auto search = GRADIENTS.find(GradientName); search != GRADIENTS.end()) {
+QCPColorGradient PixelsPlot::getColorGradient(const std::string &GradientName) {
+  if (const auto search = GRADIENTS.find(GradientName);
+      search != GRADIENTS.end()) {
     return search->second;
   } else {
     fmt::print("Gradient {} not found, using 'hot' instead.\n", GradientName);
@@ -179,7 +182,8 @@ void PixelsPlot::updateData() {
   auto t2 = std::chrono::high_resolution_clock::now();
   std::chrono::duration<int64_t, std::nano> elapsed = t2 - t1;
 
-  // update histogram data from Consumer according to the source specified in the config
+  // update histogram data from Consumer according to the source specified in
+  // the config
   const std::string source = mConfig.mPlot.Source;
   vector<uint32_t> Histogram = mConsumer.readData(DataType::HISTOGRAM, source);
 

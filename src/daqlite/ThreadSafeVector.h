@@ -1,4 +1,4 @@
-// Copyright (C) 2024 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2024 - 2026 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file ThreadSafeVector.h
@@ -33,9 +33,24 @@ public:
     mVector.push_back(value);
   }
 
+  /// \brief Constructs an element in-place at the end of the vector.
+  /// \tparam Args Types of arguments to forward to the element constructor.
+  /// \param args Arguments to forward to the element constructor.
+  template <typename... Args> void emplace_back(Args &&...args) {
+    std::lock_guard<std::mutex> lock(mMutex);
+    mVector.emplace_back(std::forward<Args>(args)...);
+  }
+
+  /// \brief Reserves storage for at least the specified number of elements.
+  /// \param capacity The number of elements to reserve space for.
+  void reserve(const size_t capacity) {
+    std::lock_guard<std::mutex> lock(mMutex);
+    mVector.reserve(capacity);
+  }
+
   /// \brief Retrieves a copy of the vector.
   /// \return A copy of the vector.
-  std::vector<DataType> get() const {
+  inline std::vector<DataType> get() const {
     std::lock_guard<std::mutex> lock(mMutex);
     return mVector;
   }
@@ -43,14 +58,22 @@ public:
   /// \brief Retrieves the element at the specified index.
   /// \param index The index of the element to retrieve.
   /// \return The element at the specified index.
-  DataType at(const size_t index) const {
+  inline DataType at(size_t index) const {
     std::lock_guard<std::mutex> lock(mMutex);
     return mVector.at(index);
   }
 
+  /// \brief Retrieves the element at the specified index using the subscript
+  /// operator. \param index The index of the element to retrieve. \return The
+  /// element at the specified index.
+  inline DataType operator[](size_t index) const {
+    std::lock_guard<std::mutex> lock(mMutex);
+    return mVector[index];
+  }
+
   /// \brief Retrieves the number of elements in the vector.
   /// \return The number of elements in the vector.
-  size_t size() const {
+  inline size_t size() const {
     std::lock_guard<std::mutex> lock(mMutex);
     return mVector.size();
   }
@@ -109,6 +132,16 @@ public:
     return *this;
   }
 
+  /// \brief Assigns values from another vector (move semantics).
+  /// \param other The vector containing values to be moved.
+  /// \return A reference to this vector.
+  ThreadSafeVector<DataType, OtherDataType> &
+  operator=(std::vector<DataType> &&other) noexcept {
+    std::lock_guard<std::mutex> lock(mMutex);
+    mVector = std::move(other);
+    return *this;
+  }
+
   /// \brief Assigns values from another vector of a different type to this
   /// vector. \param other The vector containing values to be assigned. \return
   /// A reference to this vector.
@@ -124,7 +157,7 @@ public:
 
   /// \brief Converts this vector to a std::vector.
   /// \return A copy of the vector as a std::vector.
-  operator std::vector<DataType>() const {
+  inline operator std::vector<DataType>() const {
     std::lock_guard<std::mutex> lock(mMutex);
     return mVector;
   }

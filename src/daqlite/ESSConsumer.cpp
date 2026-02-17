@@ -1,4 +1,4 @@
-// Copyright (C) 2020 - 2025 European Spallation Source, ERIC. See LICENSE file
+// Copyright (C) 2020 - 2026 European Spallation Source, ERIC. See LICENSE file
 //===----------------------------------------------------------------------===//
 ///
 /// \file ESSConsumer.cpp
@@ -7,14 +7,14 @@
 
 #include <ESSConsumer.h>
 
-#include <types/PlotType.h>
 #include <Configuration.h>
 #include <ThreadSafeVector.h>
+#include <types/PlotType.h>
 
-#include <flatbuffers/flatbuffers.h>
 #include <da00_dataarray_generated.h>
 #include <ev42_events_generated.h>
 #include <ev44_events_generated.h>
+#include <flatbuffers/flatbuffers.h>
 
 #include <algorithm>
 #include <assert.h>
@@ -30,9 +30,9 @@
 using std::string;
 using std::vector;
 
-ESSConsumer::ESSConsumer(
-    Configuration &Config,
-    vector<std::pair<string, string>> &KafkaConfig)
+// clang-format off
+ESSConsumer::ESSConsumer(Configuration &Config,
+                         vector<std::pair<string, string>> &KafkaConfig)
     : mConfig(Config)
     , mKafkaConfig(KafkaConfig) {
   auto &geom = mConfig.mGeometry;
@@ -45,11 +45,20 @@ ESSConsumer::ESSConsumer(
   mConsumer = subscribeTopic();
   assert(mConsumer != nullptr);
 
-  for (DataType t: {DataType::NONE, DataType::ANY, DataType::TOF, DataType::HISTOGRAM, DataType::HISTOGRAM_TOF, DataType::PIXEL_ID}) {
+  const auto types = {
+    DataType::NONE, 
+    DataType::ANY, 
+    DataType::TOF, 
+    DataType::HISTOGRAM,
+    DataType::HISTOGRAM_TOF, 
+    DataType::PIXEL_ID
+  };
+  for (DataType t : types) {
     mSubscriptionCount[t] = 0;
     mDeliveryCount[t] = 0;
   }
 }
+// clang-format on
 
 RdKafka::KafkaConsumer *ESSConsumer::subscribeTopic() const {
   auto mConf = RdKafka::Conf::create(RdKafka::Conf::CONF_GLOBAL);
@@ -103,8 +112,11 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  // If sources has been registered, only process messages for those sources
-  const std::string source = mSources.empty() ? "" : EvMsg->source_name()->str();
+  // Determine source key for data storage
+  // If no sources registered, use empty string for combined storage
+  // Otherwise, use the message's source name
+  const std::string source =
+      mSources.empty() ? "" : EvMsg->source_name()->str();
   if (!mSources.empty() && !hasSource(source)) {
     return 0;
   }
@@ -151,8 +163,11 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  // If sources has been registered, only process messages for those sources
-  const std::string source = mSources.empty() ? "" : EvMsg->source_name()->str();
+  // Determine source key for data storage
+  // If no sources registered, use empty string for combined storage
+  // Otherwise, use the message's source name
+  const std::string source =
+      mSources.empty() ? "" : EvMsg->source_name()->str();
   if (!mSources.empty() && !hasSource(source)) {
     return 0;
   }
@@ -194,8 +209,11 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
     return 0;
   }
 
-  // If sources has been registered, only process messages for those sources
-  const std::string source = mSources.empty() ? "" : EvMsg->source_name()->str();
+  // Determine source key for data storage
+  // If no sources registered, use empty string for combined storage
+  // Otherwise, use the message's source name
+  const std::string source =
+      mSources.empty() ? "" : EvMsg->source_name()->str();
   if (!mSources.empty() && !hasSource(source)) {
     return 0;
   }
@@ -349,51 +367,76 @@ std::unique_ptr<RdKafka::Message> ESSConsumer::consume() {
 }
 
 const ESSConsumer::TSVectorMap *ESSConsumer::getData(DataType dataType) const {
-  switch (dataType)
-  {
-    case DataType::HISTOGRAM:
-      return &mHistograms;
+  switch (dataType) {
+  case DataType::HISTOGRAM:
+    return &mHistograms;
 
-    case DataType::HISTOGRAM_TOF:
-      return &mHistogramTOFs;
+  case DataType::HISTOGRAM_TOF:
+    return &mHistogramTOFs;
 
-    case DataType::PIXEL_ID:
-      return &mPixelIDs;
+  case DataType::PIXEL_ID:
+    return &mPixelIDs;
 
-    case DataType::TOF:
-      return &mTOFs;
+  case DataType::TOF:
+    return &mTOFs;
 
-    default:
-      assert(false && "Invalid data type");
-      return nullptr;
+  default:
+    assert(false && "Invalid data type");
+    return nullptr;
   }
 }
 
-vector<uint32_t> ESSConsumer::readData(DataType dataType, const std::string &source, bool reset) {
+vector<uint32_t> ESSConsumer::readData(DataType dataType,
+                                       const std::string &source, bool reset) {
   // Get non-const pointer to data container for the specified data type
-  TSVectorMap *dataMap = const_cast<TSVectorMap*>(getData(dataType));
+  TSVectorMap *dataMap = const_cast<TSVectorMap *>(getData(dataType));
 
   // Check that data exists
   if (dataMap == nullptr) {
     return {};
   }
 
-  // Check that data exists for the requested source
-  const auto iter = dataMap->find(source);
-  if (iter == dataMap->cend()) {
-    return {};
+  vector<uint32_t> result;
+
+  auto iter = dataMap->begin();
+
+  // If a source is specified, get data for that source only
+  if (source != Configuration::EMPTY_SOURCE) {
+    // Check that data exists for the requested source
+    iter = dataMap->find(source);
+    if (iter == dataMap->cend()) {
+      return {};
+    }
+
+    // Get data copy
+    result = iter->second;
+  } else {
+    // If no source is specified, combine data from all sources element-wise
+    // This adds values at the same index across all source vectors
+    for (const auto &[key, data] : *dataMap) {
+      if (result.empty()) {
+        result = data;
+      } else {
+        // Resize result if necessary to accommodate larger data
+        if (data.size() > result.size()) {
+          result.resize(data.size(), 0);
+        }
+        // Add values element-wise
+        for (size_t i = 0; i < data.size(); i++) {
+          result[i] += data[i];
+        }
+      }
+    }
   }
 
-  // Get data copy and clear if requested
-  vector<uint32_t> result = iter->second;
-  if (reset && checkDelivery(dataType)) {
-    iter->second.clear();
-  }
+  // Clear data if reset is requested and all deliveries have been made
+  resetDataIfNeeded(dataMap, dataType, source, reset);
 
   return result;
 }
 
-size_t ESSConsumer::getDataSize(DataType dataType, const std::string &source) const {
+size_t ESSConsumer::getDataSize(DataType dataType,
+                                const std::string &source) const {
   // Get pointer to data container for the specified data type
   const TSVectorMap *dataMap = getData(dataType);
 
@@ -449,55 +492,53 @@ void ESSConsumer::addSubscriber(PlotType Type, bool add) {
   mSubscriptionCount[DataType::ANY] += increment;
 
   // Register or de-register data types for the plot type
-  switch (Type)
-  {
-    case PlotType::TOF:
-      mSubscriptionCount[DataType::HISTOGRAM_TOF] += increment;
-      break;
+  switch (Type) {
+  case PlotType::TOF:
+    mSubscriptionCount[DataType::HISTOGRAM_TOF] += increment;
+    break;
 
-    case PlotType::TOF2D:
-      mSubscriptionCount[DataType::PIXEL_ID] += increment;
-      mSubscriptionCount[DataType::TOF] += increment;
-      break;
+  case PlotType::TOF2D:
+    mSubscriptionCount[DataType::PIXEL_ID] += increment;
+    mSubscriptionCount[DataType::TOF] += increment;
+    break;
 
-    case PlotType::PIXELS:
-      mSubscriptionCount[DataType::HISTOGRAM] += increment;
-      break;
+  case PlotType::PIXELS:
+    mSubscriptionCount[DataType::HISTOGRAM] += increment;
+    break;
 
-    case PlotType::HISTOGRAM:
-      mSubscriptionCount[DataType::HISTOGRAM] += increment;
-      break;
+  case PlotType::HISTOGRAM:
+    mSubscriptionCount[DataType::HISTOGRAM] += increment;
+    break;
 
-    default:
-      break;
+  default:
+    break;
   }
 
   // Uncomment to print the subscription state
   // for (const auto& dt: DataType::types()) {
-  //   fmt::print("ESSConsumer::addSubscriber {} {}\n", Type, mSubscriptionCount[dt]);
+  //   fmt::print("ESSConsumer::addSubscriber {} {}\n", Type,
+  //   mSubscriptionCount[dt]);
   // }
 }
 
 size_t ESSConsumer::subscriptionCount() const {
   size_t count = 0;
-  for (const auto& [key, c]: mSubscriptionCount) {
+  for (const auto &[key, c] : mSubscriptionCount) {
     count += c;
   }
 
   return count;
 }
 
-void ESSConsumer::gotEventRequest()
-{
-    mEventRequests += 1;
+void ESSConsumer::gotEventRequest() {
+  mEventRequests += 1;
 
-    // Reset if all event requests have been delivered
-    if (mEventRequests == mSubscriptionCount[DataType::ANY])
-    {
-        mEventCount = 0;
-        mEventAccept = 0;
-        mEventDiscard = 0;
+  // Reset if all event requests have been delivered
+  if (mEventRequests == mSubscriptionCount[DataType::ANY]) {
+    mEventCount = 0;
+    mEventAccept = 0;
+    mEventDiscard = 0;
 
-        mEventRequests = 0;
-    }
+    mEventRequests = 0;
+  }
 }

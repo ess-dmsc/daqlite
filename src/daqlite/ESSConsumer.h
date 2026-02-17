@@ -93,41 +93,57 @@ public:
   /// \brief Add a new plot subscribing for data
   ///
   /// \param Type  The plot type
-  void addSubscriber(PlotType Type, bool add=true);
+  void addSubscriber(PlotType Type, bool add = true);
 
   /// \return The current number of data subscriptions
   size_t subscriptionCount() const;
 
-  /// \brief Call this after pulling events data in order to clear all delivered subscriptions
+  /// \brief Call this after pulling events data in order to clear all delivered
+  /// subscriptions
   void gotEventRequest();
 
-  /// \brief For a given flat buffer source, read out data for a given data type
-  /// \param dataType  Type of the data
-  /// \param source    Flat buffer source
-  /// \param reset     If true, the internal container holding the data is cleared
-  /// \return          an integer vector containing the requested data
-  std::vector<uint32_t> readData(DataType dataType, const std::string &source="", bool reset=true);
+  /// \brief Read out data for a given data type, optionally from a specific
+  /// source
+  ///
+  /// \param dataType  Type of the data (HISTOGRAM, HISTOGRAM_TOF,
+  ///                  PIXEL_ID, or TOF)
+  /// \param source    Flat buffer source name. If empty (""), combines data
+  ///                  from all sources element-wise (adds values at the same
+  ///                  index across all sources)
+  /// \param reset     If true and all deliveries are complete, clears
+  ///                  the internal data container(s)
+  /// \return          Vector containing the requested data. Returns empty
+  ///                  vector if source not found or dataType is invalid
+  std::vector<uint32_t> readData(DataType dataType,
+                                 const std::string &source = "",
+                                 bool reset = true);
 
-  /// \brief For a given flat buffer source, get the data container size for a given data type
+  /// \brief Get the data container size for a specific source and data type
   /// \param dataType  Type of the data
-  /// \param source    Flat buffer source
-  /// \return          data container size
-  size_t getDataSize(DataType dataType, const std::string &source="") const;
+  /// \param source    Flat buffer source name (empty string returns 0)
+  /// \return          Size of the data container for the specified source, or 0
+  ///                  if not found
+  size_t getDataSize(DataType dataType, const std::string &source = "") const;
 
-  /// \brief For a given flat buffer source, get the number of bins for the TOF data container
-  /// \param source    Flat buffer source
-  /// \return          data container size
-  size_t getBinSize(const std::string &source="") const;
+  /// \brief Get the number of bins for the TOF data container
+  /// \param source    Flat buffer source name
+  /// \return          Number of bins (TOF data size - 1), or 0 if source not
+  ///                  found or empty
+  size_t getBinSize(const std::string &source = "") const;
 
   /// \brief Register a flat buffer source for processing
-  /// \param source  The flat buffer source
+  /// \param source  The flat buffer source name to register. Empty strings are
+  ///                ignored.
+  /// \note Only messages from registered sources will be processed
+  ///       when sources are defined
   void addSource(const std::string &source);
 
 private:
-  /// \brief For a given flat buffer source, get a pointer to data for a given data type
-  /// \param dataType  Type of the data
-  /// \return          a pointer to the requested data container or nullptr if
-  ///                  no data source could be found
+  /// \brief Get a pointer to the data container map for a given data type
+  /// \param dataType  Type of the data (HISTOGRAM, HISTOGRAM_TOF, PIXEL_ID, or
+  ///                  TOF)
+  /// \return          Pointer to the TSVectorMap containing data for all
+  ///                  sources, or nullptr if dataType is invalid
   const TSVectorMap *getData(DataType dataType) const;
 
   /// \brief Check if a flat buffer source has been registered for processing
@@ -184,6 +200,31 @@ private:
   uint32_t mNumPixels{0}; ///< Number of pixels
   uint32_t mMinPixel{0};  ///< Offset
   uint32_t mMaxPixel{0};  ///< Number of pixels + offset
+
+  /// \brief  Reset data if requested and all deliveries have been made
+  /// \param  dataMap   The data map to reset
+  /// \param  dataType  The data type being delivered
+  /// \param  source    Source name. If empty, resets all sources; otherwise
+  ///                   resets specific source
+  /// \param  reset     Whether to reset data
+  ///
+  /// \note Only resets data when checkDelivery confirms all subscribers have
+  /// received data
+  inline void resetDataIfNeeded(TSVectorMap *dataMap, DataType dataType,
+                                const std::string &source, bool reset) {
+    if (reset && checkDelivery(dataType)) {
+      if (!source.empty()) {
+        auto iter = dataMap->find(source);
+        if (iter != dataMap->end()) {
+          iter->second.clear();
+        }
+      } else {
+        for (auto &[key, data] : *dataMap) {
+          data.clear();
+        }
+      }
+    }
+  }
 
   /// \brief  Check if all deliveries have been made for a given data type
   /// \param  Type  Check for this data type
