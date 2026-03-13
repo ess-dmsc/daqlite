@@ -116,7 +116,8 @@ uint32_t ESSConsumer::processEV44Data(RdKafka::Message *Msg) {
   // If no sources registered, use empty string for combined storage
   // Otherwise, use the message's source name
   const std::string source =
-      mSources.empty() ? "" : EvMsg->source_name()->str();
+      mSources.empty() ? std::string(Configuration::EMPTY_SOURCE)
+                       : std::string(EvMsg->source_name()->str());
   if (!mSources.empty() && !hasSource(source)) {
     return 0;
   }
@@ -167,7 +168,8 @@ uint32_t ESSConsumer::processDA00Data(RdKafka::Message *Msg) {
   // If no sources registered, use empty string for combined storage
   // Otherwise, use the message's source name
   const std::string source =
-      mSources.empty() ? "" : EvMsg->source_name()->str();
+      mSources.empty() ? std::string(Configuration::EMPTY_SOURCE)
+                       : std::string(EvMsg->source_name()->str());
   if (!mSources.empty() && !hasSource(source)) {
     return 0;
   }
@@ -213,7 +215,8 @@ uint32_t ESSConsumer::processEV42Data(RdKafka::Message *Msg) {
   // If no sources registered, use empty string for combined storage
   // Otherwise, use the message's source name
   const std::string source =
-      mSources.empty() ? "" : EvMsg->source_name()->str();
+      mSources.empty() ? std::string(Configuration::EMPTY_SOURCE)
+                       : std::string(EvMsg->source_name()->str());
   if (!mSources.empty() && !hasSource(source)) {
     return 0;
   }
@@ -458,8 +461,8 @@ size_t ESSConsumer::getBinSize(const std::string &source) const {
 };
 
 void ESSConsumer::addSource(const std::string &source) {
-  // Empty string is ignored
-  if (source.empty()) {
+  // Empty string and EMPTY_SOURCE are ignored - they mean "no filtering"
+  if (source.empty() || source == Configuration::EMPTY_SOURCE) {
     return;
   }
 
