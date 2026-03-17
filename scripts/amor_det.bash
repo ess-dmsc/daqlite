@@ -13,6 +13,7 @@ else
     DAQLITE_CONFIG="../configs"
 fi
 
-$DAQLITE_HOME/bin/daqlite $BROKER $KAFKA_CONFIG -f $DAQLITE_CONFIG/amorb/amor.json &
-$DAQLITE_HOME/bin/daqlite $BROKER $KAFKA_CONFIG -f $DAQLITE_CONFIG/amorb/amortof.json &
-$DAQLITE_HOME/bin/daqlite $BROKER $KAFKA_CONFIG -f $DAQLITE_CONFIG/amorb/amortof2d.json
+# Amor instrument
+$DAQLITE_HOME/bin/daqlite $BROKER $KAFKA_CONFIG -f $DAQLITE_CONFIG/amor/amor.json &
+$DAQLITE_HOME/bin/daqlite $BROKER $KAFKA_CONFIG -f $DAQLITE_CONFIG/amor/amortof.json &
+$DAQLITE_HOME/bin/daqlite $BROKER $KAFKA_CONFIG -f $DAQLITE_CONFIG/amor/amortof2d.json
