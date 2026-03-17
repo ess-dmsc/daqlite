@@ -12,7 +12,7 @@ stages:
   - build
   - publish
 
-gitlab-ci-daqlite-build:
+build:
   stage: build
   image: registry.esss.lu.se/ecdc/ess-dmsc/build-nodes/ubuntu2204-qt6:1.1
   script:
@@ -29,37 +29,11 @@ gitlab-ci-daqlite-build:
       - build/licenses
     expire_in: 1 week
 
-gitlab-ci-daqlite-publish-docker-image:
-  stage: publish
-  image: docker:28-cli
-  script:
-    - |
-      docker login \
-        -u "$CI_REGISTRY_USER" \
-        -p "$CI_REGISTRY_PASSWORD" \
-        "$CI_REGISTRY"
-    - |
-      docker build \
-          --build-arg https_proxy="http://172.20.72.11:8888" \
-          --build-arg http_proxy="http://172.20.72.11:8888" \
-          -t registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_IMAGE_TAG \
-          -f .ci/docker/Dockerfile.deploy .
-    - docker push registry.esss.lu.se/ecdc/ess-dmsc/daqlite:$DOCKER_IMAGE_TAG
-  rules:
-    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
-      variables:
-        DOCKER_IMAGE_TAG: "latest"
-    - if: $CI_COMMIT_TAG
-      variables:
-        DOCKER_IMAGE_TAG: "${CI_COMMIT_TAG}"
-    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
-      when: never
-
-gitlab-ci-daqlite-publish-to-artifactory:
+publish-to-artifactory:
   stage: publish
   image: alpine/curl:latest
   dependencies:
-    - gitlab-ci-daqlite-build
+    - build
   before_script:
     - curl -fL https://install-cli.jfrog.io | sh
     - jf config add $ESS_ARTIFACTORY_ID --url=$ESS_ARTIFACTORY_URL --user=$ESS_ARTIFACTORY_ECDC_USER --password=$ESS_ARTIFACTORY_ECDC_GENERIC_TOKEN
@@ -82,10 +56,10 @@ gitlab-ci-daqlite-publish-to-artifactory:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
       when: never
 
-gitlab-ci-daqlite-trigger-efu-devtools:
+trigger-efu-devtools:
   stage: publish
   needs:
-    - gitlab-ci-daqlite-publish-to-artifactory
+    - publish-to-artifactory
   trigger:
     project: ecdc/ess-dmsc/docker-efu-devtools
     branch: main
