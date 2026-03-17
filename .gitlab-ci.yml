@@ -63,5 +63,8 @@ trigger-efu-devtools:
   trigger:
     project: ecdc/ess-dmsc/docker-efu-devtools
     branch: main
+  variables:
+    DAQLITE_BUILD_ID: "${CI_PIPELINE_IID}"
+    DAQLITE_TARBALL_PATH: "${CI_PROJECT_NAME}/${CI_DEFAULT_BRANCH}/${CI_PIPELINE_IID}/daqlite-ubuntu2204.tar.gz"
   rules:
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
